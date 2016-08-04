@@ -11,20 +11,27 @@ public class io {
 
     public static void main(String[] args){
 
-        File input_file = new File("D:\\Uni Work\\SE306\\input.dot");
+        File input_file = new File("digraph_example.dot");
         processInput(input_file);
+
     }
     public static void processInput(File input_file) {
         String line;
         try {
             BufferedReader br = new BufferedReader(new FileReader(input_file));
             br.readLine();
-            while ((line = br.readLine()) != null){
-                String[] edge = line.split("\\[");
-                System.out.println("Edge/Node: " + edge[0]);
-                if(edge.length > 1) {
-                    int weight = Integer.parseInt(edge[1].replaceAll("[^0-9]", ""));
-                    System.out.println(weight);
+            while ((line = br.readLine()) != null && !line.equals("}")){
+                String[] left = line.split("\\[");
+                String[] edge = left[0].split("->");
+                if (edge.length > 1){
+                    System.out.println("Edge from node " + edge[0] + " to node " + edge[1]); // can populate data structure using this
+                }
+                else{
+                    System.out.println("Single node: " + edge[0]);
+                }
+                if(left.length > 1) {
+                    int weight = Integer.parseInt(left[1].replaceAll("[^0-9]", ""));
+                    System.out.println(weight); // use weight to populate node weight or edge weight in data structure. 
                 }
             }
         } catch (FileNotFoundException e) {
