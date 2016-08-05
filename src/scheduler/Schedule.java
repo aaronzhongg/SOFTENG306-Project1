@@ -22,7 +22,7 @@ public class Schedule {
 		schedule = new ArrayList<Node>();
 	}
 	
-	//For testing purposes, do not use since it will most likely make an invalid schedule
+	//For initialising a list of all the nodes. Do not use this to make the schedule
 	public Schedule(DefaultGraph g){
 		schedule = new ArrayList<Node>();
 		Iterator<Node> i = g.getNodeIterator();
