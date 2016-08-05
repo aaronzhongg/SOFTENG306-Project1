@@ -1,7 +1,10 @@
 package util;
 
 import java.io.*;
+import java.util.Iterator;
+
 import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.file.FileSource;
 import org.graphstream.stream.file.FileSourceDOT;
@@ -46,7 +49,7 @@ public class io {
         FileSource fs = new FileSourceDOT();
 
         fs.addSink(g);
-
+        
         try{
             fs.readAll("digraph_example.dot");
         } catch (IOException e) {
@@ -54,6 +57,12 @@ public class io {
         } finally {
             fs.removeSink(g);
         }
+        
+        //Add processorID attribute to every node
+        for (int i = 0; i < g.getNodeCount(); i++) {
+        	g.getNode(i).addAttribute("processorID", -1);
+        }
+       
         g.display();
         return g;
     }
