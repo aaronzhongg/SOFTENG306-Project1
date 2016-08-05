@@ -13,14 +13,8 @@ import org.graphstream.stream.file.FileSourceDOT;
  */
 public class io {
 
-    public static void main(String[] args){
 
-        File input_file = new File("digraph_example.dot");
-        graphstream(input_file);
-        //processInput(input_file);
-
-    }
-    public static void processInput(File input_file) {
+    public void processInput(File input_file) {
         String line;
         try {
             BufferedReader br = new BufferedReader(new FileReader(input_file));
@@ -47,7 +41,7 @@ public class io {
 
     }
 
-    public static void graphstream(File input_file){
+    public Graph DOTParser(File input_file){
         Graph g = new DefaultGraph("g");
         FileSource fs = new FileSourceDOT();
 
@@ -60,6 +54,7 @@ public class io {
         } finally {
             fs.removeSink(g);
         }
-        g.display(true);
+        g.display();
+        return g;
     }
 }
