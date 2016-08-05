@@ -3,7 +3,7 @@ package main;
 import java.io.File;
 
 import org.graphstream.graph.Graph;
-import util.io;
+import util.*;
 
 /**
  * Created by jay on 5/08/16.

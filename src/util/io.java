@@ -42,19 +42,20 @@ public class io {
     }
 
     public Graph DOTParser(File input_file){
-        Graph g = new DefaultGraph("g");
+        Graph g = new DefaultGraph("input graph");
         FileSource fs = new FileSourceDOT();
 
         fs.addSink(g);
 
         try{
-            fs.readAll("digraph_example.dot");
+            fs.readAll(input_file.getCanonicalPath());
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             fs.removeSink(g);
         }
         g.display();
+        //System.out.println(g.getEdge(0).getAttribute("Weight").toString());
         return g;
     }
 }
