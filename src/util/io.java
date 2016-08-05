@@ -1,6 +1,10 @@
 package util;
 
 import java.io.*;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.implementations.DefaultGraph;
+import org.graphstream.stream.file.FileSource;
+import org.graphstream.stream.file.FileSourceDOT;
 
 /**
  * Created by jay on 1/08/16.
@@ -12,7 +16,8 @@ public class io {
     public static void main(String[] args){
 
         File input_file = new File("digraph_example.dot");
-        processInput(input_file);
+        graphstream(input_file);
+        //processInput(input_file);
 
     }
     public static void processInput(File input_file) {
@@ -31,7 +36,7 @@ public class io {
                 }
                 if(left.length > 1) {
                     int weight = Integer.parseInt(left[1].replaceAll("[^0-9]", ""));
-                    System.out.println(weight); // use weight to populate node weight or edge weight in data structure. 
+                    System.out.println(weight); // use weight to populate node weight or edge weight in data structure.
                 }
             }
         } catch (FileNotFoundException e) {
@@ -40,5 +45,21 @@ public class io {
             e.printStackTrace();
         }
 
+    }
+
+    public static void graphstream(File input_file){
+        Graph g = new DefaultGraph("g");
+        FileSource fs = new FileSourceDOT();
+
+        fs.addSink(g);
+
+        try{
+            fs.readAll("digraph_example.dot");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            fs.removeSink(g);
+        }
+        g.display(true);
     }
 }
