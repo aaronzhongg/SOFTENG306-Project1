@@ -24,9 +24,14 @@ public class Main {
 
 		// Find root nodes from the input graph
 		ArrayList<Integer> rootNodes = scheduleHelper.findRootNodes(g);
-
-		for (int r: rootNodes) {
-			System.out.println(r);
+		
+		
+		//Test if processableNodes function is working
+		g.getNode(0).setAttribute("processorID", 0);
+		g.getNode(1).setAttribute("processorID", 0);
+		ArrayList<Integer> processableNodes = scheduleHelper.processableNodes(g, 1);
+		for (int r: processableNodes) {
+			System.out.println(r + " " + g.getNode(r));
 		}
 	}
 
