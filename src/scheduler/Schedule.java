@@ -16,10 +16,18 @@ import org.graphstream.graph.implementations.DefaultGraph;
 public class Schedule {
 	
 	public ArrayList<Node> schedule;
+	public int[] procLengths;			//this keeps track of the current lengths of each processor
 
 	//make empty schedule
 	public Schedule(){
 		schedule = new ArrayList<Node>();
+		procLengths = new int[1];		//default of 1 processor at the very least
+	}
+	
+	//make empty schedule
+	public Schedule(int procCount){
+		schedule = new ArrayList<Node>();
+		procLengths = new int[procCount];		//default of 1 processor at the very least
 	}
 	
 	//For initialising a list of all the nodes. Do not use this to make the schedule
@@ -46,4 +54,20 @@ public class Schedule {
 		schedule.remove(nodePosition);
 	}
 	
+	//Find the current length of the schedule. This assumes the input schedule is valid
+	public int findScheduleLength() {
+		int cost = this.schedule.get(0).getAttribute("Weight");	//initial cost is the first node in the first processor
+		int currentProc = 0; 			//current processor, starts at the first one 0
+		int i = 1;
+		
+		do{
+			Node n = this.schedule.get(i);
+			if(Integer.parseInt(n.getAttribute("processorID").toString()) == currentProc){
+				
+			}
+		}while(i < this.schedule.size());
+		
+		return 0;
+		
+	}
 }

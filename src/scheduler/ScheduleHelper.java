@@ -8,7 +8,7 @@ import org.graphstream.graph.Node;
 public class ScheduleHelper {
 
 	//Find the root nodes 
-	public ArrayList<Integer> findRootNodes(Graph g) {
+	public static ArrayList<Integer> findRootNodes(Graph g) {
 
 		ArrayList<Integer> rootNodes = new ArrayList<Integer>();
 		int i = 0;
@@ -23,6 +23,9 @@ public class ScheduleHelper {
 		return rootNodes;
 	}
 	
+	public static int getNodeWeight(Graph g, int nodeIndex){
+		return Integer.parseInt(g.getNode(nodeIndex).getAttribute("Weight").toString());
+	}
 	
 
 }
