@@ -21,12 +21,13 @@ public class ScheduleHelper {
 	}
 
 	//Find the disjoint nodes
+	//NOTE: we should add this eventually to the "find RootNodes", so we don't iterate through twice
     public ArrayList<Node> findDisjointNodes(Graph g){
 
         ArrayList<Node> disjointNodes = new ArrayList<>();
 
         for(Node n:g){
-            if (n.getOutDegree() == 0){
+            if (n.getOutDegree() == 0 && n.getInDegree() == 0){
                 disjointNodes.add(n);
             }
         }
