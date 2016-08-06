@@ -8,20 +8,30 @@ import org.graphstream.graph.Node;
 public class ScheduleHelper {
 
 	//Find the root nodes 
-	public ArrayList<Integer> findRootNodes(Graph g) {
+	public ArrayList<Node> findRootNodes(Graph g) {
 
-		ArrayList<Integer> rootNodes = new ArrayList<Integer>();
-		int i = 0;
-
+		ArrayList<Node> rootNodes = new ArrayList<>();
 		for (Node n:g) {
 			if (n.getInDegree() == 0) {
-				rootNodes.add(i);
+				rootNodes.add(n);
 			}
-			i++;
 		}
 
 		return rootNodes;
 	}
+
+	//Find the disjoint nodes
+    public ArrayList<Node> findDisjointNodes(Graph g){
+
+        ArrayList<Node> disjointNodes = new ArrayList<>();
+
+        for(Node n:g){
+            if (n.getOutDegree() == 0){
+                disjointNodes.add(n);
+            }
+        }
+        return disjointNodes;
+    }
 	
 	
 
