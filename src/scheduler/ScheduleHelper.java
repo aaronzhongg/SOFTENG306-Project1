@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
+
+import scheduler.Greedy.QueueItem;
+
 import org.graphstream.graph.Edge;
 
 public class ScheduleHelper {
@@ -63,4 +66,54 @@ public class ScheduleHelper {
 		return processableNodes;
 	}
 
+	//needs to return the cost of putting the queue item into the processor
+	public static int scheduleNode(Schedule schedule, QueueItem q, Graph g) {
+		
+		int nodeWeight = getNodeWeight(g, q.nodeIndex);
+		int scheduleIncrease = 0;
+		ArrayList<Integer> parentNodeCosts = new ArrayList<Integer>(); // This stores the cost of putting the queue item into the specified pid when coming from each parent node
+		ArrayList<Node> parentNodes = new ArrayList<Node>(); // Stores the parent node queue item comes from
+		
+		//Get the post-processed processorLength of the queueitem from each of the parent nodes
+		for (Edge e:g.getNode(q.nodeIndex).getEachEnteringEdge()) {
+			Node parentNode = e.getNode0();
+			int parentProcessor = Integer.parseInt(parentNode.getAttribute("processorID").toString());
+			
+			//if parent node was processed on the same processor than the queue item can be added with just nodeWeight
+			if (q.processorID == parentProcessor) {
+				parentNodeCosts.add(schedule.procLengths[q.processorID] + nodeWeight);
+				parentNodes.add(parentNode);
+			} else {
+				//parent node was not processed on the same processor
+				
+				//need to find when the parent node finished processing
+				int parentNodeFinishedProcessing = Integer.parseInt(parentNode.getAttribute("Start").toString()) + getNodeWeight(g, parentNode.getIndex());
+				
+				//if the parent node finished processing longer than the weight of the edge to the child then can add automatically to the processor
+				if (schedule.scheduleLength - parentNodeFinishedProcessing >= Integer.parseInt(e.getAttribute("Weight").toString())){
+					parentNodeCosts.add(schedule.procLengths[q.processorID] + nodeWeight);
+					parentNodes.add(parentNode);
+				} else {
+					//find out how long need to wait before can add to processor
+					
+					//time left to wait
+					int timeToWait = Integer.parseInt(e.getAttribute("Weight").toString()) - (schedule.scheduleLength - parentNodeFinishedProcessing);
+					
+					parentNodeCosts.add(schedule.procLengths[q.processorID] + nodeWeight + timeToWait);
+					parentNodes.add(parentNode);
+				}
+			}
+			
+		}
+		
+		int minimumProcLength = parentNodeCosts.get(0);
+		for(int i: parentNodeCosts) {
+			if (i < minimumProcLength) {
+				minimumProcLength = i;
+			}
+		}
+		
+		return minimumProcLength;
+				
+	}
 }

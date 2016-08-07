@@ -61,6 +61,7 @@ public class io {
         //Add processorID attribute to every node
         for (int i = 0; i < g.getNodeCount(); i++) {
         	g.getNode(i).addAttribute("processorID", -1);
+        	g.getNode(i).addAttribute("Start" , -1);
         }
        
         g.display();
