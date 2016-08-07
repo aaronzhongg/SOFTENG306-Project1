@@ -32,15 +32,15 @@ public class Greedy {
 		return null;
 	}
 	
-	private class QueueItem{
-		private int nodeIndex;
-		private int processorID;
+	public class QueueItem{
+		public int nodeIndex;
+		public int processorID;
 		
-		private QueueItem(int n){
+		public QueueItem(int n){
 			nodeIndex = n;
 			processorID = -1;	//default value, -1 means it has not been processed yet.
 		}
-		private QueueItem(int n, int p){
+		public QueueItem(int n, int p){
 			nodeIndex = n;
 			processorID = p;
 		}
