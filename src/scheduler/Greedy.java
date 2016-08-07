@@ -19,7 +19,7 @@ public class Greedy {
 		int popIndex = 0;
 		for(int i = 0; i < queue.size(); i++){
 			QueueItem q = queue.get(i);
-			if(ScheduleHelper.getNodeWeight(g, q.nodeIndex) < ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)){
+			if(ScheduleHelper.getNodeWeight(g, q.nodeIndex) <= ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)){
 				smallest = q;
 				popIndex = i;
 			}
@@ -29,18 +29,57 @@ public class Greedy {
 		schedule.procLengths[smallest.processorID] += ScheduleHelper.getNodeWeight(g, smallest.nodeIndex);
 		queue.remove(popIndex);
 		
-		return null;
+		while(!queue.isEmpty()){
+			ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);
+			for(int i:childrenNodes){
+				for(int j = 0; j < procCount; j++ ){
+					queue.add(new QueueItem(i, j));
+				}
+			}
+			/*
+			 * NOTE: Use zong's function to find 'best' node to insert
+			 * this is an array with 2 values, the first is the increase in the schedule length if the node is inserted
+			 * the second value is the increase in processor length if the node is inserted.
+			 */
+			
+			int[] weightIncreases = zongFunction(queue.get(0));		
+			
+			int smallestWeight = weightIncreases[0]; //first one to compare with
+			int processorWeightInc = weightIncreases[1];
+			for(int i = 0; i < queue.size(); i++){
+				QueueItem q = queue.get(i);
+				weightIncreases = zongFunction(q);
+				if(weightIncreases[0] <= smallestWeight){
+					smallest = q;
+					smallestWeight = weightIncreases[0];
+					processorWeightInc = weightIncreases[1];
+					popIndex = i;
+				}
+			}
+			schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID);
+			schedule.procLengths[smallest.processorID] += processorWeightInc;
+			queue.remove(popIndex);
+		}
+			
+		/*
+		 * Possible outcomes:
+		 * node is root = just add weight
+		 * node is child, only dependent on 1 parent
+		 * node is child, depends on more than 1 parent
+		 */
+		
+		return schedule;
 	}
 	
-	private class QueueItem{
-		private int nodeIndex;
-		private int processorID;
+	public class QueueItem{
+		public int nodeIndex;
+		public int processorID;
 		
-		private QueueItem(int n){
+		public QueueItem(int n){
 			nodeIndex = n;
 			processorID = -1;	//default value, -1 means it has not been processed yet.
 		}
-		private QueueItem(int n, int p){
+		public QueueItem(int n, int p){
 			nodeIndex = n;
 			processorID = p;
 		}

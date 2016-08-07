@@ -31,7 +31,7 @@ public class ScheduleHelper {
 	
 
 	// After a node has been processed, call this function to return all new nodes that can be processed
-	public ArrayList<Integer> processableNodes(Graph g, int nodeIndex) {
+	public static ArrayList<Integer> processableNodes(Graph g, int nodeIndex) {
 
 		ArrayList<Integer> processableNodes = new ArrayList<Integer>();
 

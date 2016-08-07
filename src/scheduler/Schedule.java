@@ -55,6 +55,7 @@ public class Schedule {
 	}
 	
 	//Find the current length of the schedule. This assumes the input schedule is valid
+	//MIGHT NOT BE NEEDED, leave it for now
 	public int findScheduleLength() {
 		int cost = this.schedule.get(0).getAttribute("Weight");	//initial cost is the first node in the first processor
 		int currentProc = 0; 			//current processor, starts at the first one 0
