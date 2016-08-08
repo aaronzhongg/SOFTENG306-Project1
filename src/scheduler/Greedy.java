@@ -6,7 +6,7 @@ import org.graphstream.graph.Graph;
 
 public class Greedy {
 	public Schedule greedySearch(Graph g, int procCount){
-		Schedule schedule = new Schedule();		//make a new, empty schedule
+		Schedule schedule = new Schedule(procCount);		//make a new, empty schedule
 		ArrayList<QueueItem> queue = new ArrayList<QueueItem>();
 		ArrayList<Integer> root = ScheduleHelper.findRootNodes(g);
 		for(Integer i:root){

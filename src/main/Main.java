@@ -23,16 +23,17 @@ public class Main {
 		Graph g = IOProcessor.DOTParser(input_file);
 
 		// Find root nodes from the input graph
-		ArrayList<Integer> rootNodes = scheduleHelper.findRootNodes(g);
+		ArrayList<Integer> rootNodes = ScheduleHelper.findRootNodes(g);
 		
 		
 		//Test if processableNodes function is working
-		g.getNode(0).setAttribute("processorID", 0);
-		g.getNode(1).setAttribute("processorID", 0);
-		ArrayList<Integer> processableNodes = scheduleHelper.processableNodes(g, 1);
-		for (int r: processableNodes) {
-			System.out.println(r + " " + g.getNode(r));
-		}
+//		g.getNode(0).setAttribute("processorID", 0);
+////		g.getNode(1).setAttribute("processorID", 0);
+//		ArrayList<Integer> processableNodes = ScheduleHelper.processableNodes(g, 0);
+//		for (int r: processableNodes) {
+//			System.out.println(r + " " + Double.parseDouble(g.getNode(r).getAttribute("Weight").toString()));
+//			
+//		}
 		
 		Greedy greedy = new Greedy();
 		schedule = greedy.greedySearch(g, 2);
