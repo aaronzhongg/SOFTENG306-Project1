@@ -67,13 +67,15 @@ public class ScheduleHelper {
 	}
 
 	//needs to return the cost of putting the queue item into the processor
-	public static int scheduleNode(Schedule schedule, QueueItem q, Graph g) {
+	public static int[] scheduleNode(Schedule schedule, QueueItem q, Graph g) {
 
 		int minimumProcLength;
+		int procWaitTime = 0;
 		int nodeWeight = getNodeWeight(g, q.nodeIndex);
 		int scheduleIncrease = 0;
 		ArrayList<Integer> parentNodeCosts = new ArrayList<Integer>(); // This stores the cost of putting the queue item into the specified pid when coming from each parent node
 		ArrayList<Node> parentNodes = new ArrayList<Node>(); // Stores the parent node queue item comes from
+		
 
 		if (g.getNode(q.nodeIndex).getInDegree() != 0) {
 			//Get the post-processed processorLength of the queueitem from each of the parent nodes
@@ -92,15 +94,18 @@ public class ScheduleHelper {
 					int parentNodeFinishedProcessing = (int)Double.parseDouble(parentNode.getAttribute("Start").toString()) + getNodeWeight(g, parentNode.getIndex());
 
 					//if the parent node finished processing longer than the weight of the edge to the child then can add automatically to the processor
-					if (schedule.scheduleLength - parentNodeFinishedProcessing >= (int)Double.parseDouble(e.getAttribute("Weight").toString())){
+					if (schedule.procLengths[q.processorID] - parentNodeFinishedProcessing >= (int)Double.parseDouble(e.getAttribute("Weight").toString())){
 						parentNodeCosts.add(schedule.procLengths[q.processorID] + nodeWeight);
 						parentNodes.add(parentNode);
 					} else {
 						//find out how long need to wait before can add to processor
 
 						//time left to wait
-						int timeToWait = (int)Double.parseDouble(e.getAttribute("Weight").toString()) - (schedule.scheduleLength - parentNodeFinishedProcessing);
+						int timeToWait = (int)Double.parseDouble(e.getAttribute("Weight").toString()) - (schedule.procLengths[q.processorID] - parentNodeFinishedProcessing);
 
+						if (timeToWait < 0) {
+							timeToWait = 0;
+						}
 						parentNodeCosts.add(schedule.procLengths[q.processorID] + nodeWeight + timeToWait);
 						parentNodes.add(parentNode);
 					}
@@ -109,15 +114,28 @@ public class ScheduleHelper {
 			}
 
 			minimumProcLength = parentNodeCosts.get(0);
-			for(int i: parentNodeCosts) {
-				if (i < minimumProcLength) {
-					minimumProcLength = i;
+			
+			int temp = 0;
+			for(int i = 0; i < parentNodeCosts.size() - 1; i++) {
+				int pNodeCost = parentNodeCosts.get(i);
+				if (pNodeCost < minimumProcLength) {
+					minimumProcLength = pNodeCost;
+					temp = i;
 				}
 			}
+			
+			Node p = parentNodes.get(temp);
+			
+			if ((int)Double.parseDouble(p.getAttribute("processorID").toString()) != q.processorID) {
+				procWaitTime = minimumProcLength - nodeWeight - schedule.procLengths[q.processorID];
+			}
+			
 		} else {
 			minimumProcLength = getNodeWeight(g, q.nodeIndex) + schedule.procLengths[q.processorID];
 		}
-		return minimumProcLength;
+		
+		int[] newProcLengthAndTimeToWait = {minimumProcLength, procWaitTime};
+		return newProcLengthAndTimeToWait;
 
 	}
 }

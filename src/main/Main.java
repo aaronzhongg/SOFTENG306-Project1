@@ -15,7 +15,7 @@ public class Main {
 	public static void main(String[] args){
 
 		int processorInput = 2;
-		String file_name = "digraph_example2.dot";
+		String file_name = "digraph_example4.dot";
 		File input_file = new File(file_name);
 		io IOProcessor = new io();
 		Schedule schedule = new Schedule();

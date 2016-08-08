@@ -34,7 +34,7 @@ public class Greedy {
 			}
 //			popIndex++;
 		}
-		schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID);
+		schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID, 0);
 		schedule.updateProcessorLength(smallest.processorID, ScheduleHelper.getNodeWeight(g, smallest.nodeIndex));
 //		queue.remove(popIndex);
 		//need to pop all queueitems with same nodeindex that was just processed
@@ -54,6 +54,8 @@ public class Greedy {
 			 * the second value is the increase in processor length if the node is inserted.
 			 */
 			
+			int[] procInfo;
+			int procWaitTime = 0;
 			int newProcLength;	
 			int scheduleLength;
 			int smallestWeightChange = 2147483647; //first one to compare with, give the initial weight change as the maximum possible
@@ -61,11 +63,13 @@ public class Greedy {
 			
 			for(int i = 0; i < queue.size(); i++){
 				QueueItem q = queue.get(i);
-				newProcLength = ScheduleHelper.scheduleNode(schedule, q, g);	//new length of the processor after adding this particular node
+				procInfo = ScheduleHelper.scheduleNode(schedule, q, g);
+				newProcLength = procInfo[0];	//new length of the processor after adding this particular node
 				scheduleLength = schedule.findScheduleLength();					//currrent length of schedule
-				if(scheduleLength - newProcLength <= smallestWeightChange){ 	
+				if(newProcLength - scheduleLength <= smallestWeightChange){ 
+					procWaitTime = procInfo[1];
 					smallest = q;
-					smallestWeightChange = scheduleLength - newProcLength;
+					smallestWeightChange = newProcLength - scheduleLength;
 					processorWeightInc = newProcLength - schedule.procLengths[q.processorID];
 //					popIndex = i;
 				}
@@ -79,7 +83,7 @@ public class Greedy {
 			}
 
 			
-			schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID);
+			schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID, procWaitTime);
 			schedule.updateProcessorLength(smallest.processorID, processorWeightInc);
 			
 			childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);
