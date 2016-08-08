@@ -15,12 +15,13 @@ public class Main {
 	public static void main(String[] args){
 
 		int processorInput = 2;
-		File input_file = new File("digraph_example.dot");
+		String file_name = "digraph_example2.dot";
+		File input_file = new File(file_name);
 		io IOProcessor = new io();
 		Schedule schedule = new Schedule();
 		ScheduleHelper scheduleHelper = new ScheduleHelper();
 
-		Graph g = IOProcessor.DOTParser(input_file);
+		Graph g = IOProcessor.DOTParser(input_file, file_name);
 
 		// Find root nodes from the input graph
 		ArrayList<Integer> rootNodes = ScheduleHelper.findRootNodes(g);

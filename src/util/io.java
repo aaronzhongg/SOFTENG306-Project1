@@ -44,14 +44,14 @@ public class io {
 
     }
 
-    public Graph DOTParser(File input_file){
+    public Graph DOTParser(File input_file, String file_name){
         Graph g = new DefaultGraph("g");
         FileSource fs = new FileSourceDOT();
 
         fs.addSink(g);
         
         try{
-            fs.readAll("digraph_example.dot");
+            fs.readAll(file_name);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

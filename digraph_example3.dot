@@ -1,0 +1,11 @@
+digraph �example� {	
+	a	[ Weight = 4];	
+	b	[ Weight = 4];	
+	b -> a	[ Weight = 1];	
+	c	[ Weight = 3];		
+	d	[ Weight = 2];
+	d -> c	[ Weight = 1];
+	e	[ Weight = 2];
+	e -> b	[ Weight = 1];
+	e -> d	[ Weight = 1];
+}
