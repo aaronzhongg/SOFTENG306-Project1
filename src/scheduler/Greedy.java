@@ -16,26 +16,38 @@ public class Greedy {
 			}
 		}
 		QueueItem smallest = queue.get(0);
-		int popIndex = 0;
+//		int popIndex = 0;
+		
+		// picking smallest root node 
 		for(int i = 0; i < queue.size(); i++){
 			QueueItem q = queue.get(i);
 			if(ScheduleHelper.getNodeWeight(g, q.nodeIndex) <= ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)){
 				smallest = q;
-				popIndex = i;
+//				popIndex = i;
 			}
 		}
 		
+//		int popIndex = 0;
+		for (int popIndex = queue.size() -1 ; popIndex > -1; popIndex--) {
+			if (queue.get(popIndex).nodeIndex == smallest.nodeIndex) {
+				queue.remove(popIndex);
+			}
+//			popIndex++;
+		}
 		schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID);
 		schedule.updateProcessorLength(smallest.processorID, ScheduleHelper.getNodeWeight(g, smallest.nodeIndex));
-		queue.remove(popIndex);
+//		queue.remove(popIndex);
+		//need to pop all queueitems with same nodeindex that was just processed
+		
+		ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);
+		for(int i:childrenNodes){
+			for(int j = 0; j < procCount; j++ ){
+				queue.add(new QueueItem(i, j));
+			}
+		}
 		
 		while(!queue.isEmpty()){
-			ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);
-			for(int i:childrenNodes){
-				for(int j = 0; j < procCount; j++ ){
-					queue.add(new QueueItem(i, j));
-				}
-			}
+		
 			/*
 			 * NOTE: Use zong's function to find 'best' node to insert
 			 * this is an array with 2 values, the first is the increase in the schedule length if the node is inserted
@@ -55,12 +67,28 @@ public class Greedy {
 					smallest = q;
 					smallestWeightChange = scheduleLength - newProcLength;
 					processorWeightInc = newProcLength - schedule.procLengths[q.processorID];
-					popIndex = i;
+//					popIndex = i;
 				}
 			}
+			
+			for (int popIndex = queue.size() -1 ; popIndex > -1; popIndex--) {
+				if (queue.get(popIndex).nodeIndex == smallest.nodeIndex) {
+					queue.remove(popIndex);
+				}
+//				popIndex++;
+			}
+
+			
 			schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID);
 			schedule.updateProcessorLength(smallest.processorID, processorWeightInc);
-			queue.remove(popIndex);
+			
+			childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);
+			for(int i:childrenNodes){
+				for(int j = 0; j < procCount; j++ ){
+					queue.add(new QueueItem(i, j));
+				}
+			}
+//			queue.remove(popIndex);
 		}
 			
 		/*

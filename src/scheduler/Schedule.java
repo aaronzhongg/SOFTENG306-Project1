@@ -46,13 +46,13 @@ public class Schedule {
 	//adds a node to the scheduler
 	public void addNode(Node n, int processorID){
 		n.setAttribute("processorID", processorID);
-		n.setAttribute("Start", procLengths[processorID] - (int)Double.parseDouble(n.getAttribute("Weight").toString()));
+		n.setAttribute("Start", procLengths[processorID]);
 		schedule.add(n);
 	}
 	//Changes the processor id for a node. This assumes the node has the processorID attribute.
 	public void changeNodeProcessor(int nodePosition, int processorID){
 		schedule.get(nodePosition).setAttribute("processorID", processorID);
-		schedule.get(nodePosition).setAttribute("Start", procLengths[processorID] - Double.parseDouble(schedule.get(nodePosition).getAttribute("Weight").toString()));
+		schedule.get(nodePosition).setAttribute("Start", procLengths[processorID]);
 	}
 	
 	//removes a node in a given position in the schedule
