@@ -46,18 +46,27 @@ public class Schedule {
 	//adds a node to the scheduler
 	public void addNode(Node n, int processorID){
 		n.setAttribute("processorID", processorID);
+		n.setAttribute("Start", procLengths[processorID] - Integer.parseInt(n.getAttribute("Weight").toString()));
 		schedule.add(n);
-		scheduleLength = findScheduleLength();
 	}
 	//Changes the processor id for a node. This assumes the node has the processorID attribute.
 	public void changeNodeProcessor(int nodePosition, int processorID){
 		schedule.get(nodePosition).setAttribute("processorID", processorID);
-		scheduleLength = findScheduleLength();
+		schedule.get(nodePosition).setAttribute("Start", procLengths[processorID] - Integer.parseInt(schedule.get(nodePosition).getAttribute("Weight").toString()));
 	}
 	
 	//removes a node in a given position in the schedule
 	public void removeNode(int nodePosition){
 		schedule.remove(nodePosition);
+		
+		//
+	}
+	
+	//update processor lengths 
+	public void updateProcessorLength(int processorID, int procIncrease) {
+		procLengths[processorID] += procIncrease;
+		
+		//update schedule length
 		scheduleLength = findScheduleLength();
 	}
 	
