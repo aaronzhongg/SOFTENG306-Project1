@@ -115,7 +115,7 @@ public class ScheduleHelper {
 				}
 			}
 		} else {
-			minimumProcLength = getNodeWeight(g, q.nodeIndex);
+			minimumProcLength = getNodeWeight(g, q.nodeIndex) + schedule.procLengths[q.processorID];
 		}
 		return minimumProcLength;
 
