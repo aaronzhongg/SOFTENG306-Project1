@@ -1,4 +1,4 @@
-digraph “example” {	
+digraph ï¿½exampleï¿½ {	
 	a	[ Weight = 2];	
 	b	[ Weight = 3];	
 	a -> b	[ Weight = 1];	
