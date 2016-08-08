@@ -3,8 +3,8 @@ package main;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.graphstream.graph.Graph;
 import org.graphstream.graph.*;
+
 import scheduler.*;
 import util.io;
 
@@ -23,9 +23,9 @@ public class Main {
 		Graph g = IOProcessor.DOTParser(input_file);
 
 		// Find root nodes from the input graph
-		ArrayList<Integer> rootNodes = scheduleHelper.findRootNodes(g);
+		ArrayList<Node> rootNodes = scheduleHelper.findRootNodes(g);
 
-		for (int r: rootNodes) {
+		for (Node r: rootNodes) {
 			System.out.println(r);
 		}
 	}

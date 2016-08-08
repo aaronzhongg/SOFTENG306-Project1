@@ -1,18 +1,23 @@
 package scheduler;
 
+import java.util.ArrayList;
+
 import org.graphstream.graph.Node;
 import org.graphstream.graph.Graph;
 
 public class BranchAndBound {
-
+	
+	private Schedule s;
+	private Graph g;
+	
 	/**
 	 * Class takes the valid schedule as input and uses other functions to compute it - called by other classes
 	 * @param g
 	 * @param bottom
 	 */
-	public void branchAndBound(Graph g, Node bottom){
-		
-		traversegraph(g, bottom);
+	public void branchAndBound(Graph g, Schedule schedule){
+		s = schedule;
+		traverseSchedule(g);
 	}
 	
 	/**
@@ -20,11 +25,9 @@ public class BranchAndBound {
 	 * @param g
 	 * @param currentNode
 	 */
-	private void traversegraph(Graph g, Node currentNode){
-		int i = 0;
-		while (i==0) {
-			comparison(currentNode);
-			i++;
+	private void traverseSchedule(Graph g){
+		for (int i = s.size(); i > -1; i--) {
+			comparison(s.getNode(i));
 		}
 	}
 	
@@ -34,29 +37,46 @@ public class BranchAndBound {
 	 */
 	private void comparison(Node currentNode){
 		
+		
+		
 		// if currentNode has more then one child (i.e. a child not in valid schedule)
-		
-			// Node a = currentNode.child1; (in valid schedule)
-			// Node b = currentNode.child2; (not in valid schedule)
-		
-			// if child 2 < child 1
-				// go down path
-				checkChildPath();
+		if (currentNode.getOutDegree() > 1) {
+
+			// for (each child){
+				// compare children with currentNode
 			
-			// else IGNORE
+				// if child < currentNode
+					// go down path
+					Node child = null;
+					int childPath = checkChildPath(currentNode, child);
+					if (childPath != -1) {
+						smallerChildPath();
+					}
+				
+				// else IGNORE
+			//}
+			changeSchedulerPath();
+		}
+		else return;
 		
 	}
 	
 	/**
 	 * Checks if this path is more optimal then the one chosen in valid schedule
 	 */
-	private void checkChildPath(){
-		// traverse down and see if path is better to take
-		//if yes
-			changeSchedulerPath();
-		//if not do nothing, as will go back to traversegraph()
-		
+	private int checkChildPath(Node currentNode, Node child){
+		// traverse down child USING SEARCHING TREE?? and see if path is better to take
+		// calculate all weights
+		return -1; // return -1 if bad, actual value if it's better then currentNode
 	}
+	
+	/**
+	 * 
+	 */
+	private void smallerChildPath(){
+		// add children and their weights to this as a potential path
+	}
+	
 	
 	/**
 	 * 

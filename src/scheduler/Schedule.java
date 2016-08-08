@@ -46,4 +46,12 @@ public class Schedule {
 		schedule.remove(nodePosition);
 	}
 	
+	public int size(){
+		return schedule.size();
+	}
+	
+	public Node getNode(int i){
+		return schedule.get(i);
+	}
+	
 }

@@ -21,7 +21,7 @@ public class ScheduleHelper {
 	}
 
 	//Find the disjoint nodes
-	//NOTE: we should add this eventually to the "find RootNodes", so we don't iterate through twice
+	//NOTE: potentially add this eventually to the "find RootNodes", so we don't iterate through twice
     public ArrayList<Node> findDisjointNodes(Graph g){
 
         ArrayList<Node> disjointNodes = new ArrayList<>();
@@ -33,7 +33,5 @@ public class ScheduleHelper {
         }
         return disjointNodes;
     }
-	
-	
-
+    
 }
