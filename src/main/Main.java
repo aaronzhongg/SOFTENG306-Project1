@@ -33,6 +33,13 @@ public class Main {
 		for (int r: processableNodes) {
 			System.out.println(r + " " + g.getNode(r));
 		}
+		
+		Greedy greedy = new Greedy();
+		schedule = greedy.greedySearch(g, 2);
+		for(Node n:schedule.schedule){
+			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("processorID") + " Starts at: " + n.getAttribute("Start"));
+		}
+		System.out.println("Total Schedule Length: " + schedule.scheduleLength);
 	}
 
 

@@ -26,7 +26,7 @@ public class Greedy {
 		}
 		
 		schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID);
-		schedule.procLengths[smallest.processorID] += ScheduleHelper.getNodeWeight(g, smallest.nodeIndex);
+		schedule.updateProcessorLength(smallest.processorID, ScheduleHelper.getNodeWeight(g, smallest.nodeIndex));
 		queue.remove(popIndex);
 		
 		while(!queue.isEmpty()){
@@ -42,22 +42,24 @@ public class Greedy {
 			 * the second value is the increase in processor length if the node is inserted.
 			 */
 			
-			int[] weightIncreases = zongFunction(queue.get(0));		
+			int newProcLength;	
+			int scheduleLength;
+			int smallestWeightChange = 2147483647; //first one to compare with, give the initial weight change as the maximum possible
+			int processorWeightInc = 0;
 			
-			int smallestWeight = weightIncreases[0]; //first one to compare with
-			int processorWeightInc = weightIncreases[1];
 			for(int i = 0; i < queue.size(); i++){
 				QueueItem q = queue.get(i);
-				weightIncreases = zongFunction(q);
-				if(weightIncreases[0] <= smallestWeight){
+				newProcLength = ScheduleHelper.scheduleNode(schedule, q, g);	//new length of the processor after adding this particular node
+				scheduleLength = schedule.findScheduleLength();					//currrent length of schedule
+				if(scheduleLength - newProcLength <= smallestWeightChange){ 	
 					smallest = q;
-					smallestWeight = weightIncreases[0];
-					processorWeightInc = weightIncreases[1];
+					smallestWeightChange = scheduleLength - newProcLength;
+					processorWeightInc = newProcLength - schedule.procLengths[q.processorID];
 					popIndex = i;
 				}
 			}
 			schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID);
-			schedule.procLengths[smallest.processorID] += processorWeightInc;
+			schedule.updateProcessorLength(smallest.processorID, processorWeightInc);
 			queue.remove(popIndex);
 		}
 			
@@ -71,6 +73,11 @@ public class Greedy {
 		return schedule;
 	}
 	
+//	public void addNodeToSchedule(Schedule s, QueueItem q, Graph g, int popIndex, int processorWeightInc){
+//		s.addNode(g.getNode(q.nodeIndex), q.processorID);
+//		s.procLengths[q.processorID] += processorWeightInc;
+//		queue.remove(popIndex);
+//	}
 	public class QueueItem{
 		public int nodeIndex;
 		public int processorID;
