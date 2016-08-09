@@ -3,6 +3,10 @@ package util;
 import java.io.*;
 import java.util.Iterator;
 
+import org.graphstream.stream.file.FileSinkDOT;
+import org.graphstream.stream.netstream.packing.Base64;
+import scheduler.Schedule;
+
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.DefaultGraph;
@@ -66,5 +70,31 @@ public class io {
        
         g.display();
         return g;
+    }
+
+    public void outputFile(Schedule schedule, Graph inputGraph){
+//        for (Node n: schedule.schedule){
+//            for (Node graphnode: inputGraph.getNodeSet()){
+//                if (n.getId() == graphnode.getId()){
+//                    //graphnode.addAttribute("Start", n.getAttribute("Start").toString());
+//                    //graphnode.addAttribute("Processor", n.getAttribute("processorID").toString());
+//                }
+//
+//            }
+//        }
+        FileSinkDOT fs = new FileSinkDOT(true);
+        File outputFile = new File("/tmp/output.dot");
+        FileOutputStream fos = null;
+        try {
+            outputFile.createNewFile();
+            fos = new FileOutputStream(outputFile);
+            fs.writeAll(inputGraph, fos);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 }

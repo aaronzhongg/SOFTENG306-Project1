@@ -42,6 +42,9 @@ public class Main {
 			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("processorID") + " Starts at: " + n.getAttribute("Start"));
 		}
 		System.out.println("Total Schedule Length: " + schedule.scheduleLength);
+
+        IOProcessor.outputFile(schedule, g); // creates the output file
+
 	}
 
 
