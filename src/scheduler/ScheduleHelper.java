@@ -17,13 +17,13 @@ public class ScheduleHelper {
 
 	/**
 	 * Finds all the root nodes of the input graph
-	 * @param g
+	 * @param g : graph
 	 * @returns all the root nodes
 	 */
 	public static ArrayList<Integer> findRootNodes(Graph g) {
 		ArrayList<Integer> rootNodes = new ArrayList<Integer>();
+		
 		int i = 0;
-
 		for (Node n:g) {
 			if (n.getInDegree() == 0) {
 				rootNodes.add(i);
@@ -34,10 +34,10 @@ public class ScheduleHelper {
 	}
 
 	/**
-	 * Get's the weight of the input node, and returns its weight
-	 * @param g
-	 * @param nodeIndex
-	 * @return
+	 * Get's the weight of the input node
+	 * @param g : graph
+	 * @param nodeIndex : of node you want the weight of
+	 * @return : weight of nodeIndex
 	 */
 	public static int getNodeWeight(Graph g, int nodeIndex){
 		return (int)Double.parseDouble(g.getNode(nodeIndex).getAttribute("Weight").toString());
@@ -67,7 +67,7 @@ public class ScheduleHelper {
 			for (Edge childEdge: childIte) {
 				Node parentNode = childEdge.getNode0();
 
-				if ((int)Double.parseDouble(parentNode.getAttribute("processorID").toString()) == -1) {
+				if ((int)Double.parseDouble(parentNode.getAttribute("processorID").toString()) == -1) { //checks if parent processed
 					nodeProcessable = false;
 					break;
 				}
@@ -83,8 +83,8 @@ public class ScheduleHelper {
 	/**
 	 * Returns the cost of putting the queue item into the processor
 	 * @param schedule
-	 * @param q
-	 * @param g
+	 * @param q : item in the queue
+	 * @param g : graph
 	 * @return
 	 */
 	public static int[] scheduleNode(Schedule schedule, QueueItem q, Graph g) {
@@ -97,29 +97,30 @@ public class ScheduleHelper {
 		ArrayList<Node> parentNodes = new ArrayList<Node>(); // Stores the parent node queue item comes from
 		
 
-		if (g.getNode(q.nodeIndex).getInDegree() != 0) {
+		if (g.getNode(q.nodeIndex).getInDegree() != 0) { //if it's not a root
+			
 			//Get the post-processed processorLength of the queueitem from each of the parent nodes
-			for (Edge e:g.getNode(q.nodeIndex).getEachEnteringEdge()) {
+			for (Edge e : g.getNode(q.nodeIndex).getEachEnteringEdge()) {
 				Node parentNode = e.getNode0();
 				int parentProcessor = (int)Double.parseDouble(parentNode.getAttribute("processorID").toString());
 
-				//if parent node was processed on the same processor than the queue item can be added with just nodeWeight
-				if (q.processorID == parentProcessor) {
+				
+				if (q.processorID == parentProcessor) {	//if parent node was processed on the same processor than the queue item can be added with just nodeWeight
 					parentNodeCosts.add(schedule.procLengths[q.processorID] + nodeWeight);
 					parentNodes.add(parentNode);
-				} else {
-					//parent node was not processed on the same processor
-
+				} else { //parent node was not processed on the same processor
+					
 					//need to find when the parent node finished processing
 					int parentNodeFinishedProcessing = (int)Double.parseDouble(parentNode.getAttribute("Start").toString()) + getNodeWeight(g, parentNode.getIndex());
 
 					//if the parent node finished processing longer than the weight of the edge to the child then can add automatically to the processor
 					if (schedule.procLengths[q.processorID] - parentNodeFinishedProcessing >= (int)Double.parseDouble(e.getAttribute("Weight").toString())){
+						
 						parentNodeCosts.add(schedule.procLengths[q.processorID] + nodeWeight);
 						parentNodes.add(parentNode);
-					} else {
-						//find out how long need to wait before can add to processor
-
+						
+					} else {	//find out how long need to wait before can add to processor
+						
 						//time left to wait
 						int timeToWait = (int)Double.parseDouble(e.getAttribute("Weight").toString()) - (schedule.procLengths[q.processorID] - parentNodeFinishedProcessing);
 
@@ -150,7 +151,7 @@ public class ScheduleHelper {
 				procWaitTime = minimumProcLength - nodeWeight - schedule.procLengths[q.processorID];
 			}
 			
-		} else {
+		} else { // if it's a root node, length is the node weight plus the processor length of the processor
 			minimumProcLength = getNodeWeight(g, q.nodeIndex) + schedule.procLengths[q.processorID];
 		}
 		

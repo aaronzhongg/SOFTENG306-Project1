@@ -1,17 +1,13 @@
 package scheduler;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-
 import org.graphstream.graph.*;
-import org.graphstream.graph.implementations.DefaultGraph;
 
 /**
  * This is the schedule data structure.
  * This stores the nodes of the graph with their assigned processor ids
  * The order of the schedule should be the order the tasks are scheduled
  * @author Alex
- *
  */
 public class Schedule {
 
@@ -20,7 +16,7 @@ public class Schedule {
 	public int scheduleLength;			//this is the current total schedule length (of the largest processor length)
 
 	/**
-	 * CONSTRUCTOR: makes an empty schedule
+	 * CONSTRUCTORS: makes empty schedules
 	 */
 	public Schedule(){
 		schedule = new ArrayList<Node>();
@@ -35,27 +31,13 @@ public class Schedule {
 	}
 
 	/**
-	 * For initialising a list of all the input graph nodes
-	 * @param g : the inpur graph
-	 */
-	public Schedule(DefaultGraph g){
-		schedule = new ArrayList<Node>();
-		Iterator<Node> i = g.getNodeIterator();
-		while(i.hasNext()){
-			schedule.add(i.next());
-		}
-		scheduleLength = 0;
-	}
-
-	/**
-	 * adds a node to the scheduler
-	 * @param n
-	 * @param processorID
+	 * adds an input node to the scheduler
+	 * @param n : Node wanting to add
+	 * @param processorID : the processor the node will get added to
 	 * @param procWaitTime
 	 */
 	public void addNode(Node n, int processorID, int procWaitTime){
 		n.setAttribute("processorID", processorID);
-	
 		n.setAttribute("Start", procLengths[processorID] + procWaitTime);
 		schedule.add(n);
 	}
@@ -85,14 +67,12 @@ public class Schedule {
 	 */
 	public void updateProcessorLength(int processorID, int procIncrease) {
 		procLengths[processorID] += procIncrease;
-
-		//updates the schedule length
-		scheduleLength = findScheduleLength();
+		scheduleLength = findScheduleLength();	//updates the schedule length to biggest of all processors
 	}
 
 	/**
 	 * Find the current length of the schedule. This assumes the input schedule is valid.
-	 * @return
+	 * @returns the length of the schedule
 	 */
 	public int findScheduleLength() {
 		int largestProcLength = procLengths[0];
