@@ -17,23 +17,27 @@ public class Schedule {
 
 	public ArrayList<Node> schedule;
 	public int[] procLengths;			//this keeps track of the current lengths of each processor
-	public int scheduleLength;
+	public int scheduleLength;			//this is the current total schedule length (of the largest processor length)
 
-	//make empty schedule
+	/**
+	 * CONSTRUCTOR: makes an empty schedule
+	 */
 	public Schedule(){
 		schedule = new ArrayList<Node>();
 		procLengths = new int[1];		//default of 1 processor at the very least
 		scheduleLength = 0;
 	}
 
-	//make empty schedule
 	public Schedule(int procCount){
 		schedule = new ArrayList<Node>();
-		procLengths = new int[procCount];		//default of 1 processor at the very least
+		procLengths = new int[procCount];		//makes amount of input processors
 		scheduleLength = 0;
 	}
 
-	//For initialising a list of all the nodes. Do not use this to make the schedule
+	/**
+	 * For initialising a list of all the input graph nodes
+	 * @param g : the inpur graph
+	 */
 	public Schedule(DefaultGraph g){
 		schedule = new ArrayList<Node>();
 		Iterator<Node> i = g.getNodeIterator();
@@ -43,51 +47,53 @@ public class Schedule {
 		scheduleLength = 0;
 	}
 
-	//adds a node to the scheduler
+	/**
+	 * adds a node to the scheduler
+	 * @param n
+	 * @param processorID
+	 * @param procWaitTime
+	 */
 	public void addNode(Node n, int processorID, int procWaitTime){
 		n.setAttribute("processorID", processorID);
 		n.setAttribute("Start", procLengths[processorID] + procWaitTime);
 		schedule.add(n);
 	}
 
-	//Changes the processor id for a node. This assumes the node has the processorID attribute.
+	/**
+	 * Changes the processor id for a node. This assumes the node has the processorID attribute.
+	 * @param nodePosition
+	 * @param processorID
+	 */
 	public void changeNodeProcessor(int nodePosition, int processorID){
 		schedule.get(nodePosition).setAttribute("processorID", processorID);
 		schedule.get(nodePosition).setAttribute("Start", procLengths[processorID]);
 	}
 
-	//removes a node in a given position in the schedule
+	/**
+	 * removes a node in a given position in the schedule
+	 * @param nodePosition
+	 */
 	public void removeNode(int nodePosition){
 		schedule.remove(nodePosition);
-
-		//
 	}
 
-	//update processor lengths 
+	/**
+	 * update processor lengths 
+	 * @param processorID
+	 * @param procIncrease
+	 */
 	public void updateProcessorLength(int processorID, int procIncrease) {
 		procLengths[processorID] += procIncrease;
 
-		//update schedule length
+		//updates the schedule length
 		scheduleLength = findScheduleLength();
 	}
 
-	//Find the current length of the schedule. This assumes the input schedule is valid
-	//MIGHT NOT BE NEEDED, leave it for now
+	/**
+	 * Find the current length of the schedule. This assumes the input schedule is valid.
+	 * @return
+	 */
 	public int findScheduleLength() {
-		//		int cost = this.schedule.get(0).getAttribute("Weight");	//initial cost is the first node in the first processor
-		//		int currentProc = 0; 			//current processor, starts at the first one 0
-		//		int i = 1;
-		//		
-		//		do{
-		//			Node n = this.schedule.get(i);
-		//			if(Double.parseDouble(n.getAttribute("processorID").toString()) == currentProc){
-		//				
-		//			}
-		//		}while(i < this.schedule.size());
-		//		
-		//		return 0;
-
-		// schedule length should be equal to the largest procLength - assuming procLengths is updated every time new node is added/removed
 		int largestProcLength = procLengths[0];
 
 		for (int proc: procLengths) {
@@ -97,6 +103,5 @@ public class Schedule {
 		}
 
 		return largestProcLength;
-
 	}
 }

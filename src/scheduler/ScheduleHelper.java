@@ -8,13 +8,18 @@ import org.graphstream.graph.Node;
 import scheduler.Greedy.QueueItem;
 
 import org.graphstream.graph.Edge;
-
+/**
+ * This class provides methods that the Schedule data structure can use
+ *
+ */
 public class ScheduleHelper {
 
-
-	//Find the root nodes 
+	/**
+	 * Finds all the root nodes of the input graph
+	 * @param g
+	 * @returns all the root nodes
+	 */
 	public static ArrayList<Integer> findRootNodes(Graph g) {
-
 		ArrayList<Integer> rootNodes = new ArrayList<Integer>();
 		int i = 0;
 
@@ -24,25 +29,34 @@ public class ScheduleHelper {
 			}
 			i++;
 		}
-
 		return rootNodes;
 	}
 
+	/**
+	 * Get's the weight of the input node, and returns its weight
+	 * @param g
+	 * @param nodeIndex
+	 * @return
+	 */
 	public static int getNodeWeight(Graph g, int nodeIndex){
 		return (int)Double.parseDouble(g.getNode(nodeIndex).getAttribute("Weight").toString());
 	}
 
 
-	// After a node has been processed, call this function to return all new nodes that can be processed
+	/**
+	 * After a node has been processed, this method is used to return all new nodes that can be processed
+	 * @param g
+	 * @param nodeIndex
+	 * @return
+	 */
 	public static ArrayList<Integer> processableNodes(Graph g, int nodeIndex) {
 
 		ArrayList<Integer> processableNodes = new ArrayList<Integer>();
-
-		// Get all the leaving edges of the node just processed
-		Iterable<Edge> ite = g.getNode(nodeIndex).getEachLeavingEdge();
-
 		boolean nodeProcessable;
-		// Get all the child nodes of the node that was just processed, for each child node, check whether all it's parent nodes have been processed
+		
+		Iterable<Edge> ite = g.getNode(nodeIndex).getEachLeavingEdge(); // Gets all the leaving edges of the node just processed
+
+		// Gets all the child nodes of the node that was just processed, for each child node, check whether all it's parent nodes have been processed
 		for (Edge e: ite) {
 			Node n = e.getNode1();
 			nodeProcessable = true;
@@ -62,17 +76,22 @@ public class ScheduleHelper {
 				processableNodes.add(n.getIndex());
 			}
 		}
-
 		return processableNodes;
 	}
 
-	//needs to return the cost of putting the queue item into the processor
+	/**
+	 * Returns the cost of putting the queue item into the processor
+	 * @param schedule
+	 * @param q
+	 * @param g
+	 * @return
+	 */
 	public static int[] scheduleNode(Schedule schedule, QueueItem q, Graph g) {
 
 		int minimumProcLength;
 		int procWaitTime = 0;
 		int nodeWeight = getNodeWeight(g, q.nodeIndex);
-		int scheduleIncrease = 0;
+		
 		ArrayList<Integer> parentNodeCosts = new ArrayList<Integer>(); // This stores the cost of putting the queue item into the specified pid when coming from each parent node
 		ArrayList<Node> parentNodes = new ArrayList<Node>(); // Stores the parent node queue item comes from
 		

@@ -5,38 +5,42 @@ import java.util.ArrayList;
 import org.graphstream.graph.Graph;
 
 public class Greedy {
+	
+	/**
+	 * 
+	 * @param g
+	 * @param procCount
+	 * @return
+	 */
 	public Schedule greedySearch(Graph g, int procCount){
+		
 		Schedule schedule = new Schedule(procCount);		//make a new, empty schedule
 		ArrayList<QueueItem> queue = new ArrayList<QueueItem>();
 		ArrayList<Integer> root = ScheduleHelper.findRootNodes(g);
+		
 		for(Integer i:root){
-			//Add root nodes to queue.
 			for(int j = 0; j < procCount; j++ ){
 				queue.add(new QueueItem(i, j));
 			}
 		}
 		QueueItem smallest = queue.get(0);
-//		int popIndex = 0;
 		
 		// picking smallest root node 
 		for(int i = 0; i < queue.size(); i++){
 			QueueItem q = queue.get(i);
 			if(ScheduleHelper.getNodeWeight(g, q.nodeIndex) <= ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)){
 				smallest = q;
-//				popIndex = i;
 			}
 		}
 		
-//		int popIndex = 0;
 		for (int popIndex = queue.size() -1 ; popIndex > -1; popIndex--) {
 			if (queue.get(popIndex).nodeIndex == smallest.nodeIndex) {
 				queue.remove(popIndex);
 			}
-//			popIndex++;
 		}
 		schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID, 0);
 		schedule.updateProcessorLength(smallest.processorID, ScheduleHelper.getNodeWeight(g, smallest.nodeIndex));
-//		queue.remove(popIndex);
+
 		//need to pop all queueitems with same nodeindex that was just processed
 		
 		ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);
@@ -47,12 +51,6 @@ public class Greedy {
 		}
 		
 		while(!queue.isEmpty()){
-		
-			/*
-			 * NOTE: Use zong's function to find 'best' node to insert
-			 * this is an array with 2 values, the first is the increase in the schedule length if the node is inserted
-			 * the second value is the increase in processor length if the node is inserted.
-			 */
 			
 			int[] procInfo;
 			int procWaitTime = 0;
@@ -71,7 +69,6 @@ public class Greedy {
 					smallest = q;
 					smallestWeightChange = newProcLength - scheduleLength;
 					processorWeightInc = newProcLength - schedule.procLengths[q.processorID];
-//					popIndex = i;
 				}
 			}
 			
@@ -79,7 +76,6 @@ public class Greedy {
 				if (queue.get(popIndex).nodeIndex == smallest.nodeIndex) {
 					queue.remove(popIndex);
 				}
-//				popIndex++;
 			}
 
 			
@@ -92,7 +88,6 @@ public class Greedy {
 					queue.add(new QueueItem(i, j));
 				}
 			}
-//			queue.remove(popIndex);
 		}
 			
 		/*
@@ -105,11 +100,9 @@ public class Greedy {
 		return schedule;
 	}
 	
-//	public void addNodeToSchedule(Schedule s, QueueItem q, Graph g, int popIndex, int processorWeightInc){
-//		s.addNode(g.getNode(q.nodeIndex), q.processorID);
-//		s.procLengths[q.processorID] += processorWeightInc;
-//		queue.remove(popIndex);
-//	}
+	/**
+	 * This class is used by processable nodes as a queue items
+	 */
 	public class QueueItem{
 		public int nodeIndex;
 		public int processorID;
