@@ -1,7 +1,7 @@
 package scheduler;
 
 import java.util.ArrayList;
-
+import ui.Update;
 import org.graphstream.graph.Graph;
 
 public class Greedy {
@@ -17,10 +17,11 @@ public class Greedy {
 		Schedule schedule = new Schedule(procCount);		//make a new, empty schedule
 		ArrayList<QueueItem> queue = new ArrayList<QueueItem>();
 		ArrayList<Integer> root = ScheduleHelper.findRootNodes(g);
-		
+		Update update=new Update(procCount);
 		for(Integer i:root){
 			for(int j = 0; j < procCount; j++ ){
 				queue.add(new QueueItem(i, j));
+				
 			}
 		}
 		QueueItem smallest = queue.get(0);
@@ -40,16 +41,20 @@ public class Greedy {
 		}
 		schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID, 0);
 		schedule.updateProcessorLength(smallest.processorID, ScheduleHelper.getNodeWeight(g, smallest.nodeIndex));
-
+		update.updateColor(smallest.nodeIndex, smallest.processorID, g);
+		
+		g.getNode(smallest.nodeIndex).addAttribute("ui.style", "text-style:bold-italic; text-size:18;");
+		
 		//need to pop all queueitems with same nodeindex that was just processed
 		
 		ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);
 		for(int i:childrenNodes){
 			for(int j = 0; j < procCount; j++ ){
 				queue.add(new QueueItem(i, j));
+				
 			}
 		}
-		
+		int t=0;
 		while(!queue.isEmpty()){
 			
 			int[] procInfo;
@@ -69,6 +74,9 @@ public class Greedy {
 					smallest = q;
 					smallestWeightChange = newProcLength - scheduleLength;
 					processorWeightInc = newProcLength - schedule.procLengths[q.processorID];
+					
+					//g.getNode(q.nodeIndex).addAttribute("ui.style", "fill-color: rgb(0,100,255);");
+					
 				}
 			}
 			
@@ -82,12 +90,14 @@ public class Greedy {
 			schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID, procWaitTime);
 			schedule.updateProcessorLength(smallest.processorID, processorWeightInc);
 			
+			//System.out.println("TEST i="+t+" :  Node id: " + smallest.nodeIndex + " ProcID: " + smallest.processorID );
 			childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);
 			for(int i:childrenNodes){
 				for(int j = 0; j < procCount; j++ ){
 					queue.add(new QueueItem(i, j));
 				}
 			}
+			update.updateColor(smallest.nodeIndex,smallest.processorID,g);
 		}
 			
 		/*

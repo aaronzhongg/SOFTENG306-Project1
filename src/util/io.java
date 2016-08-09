@@ -3,6 +3,7 @@ package util;
 import java.io.*;
 
 import org.graphstream.stream.file.FileSinkDOT;
+
 import scheduler.Schedule;
 
 import org.graphstream.graph.Graph;
@@ -63,9 +64,12 @@ public class io {
         for (int i = 0; i < g.getNodeCount(); i++) {
         	g.getNode(i).addAttribute("processorID", -1);
         	g.getNode(i).addAttribute("Start" , -1);
+        	g.getNode(i).addAttribute("ui.label", "Node : "+g.getNode(i).getId());
+      //  g.getNode(i).addAttribute("ui.class",g.getNode(i).getAttribute("processorID")+"");
+        
         }
        
-        g.display();
+        //g.display();
         return g;
     }
 

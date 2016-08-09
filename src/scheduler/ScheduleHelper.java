@@ -6,6 +6,7 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 
 import scheduler.Greedy.QueueItem;
+import scheduler.Schedule;
 
 import org.graphstream.graph.Edge;
 /**

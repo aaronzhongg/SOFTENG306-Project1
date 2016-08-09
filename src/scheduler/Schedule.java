@@ -55,6 +55,7 @@ public class Schedule {
 	 */
 	public void addNode(Node n, int processorID, int procWaitTime){
 		n.setAttribute("processorID", processorID);
+	
 		n.setAttribute("Start", procLengths[processorID] + procWaitTime);
 		schedule.add(n);
 	}

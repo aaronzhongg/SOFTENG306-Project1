@@ -3,10 +3,12 @@ package main;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.graphstream.graph.Graph;
 import org.graphstream.graph.*;
+
 import scheduler.*;
+import ui.MainView;
 import util.io;
+import ui.Update;
 
 /**
  * Created by jay on 5/08/16.
@@ -26,7 +28,7 @@ public class Main {
         // comment out code below before submitting.
         String inputFile = "digraph_example3.dot";
         int processorInput = 2;
-
+        
 		//int processorInput = 2;
 		//String file_name = "digraph_example.dot";
 		File input_file = new File(inputFile);
@@ -35,6 +37,9 @@ public class Main {
 		//ScheduleHelper scheduleHelper = new ScheduleHelper();
 
 		Graph g = IOProcessor.DOTParser(input_file, inputFile);
+		//System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+		 MainView MainView=new MainView(g);
+		// MainView.setVisible(true);
 
 		// Find root nodes from the input graph
 		//ArrayList<Integer> rootNodes = ScheduleHelper.findRootNodes(g);
@@ -49,6 +54,8 @@ public class Main {
 		System.out.println("Total Schedule Length: " + schedule.scheduleLength);
 
         IOProcessor.outputFile(schedule, g, inputFile); // creates the output file
+       
+        
 
 	}
 }

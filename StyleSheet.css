@@ -1,0 +1,13 @@
+node {
+	size: 10px, 15px;
+	shape: box;
+	fill-color: gray;
+	stroke-mode: plain;
+	stroke-color: yellow;
+	text-style:bold;
+	
+	text-alignment:at-right;
+	text-offset:40;
+	text-size:15;
+}
+
