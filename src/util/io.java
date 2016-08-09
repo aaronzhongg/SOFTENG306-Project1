@@ -1,14 +1,11 @@
 package util;
 
 import java.io.*;
-import java.util.Iterator;
 
 import org.graphstream.stream.file.FileSinkDOT;
-import org.graphstream.stream.netstream.packing.Base64;
 import scheduler.Schedule;
 
 import org.graphstream.graph.Graph;
-import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.file.FileSource;
 import org.graphstream.stream.file.FileSourceDOT;
