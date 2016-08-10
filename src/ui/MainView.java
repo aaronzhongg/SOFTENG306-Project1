@@ -13,7 +13,7 @@ import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 public class MainView extends JFrame{
 	private Graph g;
-	private InfoPanel infoPanel;
+	//private InfoPanel infoPanel;
 
 public MainView(Graph g){
 	this.g=g;
