@@ -133,7 +133,7 @@ public class ScheduleHelper {
 				} else {	//find out how long need to wait before can add to processor
 					
 					//time left to wait
-					int timeToWait = edgeWeight - (schedule.procLengths[q.processorID] - parentNodeFinishedProcessing);
+					int timeToWait = edgeWeight - (schedule.procLengths[q.processorID] - currentParentNodeFinish);
 
 					if (timeToWait < 0) {
 						timeToWait = 0;
@@ -147,9 +147,9 @@ public class ScheduleHelper {
 			minimumProcLength = parentNodeCosts.get(0);
 			
 			int temp = 0;
-			for(int i = 0; i < parentNodeCosts.size() - 1; i++) {
+			for(int i = 0; i < parentNodeCosts.size(); i++) {
 				int pNodeCost = parentNodeCosts.get(i);
-				if (pNodeCost < minimumProcLength) {
+				if (pNodeCost > minimumProcLength) {
 					minimumProcLength = pNodeCost;
 					temp = i;
 				}

@@ -50,7 +50,7 @@ public class Main {
 		
 		// prints answer
 		for(Node n:schedule.schedule){
-			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("processorID") + " Starts at: " + n.getAttribute("Start"));
+			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("processorID") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
 		}
 		System.out.println("Total Schedule Length: " + schedule.scheduleLength);
 
