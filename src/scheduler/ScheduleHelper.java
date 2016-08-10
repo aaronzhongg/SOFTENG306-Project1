@@ -98,20 +98,28 @@ public class ScheduleHelper {
 		
 
 		if (g.getNode(q.nodeIndex).getInDegree() != 0) { //if it's not a root
-			
+			int parentNodeFinishedProcessing = 0;
+			//need to find when the longest parent node finished processing
+			for (Edge e : g.getNode(q.nodeIndex).getEachEnteringEdge()) {
+				Node parentNode = e.getNode0();
+				int tempValue = (int)Double.parseDouble(parentNode.getAttribute("Start").toString()) + getNodeWeight(g, parentNode.getIndex());
+				if(tempValue > parentNodeFinishedProcessing){
+					parentNodeFinishedProcessing = tempValue;
+				}
+			}
 			//Get the post-processed processorLength of the queueitem from each of the parent nodes
 			for (Edge e : g.getNode(q.nodeIndex).getEachEnteringEdge()) {
 				Node parentNode = e.getNode0();
-				int parentProcessor = (int)Double.parseDouble(parentNode.getAttribute("processorID").toString());
+				//int parentProcessor = (int)Double.parseDouble(parentNode.getAttribute("processorID").toString());
 
 				
-				if (q.processorID == parentProcessor) {	//if parent node was processed on the same processor than the queue item can be added with just nodeWeight
-					parentNodeCosts.add(schedule.procLengths[q.processorID] + nodeWeight);
-					parentNodes.add(parentNode);
-				} else { //parent node was not processed on the same processor
+				//if (q.processorID == parentProcessor) {	//if parent node was processed on the same processor than the queue item can be added with just nodeWeight
+					//parentNodeCosts.add(schedule.procLengths[q.processorID] + nodeWeight);
+					//parentNodes.add(parentNode);
+				//} else { //parent node was not processed on the same processor
 					
-					//need to find when the parent node finished processing
-					int parentNodeFinishedProcessing = (int)Double.parseDouble(parentNode.getAttribute("Start").toString()) + getNodeWeight(g, parentNode.getIndex());
+					
+					//parentNodeFinishedProcessing = (int)Double.parseDouble(parentNode.getAttribute("Start").toString()) + getNodeWeight(g, parentNode.getIndex());
 
 					//if the parent node finished processing longer than the weight of the edge to the child then can add automatically to the processor
 					if (schedule.procLengths[q.processorID] - parentNodeFinishedProcessing >= (int)Double.parseDouble(e.getAttribute("Weight").toString())){
@@ -130,7 +138,7 @@ public class ScheduleHelper {
 						parentNodeCosts.add(schedule.procLengths[q.processorID] + nodeWeight + timeToWait);
 						parentNodes.add(parentNode);
 					}
-				}
+				//}
 
 			}
 

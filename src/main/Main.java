@@ -26,7 +26,7 @@ public class Main {
 //        int processorInput = Integer.parseInt(args[1]);
 
         // comment out code below before submitting.
-        String inputFile = "digraph_example5.dot";
+        String inputFile = "Nodes_8_Random.dot";
         int processorInput = 2;
         
 		//int processorInput = 2;
