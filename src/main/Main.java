@@ -28,10 +28,12 @@ public class Main {
 //        int processorInput = Integer.parseInt(args[1]);
 
         // comment out code below before submitting.
+
 	
 		initialTime = System.currentTimeMillis();
 		endTime=0;
-		String inputFile = "TestDotFiles/Nodes_10_Random.dot";
+	        String inputFile = "TestDotFiles/Nodes_8_Random.dot";
+
         int processorInput = 2;
         
 		//int processorInput = 2;
