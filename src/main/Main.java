@@ -27,7 +27,7 @@ public class Main {
 
         // comment out code below before submitting.
 
-        String inputFile = "TestDotFiles/Nodes_8_Random.dot";
+        String inputFile = "TestDotFiles/Nodes_10_Random.dot";
         int processorInput = 2;
         
 		//int processorInput = 2;
@@ -39,7 +39,7 @@ public class Main {
 
 		Graph g = IOProcessor.DOTParser(input_file, inputFile);
 		//System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
-		 MainView MainView=new MainView(g);
+		 //MainView MainView=new MainView(g);
 		// MainView.setVisible(true);
 
 		// Find root nodes from the input graph

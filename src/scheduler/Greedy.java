@@ -18,7 +18,7 @@ public class Greedy {
 		Schedule schedule = new Schedule(procCount);		//make a new, empty schedule
 		ArrayList<QueueItem> queue = new ArrayList<QueueItem>();	//make an empty queue
 		ArrayList<Integer> root = ScheduleHelper.findRootNodes(g);	//finds all root nodes
-		Update update=new Update(procCount);
+		//Update update=new Update(procCount);
 		
 		for(Integer i:root){ //adds all root nodes to the queue, each with all processor ids
 			for(int j = 0; j < procCount; j++ ){
@@ -46,7 +46,7 @@ public class Greedy {
 		schedule.updateProcessorLength(smallest.processorID, ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)); //changes processor length of added smallest root node
 		
 		//updates GUI
-		update.updateColor(smallest.nodeIndex, smallest.processorID, g);//updates the color
+		//update.updateColor(smallest.nodeIndex, smallest.processorID, g);//updates the color
 		g.getNode(smallest.nodeIndex).addAttribute("ui.style", "text-style:bold-italic; text-size:18;");
 		
 		//goes through all children of the smallest root nodes and 
@@ -102,7 +102,7 @@ public class Greedy {
 				}
 			}
 			
-			update.updateColor(smallest.nodeIndex,smallest.processorID,g); //GUI
+			//update.updateColor(smallest.nodeIndex,smallest.processorID,g); //GUI
 		}
 			
 		/* NOTE
