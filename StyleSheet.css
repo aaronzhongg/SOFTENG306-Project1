@@ -1,13 +1,17 @@
 node {
 	size: 10px, 15px;
 	shape: box;
-	fill-color: gray;
-	stroke-mode: plain;
-	stroke-color: yellow;
-	text-style:bold;
 	
-	text-alignment:at-right;
-	text-offset:40;
+	fill-color: gray;
+	stroke-mode: plain; 
+	stroke-color: #999;
+	
+	
+	text-style:bold;
+	text-alignment:under;
+	
 	text-size:15;
+	
+	
 }
 

@@ -5,8 +5,6 @@ import java.awt.Component;
 
 import javax.swing.JFrame;
 
-import main.InfoPanel;
-
 import org.graphstream.graph.*;
 import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.View;
