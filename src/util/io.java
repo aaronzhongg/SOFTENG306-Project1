@@ -84,7 +84,8 @@ public class io {
 //        }
         String[] split = inputFileName.split(".dot");
         String nameWithoutSuffix = split[0];
-        String outputFileName = "/tmp/" + nameWithoutSuffix + "-output.dot";
+        File outputFileWithoutSuffix = new File(nameWithoutSuffix);
+        String outputFileName = "/tmp/" + outputFileWithoutSuffix.getName() + "-output.dot";
         FileSinkDOT fs = new FileSinkDOT(true);
         File outputFile = new File(outputFileName);
         FileOutputStream fos = null;

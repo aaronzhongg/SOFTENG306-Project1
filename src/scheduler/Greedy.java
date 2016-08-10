@@ -28,7 +28,7 @@ public class Greedy {
 		
 		QueueItem smallest = queue.get(0);
 		// picking smallest root node from the queue
-		for(int i = 1; i < queue.size(); i++){
+		for(int i = 0; i < queue.size(); i++){
 			QueueItem q = queue.get(i);
 			if(ScheduleHelper.getNodeWeight(g, q.nodeIndex) <= ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)){
 				smallest = q;
