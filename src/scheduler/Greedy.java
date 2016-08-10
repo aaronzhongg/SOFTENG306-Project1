@@ -47,7 +47,7 @@ public class Greedy {
 		
 		//updates GUI
 		//update.updateColor(smallest.nodeIndex, smallest.processorID, g);//updates the color
-		g.getNode(smallest.nodeIndex).addAttribute("ui.style", "text-style:bold-italic; text-size:18;");
+		//g.getNode(smallest.nodeIndex).addAttribute("ui.style", "text-style:bold-italic; text-size:18;");
 		
 		//goes through all children of the smallest root nodes and 
 		ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);
