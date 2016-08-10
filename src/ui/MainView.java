@@ -27,7 +27,7 @@ public MainView(Graph g){
 
 	add((Component)view,BorderLayout.CENTER);
 	infoPanel=new InfoPanel();
-	//]add(infoPanel,BorderLayout.EAST);
+	add(infoPanel,BorderLayout.EAST);
 	setVisible(true);
 }
 

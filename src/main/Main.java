@@ -16,6 +16,7 @@ import ui.Update;
  */
 public class Main {
 	private static Graph g ;
+	public static long initialTime,endTime;
 	public static void main(String[] args){
 
 	    //uncomment below before submitting - just some additional robustness and error-checking
@@ -27,7 +28,10 @@ public class Main {
 //        int processorInput = Integer.parseInt(args[1]);
 
         // comment out code below before submitting.
-        String inputFile = "TestDotFiles/Nodes_10_Random.dot";
+	
+		initialTime = System.currentTimeMillis();
+		endTime=0;
+		String inputFile = "TestDotFiles/Nodes_10_Random.dot";
         int processorInput = 2;
         
 		//int processorInput = 2;
@@ -48,7 +52,7 @@ public class Main {
 		
 		Greedy greedy = new Greedy();
 		schedule = greedy.greedySearch(g, processorInput);
-		
+		endTime=System.currentTimeMillis();
 		// prints answer
 		for(Node n:schedule.schedule){
 			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("processorID") + " Starts at: " + n.getAttribute("Start"));
