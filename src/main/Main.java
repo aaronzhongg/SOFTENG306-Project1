@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.graphstream.graph.*;
+import org.graphstream.graph.implementations.DefaultGraph;
 
 import scheduler.*;
 import ui.MainView;
@@ -14,7 +15,7 @@ import ui.Update;
  * Created by jay on 5/08/16.
  */
 public class Main {
-	
+	private static Graph g ;
 	public static void main(String[] args){
 
 	    //uncomment below before submitting - just some additional robustness and error-checking
@@ -35,10 +36,11 @@ public class Main {
 		io IOProcessor = new io();
 		Schedule schedule;
 		//ScheduleHelper scheduleHelper = new ScheduleHelper();
-
-		Graph g = IOProcessor.DOTParser(input_file, inputFile);
-		//System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+		 g = new DefaultGraph("g");
 		 MainView MainView=new MainView(g);
+		 g = IOProcessor.DOTParser(input_file, inputFile,g);
+		//System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+		
 		// MainView.setVisible(true);
 
 		// Find root nodes from the input graph

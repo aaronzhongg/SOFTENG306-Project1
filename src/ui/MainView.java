@@ -19,7 +19,7 @@ public MainView(Graph g){
 	g.addAttribute("ui.stylesheet", "url('"+location+"')");
 	setLayout(new BorderLayout());
 	setDefaultCloseOperation(EXIT_ON_CLOSE);
-	this.setBounds(200, 200, 700, 500);
+	setBounds(200, 200, 700, 500);
 	Viewer viewer=new Viewer(g,  Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
 	viewer.enableAutoLayout();
 	View view = viewer.addDefaultView(false); 

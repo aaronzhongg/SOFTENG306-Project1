@@ -46,8 +46,8 @@ public class Greedy {
 		schedule.updateProcessorLength(smallest.processorID, ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)); //changes processor length of added smallest root node
 		
 		//updates GUI
-		update.updateColor(smallest.nodeIndex, smallest.processorID, g);//updates the color
-		g.getNode(smallest.nodeIndex).addAttribute("ui.style", "text-style:bold-italic; text-size:18;");
+		update.updateColor(smallest.nodeIndex, smallest.processorID, g);//updates root node color
+		g.getNode(smallest.nodeIndex).addAttribute("ui.style", "text-style:bold-italic; text-size:18;");//make root node text different
 		
 		//goes through all children of the smallest root nodes and 
 		ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);
@@ -79,7 +79,8 @@ public class Greedy {
 					smallestWeightChange = newProcLength - scheduleLength;
 					processorWeightInc = newProcLength - schedule.procLengths[q.processorID];	
 					
-					//GUI //g.getNode(q.nodeIndex).addAttribute("ui.style", "fill-color: rgb(0,100,255);");
+					//GUI show the currently processing node in special color
+					g.getNode(q.nodeIndex).addAttribute("ui.style", "fill-color: rgb(0,100,255);");
 				}
 			}
 			
@@ -101,8 +102,8 @@ public class Greedy {
 					queue.add(new QueueItem(i, j));
 				}
 			}
-			
-			update.updateColor(smallest.nodeIndex,smallest.processorID,g); //GUI
+			//GUI update node color according to the processorID
+			update.updateColor(smallest.nodeIndex,smallest.processorID,g); 
 		}
 			
 		/* NOTE
