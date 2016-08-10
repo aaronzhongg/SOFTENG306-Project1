@@ -33,23 +33,23 @@ public class Schedule {
 	/**
 	 * adds an input node to the scheduler
 	 * @param n : Node wanting to add
-	 * @param processorID : the processor the node will get added to
+	 * @param Processor : the processor the node will get added to
 	 * @param procWaitTime
 	 */
-	public void addNode(Node n, int processorID, int procWaitTime){
-		n.setAttribute("processorID", processorID);
-		n.setAttribute("Start", procLengths[processorID] + procWaitTime);
+	public void addNode(Node n, int Processor, int procWaitTime){
+		n.setAttribute("Processor", Processor);
+		n.setAttribute("Start", procLengths[Processor] + procWaitTime);
 		schedule.add(n);
 	}
 
 	/**
-	 * Changes the processor id for a node. This assumes the node has the processorID attribute.
+	 * Changes the processor id for a node. This assumes the node has the Processor attribute.
 	 * @param nodePosition
-	 * @param processorID
+	 * @param Processor
 	 */
-	public void changeNodeProcessor(int nodePosition, int processorID){
-		schedule.get(nodePosition).setAttribute("processorID", processorID);
-		schedule.get(nodePosition).setAttribute("Start", procLengths[processorID]);
+	public void changeNodeProcessor(int nodePosition, int Processor){
+		schedule.get(nodePosition).setAttribute("Processor", Processor);
+		schedule.get(nodePosition).setAttribute("Start", procLengths[Processor]);
 	}
 
 	/**
@@ -62,11 +62,11 @@ public class Schedule {
 
 	/**
 	 * update processor lengths 
-	 * @param processorID
+	 * @param Processor
 	 * @param procIncrease
 	 */
-	public void updateProcessorLength(int processorID, int procIncrease) {
-		procLengths[processorID] += procIncrease;
+	public void updateProcessorLength(int Processor, int procIncrease) {
+		procLengths[Processor] += procIncrease;
 		scheduleLength = findScheduleLength();	//updates the schedule length to biggest of all processors
 	}
 

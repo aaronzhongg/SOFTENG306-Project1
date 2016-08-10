@@ -60,12 +60,12 @@ public class io {
             fs.removeSink(g);
         }
         
-        //Add processorID attribute to every node
+        //Add Processor attribute to every node
         for (int i = 0; i < g.getNodeCount(); i++) {
-        	g.getNode(i).addAttribute("processorID", -1);
+        	g.getNode(i).addAttribute("Processor", -1);
         	g.getNode(i).addAttribute("Start" , -1);
         	//g.getNode(i).addAttribute("ui.label", "Node : "+g.getNode(i).getId());
-      //  g.getNode(i).addAttribute("ui.class",g.getNode(i).getAttribute("processorID")+"");
+      //  g.getNode(i).addAttribute("ui.class",g.getNode(i).getAttribute("Processor")+"");
         
         }
        
@@ -78,7 +78,7 @@ public class io {
 //            for (Node graphnode: inputGraph.getNodeSet()){
 //                if (n.getId() == graphnode.getId()){
 //                    //graphnode.addAttribute("Start", n.getAttribute("Start").toString());
-//                    //graphnode.addAttribute("Processor", n.getAttribute("processorID").toString());
+//                    //graphnode.addAttribute("Processor", n.getAttribute("Processor").toString());
 //                }
 //
 //            }
@@ -94,6 +94,7 @@ public class io {
             outputFile.createNewFile();
             fos = new FileOutputStream(outputFile);
             fs.writeAll(inputGraph, fos);
+            System.out.println("Output file saved to: " + outputFileName);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

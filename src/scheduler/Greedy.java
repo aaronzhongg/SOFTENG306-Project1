@@ -42,11 +42,11 @@ public class Greedy {
 			}
 		}
 		
-		schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID, 0); //adds the smallest root node to the schedule of the smallest processor
-		schedule.updateProcessorLength(smallest.processorID, ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)); //changes processor length of added smallest root node
+		schedule.addNode(g.getNode(smallest.nodeIndex), smallest.Processor, 0); //adds the smallest root node to the schedule of the smallest processor
+		schedule.updateProcessorLength(smallest.Processor, ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)); //changes processor length of added smallest root node
 		
 		//updates GUI
-		//update.updateColor(smallest.nodeIndex, smallest.processorID, g);//updates the color
+		//update.updateColor(smallest.nodeIndex, smallest.Processor, g);//updates the color
 		//g.getNode(smallest.nodeIndex).addAttribute("ui.style", "text-style:bold-italic; text-size:18;");
 		
 		//goes through all children of the smallest root nodes and 
@@ -77,7 +77,7 @@ public class Greedy {
 					procWaitTime = procInfo[1];
 					smallest = q;
 					smallestWeightChange = newProcLength - scheduleLength;
-					processorWeightInc = newProcLength - schedule.procLengths[q.processorID];	
+					processorWeightInc = newProcLength - schedule.procLengths[q.Processor];	
 					
 					//GUI //g.getNode(q.nodeIndex).addAttribute("ui.style", "fill-color: rgb(0,100,255);");
 				}
@@ -90,10 +90,10 @@ public class Greedy {
 			}
 
 			//adds smallest node to schedule
-			schedule.addNode(g.getNode(smallest.nodeIndex), smallest.processorID, procWaitTime);
-			schedule.updateProcessorLength(smallest.processorID, processorWeightInc);
+			schedule.addNode(g.getNode(smallest.nodeIndex), smallest.Processor, procWaitTime);
+			schedule.updateProcessorLength(smallest.Processor, processorWeightInc);
 			
-			//TEST //System.out.println("TEST i="+t+" :  Node id: " + smallest.nodeIndex + " ProcID: " + smallest.processorID );
+			//TEST //System.out.println("TEST i="+t+" :  Node id: " + smallest.nodeIndex + " ProcID: " + smallest.Processor );
 			
 			childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex); //adds processable children to queue
 			for(int i:childrenNodes){
@@ -102,7 +102,7 @@ public class Greedy {
 				}
 			}
 			
-			//update.updateColor(smallest.nodeIndex,smallest.processorID,g); //GUI
+			//update.updateColor(smallest.nodeIndex,smallest.Processor,g); //GUI
 		}
 			
 		/* NOTE
@@ -121,15 +121,15 @@ public class Greedy {
 	 */
 	public class QueueItem{
 		public int nodeIndex;
-		public int processorID;
+		public int Processor;
 		
 		public QueueItem(int n){
 			nodeIndex = n;
-			processorID = -1;	//default value, -1 means it has not been processed yet.
+			Processor = -1;	//default value, -1 means it has not been processed yet.
 		}
 		public QueueItem(int n, int p){
 			nodeIndex = n;
-			processorID = p;
+			Processor = p;
 		}
 	}
 }
