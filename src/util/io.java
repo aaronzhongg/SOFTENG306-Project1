@@ -1,6 +1,11 @@
 package util;
 
 import java.io.*;
+
+import org.graphstream.stream.file.FileSinkDOT;
+
+import scheduler.Schedule;
+
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.file.FileSource;
@@ -41,20 +46,61 @@ public class io {
 
     }
 
-    public Graph DOTParser(File input_file){
+    public Graph DOTParser(File input_file, String file_name){
         Graph g = new DefaultGraph("g");
         FileSource fs = new FileSourceDOT();
 
         fs.addSink(g);
-
+        
         try{
-            fs.readAll("digraph_example.dot");
+            fs.readAll(file_name);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             fs.removeSink(g);
         }
-        g.display();
+        
+        //Add Processor attribute to every node
+        for (int i = 0; i < g.getNodeCount(); i++) {
+        	g.getNode(i).addAttribute("Processor", -1);
+        	g.getNode(i).addAttribute("Start" , -1);
+        	//g.getNode(i).addAttribute("ui.label", "Node : "+g.getNode(i).getId());
+      //  g.getNode(i).addAttribute("ui.class",g.getNode(i).getAttribute("Processor")+"");
+        
+        }
+       
+        //g.display();
         return g;
+    }
+
+    public void outputFile(Schedule schedule, Graph inputGraph, String inputFileName){
+//        for (Node n: schedule.schedule){
+//            for (Node graphnode: inputGraph.getNodeSet()){
+//                if (n.getId() == graphnode.getId()){
+//                    //graphnode.addAttribute("Start", n.getAttribute("Start").toString());
+//                    //graphnode.addAttribute("Processor", n.getAttribute("Processor").toString());
+//                }
+//
+//            }
+//        }
+        String[] split = inputFileName.split(".dot");
+        String nameWithoutSuffix = split[0];
+        File outputFileWithoutSuffix = new File(nameWithoutSuffix);
+        String outputFileName = "/tmp/" + outputFileWithoutSuffix.getName() + "-output.dot";
+        FileSinkDOT fs = new FileSinkDOT(true);
+        File outputFile = new File(outputFileName);
+        FileOutputStream fos = null;
+        try {
+            outputFile.createNewFile();
+            fos = new FileOutputStream(outputFile);
+            fs.writeAll(inputGraph, fos);
+            System.out.println("Output file saved to: " + outputFileName);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 }
