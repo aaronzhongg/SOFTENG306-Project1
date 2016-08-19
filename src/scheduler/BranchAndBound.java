@@ -29,7 +29,7 @@ public class BranchAndBound {
 			rootNodes.add(g.getNode(i));
 		}
 		//Start the branch and bound
-		while(Branch() == false){
+		while(Branch(currentSchedule,g) == false){
 			Node nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
 			currentSchedule.removeNode(currentSchedule.schedule.size() - 1);
 			if(currentSchedule.schedule.isEmpty()){
@@ -54,10 +54,62 @@ public class BranchAndBound {
 	 * 
 	 * @return
 	 */
-	public static boolean Branch() {
-		
-		
-		return false;
+	public static boolean Branch(Schedule currentSchedule, Graph g) {
+	
+		boolean hasProcessable = false;
+
+		for (Node n : g) {
+			if (!currentSchedule.schedule.contains(n)) {
+				// check all the node that is not in the schedule
+				boolean isProcessable = ScheduleHelper.isProcessable(n,
+						currentSchedule);
+				if (isProcessable) {
+					// if it is processasble
+					hasProcessable = true;
+					for (int i = 0; i < Main.processorInput; i++) {
+						// check all the available processor
+						int isBetter = ScheduleHelper.checkChildNode(n,
+								currentSchedule, i);
+						if (isBetter == 1) {
+							// if it is a better solution
+							// calculate the waiting time for the node
+							// get current last node from scheduler as parent
+							Node parent = currentSchedule.schedule
+									.get(currentSchedule.schedule.size() - 1);
+							if (!parent.getAttribute("processer")
+									.equals(i + "")) {
+								// different processor
+								Edge parentToChild = parent.getEdgeToward(n);
+								int procWaitTime = (int) Double
+										.parseDouble(parentToChild
+												.getAttribute("Weight")
+												.toString());
+								ScheduleHelper.insertNodeToSchedule(n,
+										currentSchedule, i, procWaitTime);
+							} else {
+								// same processor no waiting time
+								ScheduleHelper.insertNodeToSchedule(n,
+										currentSchedule, i, 0);
+							}
+							// Recursive
+							Branch(currentSchedule, g);
+
+						}
+					}
+				}
+			}
+
+		}
+
+		if (!hasProcessable) {
+			// no more children
+			ScheduleHelper.foundNewBestSolution(currentSchedule);
+			return false;
+		} else {
+			return true;
+		}
+
+	
 	}
 
 	

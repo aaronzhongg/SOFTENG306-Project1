@@ -240,10 +240,11 @@ public class ScheduleHelper {
 	/**
 	 * Check the cost of adding the child node into the schedule 
 	 * @param node
-	 * @param schedule
+	 * @param schedule (current best schedule)
 	 * @return true if schedule time after adding the node is less than current best total schedule time
 	 */
 	public static int checkChildNode(Node node, Schedule schedule, int processorID){
+	    Schedule scheduleCopy = schedule;
 
 		ArrayList<Node> parentNodes = new ArrayList();
 		for (Edge e : node.getEachEnteringEdge()) {
@@ -253,7 +254,7 @@ public class ScheduleHelper {
 
 		int startTime;
 		int endTime;
-		int canStartat = 2147483647;
+		int canStartat = -1;
 		int tempValue;
 		int communication_cost = 0;
 		for (Node parent: parentNodes){
@@ -262,20 +263,25 @@ public class ScheduleHelper {
 
 			if ((int)Double.parseDouble(parent.getAttribute("Processor").toString()) == processorID){
 				tempValue = endTime;
+                communication_cost = 0;
 			}
 			else {
 				Edge parentToChild = parent.getEdgeToward(node);
 				communication_cost = (int)Double.parseDouble(parentToChild.getAttribute("Weight").toString());
 				tempValue = endTime + communication_cost;
 			}
-			if (tempValue < canStartat){
+			if (tempValue > canStartat){
 				canStartat = tempValue;
 			}
 
 		}
-		// canStartat represents the earliest start time that the input node can be scheduled on the input processor.
-
-		return -1;
+		scheduleCopy.addNode(node, processorID, communication_cost);
+		//canStartat represents the earliest start time that the input node can be scheduled on the input processor.
+		if (scheduleCopy.scheduleLength >= schedule.scheduleLength) {
+            return -1;
+        } else {
+            return schedule.scheduleLength - scheduleCopy.scheduleLength;
+        }
 	}
 	
 	/**

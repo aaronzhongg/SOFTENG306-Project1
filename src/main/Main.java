@@ -14,7 +14,7 @@ import ui.Update;
  * Created by jay on 5/08/16.
  */
 public class Main {
-	
+	public static int processorInput;
 	public static void main(String[] args){
 
 	    //uncomment below before submitting - just some additional robustness and error-checking
@@ -23,7 +23,7 @@ public class Main {
             System.exit(1);
         }
 	    String inputFile = args[0];
-        int processorInput = Integer.parseInt(args[1]);
+         processorInput = Integer.parseInt(args[1]);
 
         // comment out code below before submitting.
 
