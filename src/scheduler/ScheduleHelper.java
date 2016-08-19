@@ -197,8 +197,30 @@ public class ScheduleHelper {
 	 * 
 	 */
 	public static boolean isProcessable(Node nodeToBeChecked, Schedule currentSchedule) {
+		int indexOfCheckNode = nodeToBeChecked.getIndex();// gets the index of the node to be checked
 		
-		return true;
+		boolean nodeProcessable = true;
+		
+		for (int i = 0; i<dependencyMatrix[0].length; i++){ //loops through all the parents, check if the nodeToBeChecked is the child
+			if (dependencyMatrix[i][indexOfCheckNode] == 1){
+				
+				boolean parentInSchedule = false;
+				// check i is in the schedule
+				for (Node parent : currentSchedule.schedule){ //loops through whole schedule
+					if (parent.getIndex() == i){ // if parent in schedule return true
+						parentInSchedule = true;
+						break;
+					}
+				}
+				
+				if (!parentInSchedule){ // if parent is not in the schedule return false
+					nodeProcessable = false;
+					break;
+				}	
+			}
+		}
+		
+		return nodeProcessable;
 	}
 	
 	/**
