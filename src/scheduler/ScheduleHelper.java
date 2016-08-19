@@ -17,7 +17,7 @@ public class ScheduleHelper {
 	
 	public static int[][] dependencyMatrix;
 	public static Schedule currentBestSchedule;
-	public static int currentBestBound;
+
 	/**
 	 * This method should find all node dependencies and map them to an adjacency matrix.
 	 * @param g the graph of nodes and edges
@@ -205,10 +205,13 @@ public class ScheduleHelper {
 	 * Replace the current best schedule with the new best schedule and replace the current best bound with new best bound (bound = schedule length)
 	 * @param newBestSchedule
 	 * @return return a copy of the newBestSchedule
+	 * 
+	 * could just call this one line from Branch instead of having to call this function
 	 */
 	public static Schedule foundNewBestSolution(Schedule newBestSchedule) {
+		currentBestSchedule = newBestSchedule;
 		
-		return null;
+		return newBestSchedule;
 	}
 	
 	/**
@@ -223,12 +226,14 @@ public class ScheduleHelper {
 	}
 	
 	/**
-	 * If the child node produces a lower schedule time than current best total schedule time insert node into the schedule 
+	 * Insert the node into schedule 
 	 * @param nodeToInsert
 	 * @param currentSchedule
+	 * 
+	 * could just call this one line from Branch instead of having to call this function
 	 */ 
-	public static void insertNodeToSchedule(Node nodeToInsert, Schedule currentSchedule) {
-
+	public static void insertNodeToSchedule(Node nodeToInsert, Schedule currentSchedule, int Processor, int procWaitTime) {
+		currentSchedule.addNode(nodeToInsert, Processor, procWaitTime);
 	}
 	
 
