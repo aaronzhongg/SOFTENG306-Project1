@@ -96,7 +96,7 @@ public class ScheduleHelper {
 		ArrayList<Integer> parentNodeCosts = new ArrayList<Integer>(); // This stores the cost of putting the queue item into the specified pid when coming from each parent node
 		ArrayList<Node> parentNodes = new ArrayList<Node>(); // Stores the parent node queue item comes from
 		
-
+		
 		if (g.getNode(q.nodeIndex).getInDegree() != 0) { //if it's not a root
 			int parentNodeFinishedProcessing = 0;
 			//need to find when the longest parent node finished processing
@@ -167,4 +167,49 @@ public class ScheduleHelper {
 		return newProcLengthAndTimeToWait;
 
 	}
+	
+	/**
+	 * Check whether a node is processable (all of it's parents exist in the currentSchedule) check dependency 
+	 * @param nodeToBeChecked
+	 * @param currentSchedule
+	 * @return true if nodeToBeChecked is processable (all of it's parents exist in the schedule), false otherwise
+	 * 
+	 * may have to consider time to wait??
+	 */
+	public static boolean isProcessable(Node nodeToBeChecked, Schedule currentSchedule) {
+		
+		return true;
+	}
+	
+	/**
+	 * Replace the current best schedule with the new best schedule and replace the current best bound with new best bound (bound = schedule length)
+	 * @param newBestSchedule
+	 * @return return a copy of the newBestSchedule
+	 */
+	public static Schedule foundNewBestSolution(Schedule newBestSchedule) {
+		
+		return null;
+	}
+	
+	/**
+	 * Check the cost of adding the child node into the schedule 
+	 * @param nodeToBeChecked
+	 * @param currentSchedule
+	 * @return true if schedule time after adding the node is less than current best total schedule time
+	 */
+	public static boolean checkChildNode(Node nodeToBeChecked, Schedule currentSchedule) {
+		
+		return true;
+	}
+	
+	/**
+	 * If the child node produces a lower schedule time than current best total schedule time insert node into the schedule 
+	 * @param nodeToInsert
+	 * @param currentSchedule
+	 */ 
+	public static void insertNodeToSchedule(Node nodeToInsert, Schedule currentSchedule) {
+
+	}
+	
+	
 }
