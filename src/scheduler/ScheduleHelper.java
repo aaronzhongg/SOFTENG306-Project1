@@ -66,6 +66,7 @@ public class ScheduleHelper {
 
 	/**
 	 * After a node has been processed, this method is used to return all new nodes that can be processed
+	 * This is used for the Greedy algorithm. For the branch and bound algorithm use CheckChildNodes
 	 * @param g
 	 * @param nodeIndex
 	 * @return
