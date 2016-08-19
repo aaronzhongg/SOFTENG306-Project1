@@ -189,12 +189,12 @@ public class ScheduleHelper {
 	}
 
 	/**
-	 * Check whether a node is processable (all of it's parents exist in the currentSchedule) check dependency 
+	 * Check whether a node is processable (all of it's parents exist in the currentSchedule) check dependency from dependency matrix (from ScheduleHelper)
+	 * nodeToCheck.getIndex() gives you the index. dependencyMatrix[i][j] i is parent j is child (nodeToCheck is the child)
 	 * @param nodeToBeChecked
 	 * @param currentSchedule
 	 * @return true if nodeToBeChecked is processable (all of it's parents exist in the schedule), false otherwise
 	 * 
-	 * may have to consider time to wait??
 	 */
 	public static boolean isProcessable(Node nodeToBeChecked, Schedule currentSchedule) {
 		
