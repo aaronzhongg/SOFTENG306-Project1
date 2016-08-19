@@ -14,6 +14,23 @@ import org.graphstream.graph.Edge;
  *
  */
 public class ScheduleHelper {
+	
+	/**
+	 * This method should find all node dependencies and map them to an adjacency matrix.
+	 * @param g the graph of nodes and edges
+	 * @return a 2d int array of all edges between nodes
+	 */
+	public static int[][] makeDependencyMatrix(Graph g){
+		
+		int[][] dependencyMatrix = new int[g.getNodeCount()][g.getNodeCount()];
+		
+		for(Edge e:g.getEachEdge()){
+			int i = e.getNode0().getIndex();
+			int j = e.getNode1().getIndex();
+			dependencyMatrix[i][j] = 1;
+		}
+		return dependencyMatrix;
+	}
 
 	/**
 	 * Finds all the root nodes of the input graph
@@ -167,4 +184,5 @@ public class ScheduleHelper {
 		return newProcLengthAndTimeToWait;
 
 	}
+	
 }
