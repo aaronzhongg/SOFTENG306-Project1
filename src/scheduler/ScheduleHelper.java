@@ -15,6 +15,9 @@ import org.graphstream.graph.Edge;
  */
 public class ScheduleHelper {
 	
+	public static int[][] dependencyMatrix;
+	public static Schedule currentBestSchedule;
+	public static int currentBestBound;
 	/**
 	 * This method should find all node dependencies and map them to an adjacency matrix.
 	 * @param g the graph of nodes and edges
