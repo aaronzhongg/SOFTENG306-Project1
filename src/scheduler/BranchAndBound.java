@@ -25,9 +25,7 @@ public class BranchAndBound {
 		ArrayList<Node> rootNodes = new ArrayList<Node>();
 		ArrayList<Integer> rootNodeIDs = ScheduleHelper.findRootNodes(g);
 		for(int i : rootNodeIDs){
-			if(g.getNode(i).getInDegree() == 0){
-				rootNodes.add(g.getNode(i));
-			}
+			rootNodes.add(g.getNode(i));
 		}
 		//Start the branch and bound
 		while(Branch() == false){
