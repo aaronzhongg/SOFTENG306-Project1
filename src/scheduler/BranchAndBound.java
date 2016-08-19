@@ -1,5 +1,8 @@
 package scheduler;
+import java.util.ArrayList;
+
 import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
 
 public class BranchAndBound {
 	
@@ -12,7 +15,30 @@ public class BranchAndBound {
 	 * @return
 	 */
 	public void branchAndBoundAlgorithm(Schedule schedule, Graph g) {
-		
+		//make a list of root nodes
+		ArrayList<Node> rootNodes = new ArrayList<Node>();
+		ArrayList<Integer> rootNodeIDs = ScheduleHelper.findRootNodes(g);
+		for(int i : rootNodeIDs){
+			if(g.getNode(i).getInDegree() == 0){
+				rootNodes.add(g.getNode(i));
+			}
+		}
+		//Start the branch and bound
+		while(Branch(schedule, g) == false){
+			Node nodeToBeRemoved = schedule.schedule.get(schedule.scheduleLength - 1);
+			schedule.removeNode(schedule.scheduleLength - 1);
+			if(schedule.schedule.isEmpty()){
+				//If schedule is empty, then what we removed is a root node
+				//Remove it from the list of root nodes
+				rootNodes.remove(nodeToBeRemoved);
+				if(rootNodes.isEmpty()){
+					//No more root nodes to process, the search is complete. the current best will be stored in ScheduleHelper
+					return;
+				}
+				//Otherwise, put a new root node in and start branch and bound again. (This part will be different for the parallel version
+				schedule.addNode(rootNodes.get(0), 0, 0);
+			}
+		}
 	}
 	
 	public static boolean Branch(Schedule schedule, Graph g) {
