@@ -252,7 +252,7 @@ public class ScheduleHelper {
 
 		int startTime;
 		int endTime;
-		int canStartat = 2147483647;
+		int canStartat = -1;
 		int tempValue;
 		int communication_cost = 0;
 		for (Node parent: parentNodes){
@@ -267,7 +267,7 @@ public class ScheduleHelper {
 				communication_cost = (int)Double.parseDouble(parentToChild.getAttribute("Weight").toString());
 				tempValue = endTime + communication_cost;
 			}
-			if (tempValue < canStartat){
+			if (tempValue > canStartat){
 				canStartat = tempValue;
 			}
 
