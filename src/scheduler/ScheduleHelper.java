@@ -238,13 +238,43 @@ public class ScheduleHelper {
 	
 	/**
 	 * Check the cost of adding the child node into the schedule 
-	 * @param nodeToBeChecked
-	 * @param currentSchedule
+	 * @param node
+	 * @param schedule
 	 * @return true if schedule time after adding the node is less than current best total schedule time
 	 */
-	public static boolean checkChildNode(Node nodeToBeChecked, Schedule currentSchedule) {
-		
-		return true;
+	public static int checkChildNode(Node node, Schedule schedule, int processorID){
+
+		ArrayList<Node> parentNodes = new ArrayList();
+		for (Edge e : node.getEachEnteringEdge()) {
+			Node parentNode = e.getNode0();
+			parentNodes.add(parentNode);
+		}
+
+		int startTime;
+		int endTime;
+		int canStartat = 2147483647;
+		int tempValue;
+		int communication_cost = 0;
+		for (Node parent: parentNodes){
+			startTime = (int)Double.parseDouble(parent.getAttribute("Start").toString());
+			endTime = startTime + (int)Double.parseDouble(parent.getAttribute("Weight").toString());
+
+			if ((int)Double.parseDouble(parent.getAttribute("Processor").toString()) == processorID){
+				tempValue = endTime;
+			}
+			else {
+				Edge parentToChild = parent.getEdgeToward(node);
+				communication_cost = (int)Double.parseDouble(parentToChild.getAttribute("Weight").toString());
+				tempValue = endTime + communication_cost;
+			}
+			if (tempValue < canStartat){
+				canStartat = tempValue;
+			}
+
+		}
+		// canStartat represents the earliest start time that the input node can be scheduled on the input processor.
+
+		return -1;
 	}
 	
 	/**
