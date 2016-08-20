@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class BranchAndBound {
 	Schedule currentSchedule;
 	Graph g;
-	
+	Node nodeToBeRemoved = null;
 	public BranchAndBound(Schedule s, Graph g){
 		this.currentSchedule = new Schedule(s.schedule, s.procLengths, s.scheduleLength);
 		this.g = g;
@@ -25,14 +25,17 @@ public class BranchAndBound {
 		//make a list of root nodes
 		ArrayList<Node> rootNodes = new ArrayList<Node>();
 		ArrayList<Integer> rootNodeIDs = ScheduleHelper.findRootNodes(g);
+		
 		for(int i : rootNodeIDs){
 			rootNodes.add(g.getNode(i));
 		}
+		
+		nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
+		
 		//Start the branch and bound
-		while(Branch() == false){
-			Node nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
+		while(Branch(new Schedule(currentSchedule.schedule, currentSchedule.procLengths, currentSchedule.scheduleLength)) == false){
+			nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
 			currentSchedule.removeNode(currentSchedule.schedule.size() - 1);
-			
 			int updatedScheduleLength = 0;
 			for (int i = currentSchedule.schedule.size() -1 ; i > -1; i--) {
 				Node n = currentSchedule.schedule.get(i);
@@ -72,23 +75,26 @@ public class BranchAndBound {
 	 * 
 	 * @return
 	 */
-	public boolean Branch() {
-	
+	public boolean Branch(Schedule branchingSchedule) {
+		
 		boolean hasProcessable = false;
 		boolean hasInserted = false;
 
 		for (Node n : g) {
-			if (!currentSchedule.schedule.contains(n)) {
+			if (!branchingSchedule.schedule.contains(n)) {
 				// check all the node that is not in the schedule
 				boolean isProcessable = ScheduleHelper.isProcessable(n,
-						currentSchedule);
+						branchingSchedule);
 				if (isProcessable) {
-					// if it is processasble
+					// if it is processable
 					hasProcessable = true;
-					for (int i = 0; i < currentSchedule.procLengths.length; i++) {
+					for (int i = 0; i < branchingSchedule.procLengths.length; i++) {
 						// check all the available processor
-						int howMuchBetter = ScheduleHelper.checkChildNode(n, currentSchedule, i);
-						if (howMuchBetter > 0) {
+                        int timeToWait = ScheduleHelper.checkChildNode(n, currentSchedule, i);
+                        
+                        int tempCurrentProcLength = currentSchedule.procLengths[i];
+                        tempCurrentProcLength += (int)Double.parseDouble(n.getAttribute("Weight").toString()) + timeToWait;
+                        if (tempCurrentProcLength < ScheduleHelper.currentBestSchedule.scheduleLength) {
 							
 							//Commenting this bit out for now since the checkChildNode returns the procWaitTime
 							
@@ -113,10 +119,9 @@ public class BranchAndBound {
 										currentSchedule, i, 0);
 							}*/
 							hasInserted = true;
-							ScheduleHelper.insertNodeToSchedule(n, currentSchedule, i, howMuchBetter);
-							
+							ScheduleHelper.insertNodeToSchedule(n, branchingSchedule, i, timeToWait);
 							// Recursive
-							Branch();
+							Branch(branchingSchedule);
 
 						}
 					}
@@ -124,9 +129,9 @@ public class BranchAndBound {
 			}
 
 		}
-		if (!hasProcessable) {
+		if (branchingSchedule.schedule.size() == g.getNodeCount()) {
 			// no more children
-			ScheduleHelper.foundNewBestSolution(currentSchedule);
+			ScheduleHelper.foundNewBestSolution(branchingSchedule);
 		}
 		
 		//If nothing was inserted, then go back up the tree.

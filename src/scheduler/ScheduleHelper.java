@@ -243,70 +243,78 @@ public class ScheduleHelper {
 	 * @param schedule (current best schedule)
 	 * @return true if schedule time after adding the node is less than current best total schedule time
 	 */
-	public static int checkChildNode(Node node, Schedule schedule, int processorID){
-	    //scheduleCopy = new Schedule(schedule.schedule, schedule.procLengths, schedule.scheduleLength);
-
-		ArrayList<Node> parentNodes = new ArrayList<Node>();
-		for (Edge e : node.getEachEnteringEdge()) {
-			Node parentNode = e.getNode0();
-			parentNodes.add(parentNode);
-		}
-
-		int startTime;
-		int endTime;
-		int canStartat = -1;
-		int tempValue;
-		//int communication_cost = 0;
-		int edgeWeight;
-		int timeLeftToWait = 0;
-		for (Node parent: parentNodes){
-			startTime = (int)Double.parseDouble(parent.getAttribute("Start").toString());
-			endTime = startTime + (int)Double.parseDouble(parent.getAttribute("Weight").toString());
-			
-			//node is being processed on same processor as parent currently being checked
-			if ((int)Double.parseDouble(parent.getAttribute("Processor").toString()) == processorID){
-				tempValue = endTime;
-				timeLeftToWait = 0;
-			}
-			//node being processed on different processor
-			else {
-				
-				Edge parentToChild = parent.getEdgeToward(node);
-				edgeWeight = (int)Double.parseDouble(parentToChild.getAttribute("Weight").toString());
-				int lengthCurrentProcessor = schedule.procLengths[processorID];
-				int timeWaited = lengthCurrentProcessor - endTime;
-				timeLeftToWait = edgeWeight - timeWaited;
-				
-				// timeWaited longer than edgeWeight
-				if (timeLeftToWait < 0) {
-					timeLeftToWait = 0;
-				} 
-				tempValue = lengthCurrentProcessor + timeLeftToWait;
-			}
-			
-			
-			if (tempValue > canStartat){
-				canStartat = tempValue;
-			}
-
-		}
-		int procLength = canStartat + (int)Double.parseDouble(node.getAttribute("Weight").toString());
-		for(int i : schedule.procLengths){
-			if (i > procLength){
-				procLength = i;
-			}
-		}
-		//scheduleCopy.addNode(node, processorID, communication_cost);
-		//canStartat represents the earliest start time that the input node can be scheduled on the input processor.
-		if (procLength >= currentBestSchedule.scheduleLength) {
+    public static int checkChildNode(Node node, Schedule schedule, int processorID){
+        //scheduleCopy = new Schedule(schedule.schedule, schedule.procLengths, schedule.scheduleLength);
+ 
+        ArrayList<Node> parentNodes = new ArrayList<Node>();
+        for (Edge e : node.getEachEnteringEdge()) {
+            Node parentNode = e.getNode0();
+            parentNodes.add(parentNode);
+        }
+ 
+        int startTime;
+        int endTime;
+        int canStartat = -1;
+        int tempValue;
+        //int communication_cost = 0;
+        int edgeWeight;
+        int timeLeftToWait = 0;
+        for (Node parent: parentNodes){
+            int tempTimeToWait;
+            startTime = (int)Double.parseDouble(parent.getAttribute("Start").toString());
+            endTime = startTime + (int)Double.parseDouble(parent.getAttribute("Weight").toString());
+            int parentProcessor = (int)Double.parseDouble(parent.getAttribute("Processor").toString());
+            //node is being processed on same processor as parent currently being checked
+            if (parentProcessor == processorID){
+                tempValue = endTime;
+                tempTimeToWait = 0;
+            }
+            //node being processed on different processor
+            else {
+               
+                Edge parentToChild = parent.getEdgeToward(node);
+                edgeWeight = (int)Double.parseDouble(parentToChild.getAttribute("Weight").toString());
+                int lengthCurrentProcessor = schedule.procLengths[processorID];
+                int timeWaited = lengthCurrentProcessor - endTime;
+                tempTimeToWait = edgeWeight - timeWaited;
+               
+                // timeWaited longer than edgeWeight
+                if (tempTimeToWait < 0) {
+                    tempTimeToWait = 0;
+                }
+                tempValue = lengthCurrentProcessor + timeLeftToWait;
+            }
+           
+           
+            if (tempValue > canStartat){
+                canStartat = tempValue;
+            }
+           
+            //
+            if (tempTimeToWait > timeLeftToWait) {
+                timeLeftToWait = tempTimeToWait;
+            }
+        }
+       
+       
+       
+        int procLength = canStartat + (int)Double.parseDouble(node.getAttribute("Weight").toString());
+        for(int i : schedule.procLengths){
+            if (i > procLength){
+                procLength = i;
+            }
+        }
+        //scheduleCopy.addNode(node, processorID, communication_cost);
+        //canStartat represents the earliest start time that the input node can be scheduled on the input processor.
+        if (procLength >= currentBestSchedule.scheduleLength) {
             return -1;
         } else {
             //return currentBestSchedule.scheduleLength - scheduleCopy.scheduleLength;
-        	
-        	//Should probably return communication_cost since that is basically procWaitTime
-        	return timeLeftToWait;
+           
+            //Should probably return communication_cost since that is basically procWaitTime
+            return timeLeftToWait;
         }
-	}
+    }
 	
 	/**
 	 * Insert the node into schedule 
