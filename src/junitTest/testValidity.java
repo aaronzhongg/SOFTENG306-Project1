@@ -10,6 +10,7 @@ import org.graphstream.graph.Node;
 import org.junit.Test;
 
 import scheduler.Greedy;
+import scheduler.Greedy.QueueItem;
 import scheduler.Schedule;
 import util.io;
 
@@ -23,14 +24,18 @@ import util.io;
 
 public class testValidity {
 
+	@Test
 	public void testMain() {
 		int f = 7;
 		int p = 2;
 	//	for (int f = 7; f < 12; f++){ // loops through all files
 	//		for (int p = 1; p < 5; p++){ // loops through processors 1 to 4
 				Graph g = create_the_graph(f); // creates the graph
-				Schedule s = create_the_schedule(g,p);
-				testEachGraph(s,g);
+				Greedy greedy = new Greedy();
+				Schedule s = greedy.greedySearch(g, p);
+
+				assertTrue(checkAllNodesInGraph(s,g));
+				assertTrue(checkPrecedence(s,g));
 				// if (p == 2) || (p == 4) {
 				// assert (s.scheduleLength, checkOptimal(s,p,f);
 				//}
@@ -38,12 +43,6 @@ public class testValidity {
 	//		}
 	//	}
 	//}
-	
-	@Test
-	public void testEachGraph(Schedule s,Graph g){
-		assertTrue(checkAllNodesInGraph(s,g));
-		assertTrue(checkPrecedence(s,g));
-	}
 	
 	public boolean checkAllNodesInGraph(Schedule s, Graph g){
 		boolean allNodesInGraph = true;
@@ -62,12 +61,24 @@ public class testValidity {
 			Iterable<Edge> childIte = g.getNode(n.getId()).getEachEnteringEdge(); // loop through all the parents
 			for (Edge childe: childIte){
 				Node parentn = childe.getNode0();
+				System.out.println(parentn);
+				System.out.println(n);
 				int edgeWeight = (int)Double.parseDouble(childe.getAttribute("Weight").toString());
+				int nodeWeight = (int)Double.parseDouble(parentn.getAttribute("Weight").toString());
 				int pstart = parentn.getAttribute("Start");
 				int cstart = n.getAttribute("Start");
 				
-				if (pstart - cstart < edgeWeight){// check child and parent have at least edge weight between them	
-					return false;
+				int childProcessor = (int)Double.parseDouble(childe.getAttribute("Processor").toString());
+				int parentProcessor = (int)Double.parseDouble(parentn.getAttribute("Processor").toString());
+				
+				if (parentProcessor == childProcessor){ // if they're on the same processor
+					if ((cstart - pstart) < nodeWeight){// check child and parent have at least edge weight between them	
+						return false;
+					}
+				} else { // if they're on different processors
+					if ((cstart - pstart) < (edgeWeight + nodeWeight)){// check child and parent have at least edge weight between them	
+						return false;
+					}
 				}
 			}
 		}
@@ -101,22 +112,17 @@ public class testValidity {
 	public String create_the_filename(int a){
 		String filename = "";
 		if (a == 7){
-			filename = "TestDotFiles/Nodes_7_OutTree";
+			filename = "TestDotFiles/Nodes_7_OutTree.dot";
 		} else if (a == 8){
-			filename = "TestDotFiles/Nodes_8_Random";
+			filename = "TestDotFiles/Nodes_8_Random.dot";
 		} else if (a == 9){
-			filename = "TestDotFiles/Nodes_9_SeriesParallel";
+			filename = "TestDotFiles/Nodes_9_SeriesParallel.dot";
 		} else if (a == 10){
-			filename = "TestDotFiles/Nodes_10_Random";
+			filename = "TestDotFiles/Nodes_10_Random.dot";
 		} else if (a == 11){
-			filename = "TestDotFiles/Nodes_11_OutTree";
+			filename = "TestDotFiles/Nodes_11_OutTree.dot";
 		}
 		return filename;
-	}
-	
-	public Schedule create_the_schedule(Graph g, int processorInput) { //change name
-		Greedy greedy = new Greedy();
-		return greedy.greedySearch(g, processorInput);
 	}
 	
 	public Graph create_the_graph(int fileNumber) { //change name

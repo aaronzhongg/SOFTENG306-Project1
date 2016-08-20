@@ -6,6 +6,8 @@ import org.graphstream.graph.Graph;
 
 public class Greedy {
 	
+	
+	
 	/**
 	 * Greedy Search searches through the graph, according to the queue, adding nodes to the schedule that will increment each schedule time by the least amount
 	 * Then adds the process-able nodes to the queue and goes through the queue again
