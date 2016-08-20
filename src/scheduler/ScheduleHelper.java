@@ -233,7 +233,10 @@ public class ScheduleHelper {
 	 */
 	public static void foundNewBestSolution(Schedule newBestSchedule) {
 		currentBestSchedule = new Schedule(newBestSchedule.schedule, newBestSchedule.procLengths, newBestSchedule.scheduleLength);
-		
+//		for(Node n:ScheduleHelper.currentBestSchedule.schedule){
+//			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
+//		}
+//		System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
 		return;
 	}
 	
@@ -266,7 +269,7 @@ public class ScheduleHelper {
             int parentProcessor = (int)Double.parseDouble(parent.getAttribute("Processor").toString());
             //node is being processed on same processor as parent currently being checked
             if (parentProcessor == processorID){
-                tempValue = endTime;
+                tempValue = schedule.procLengths[processorID];
                 tempTimeToWait = 0;
             }
             //node being processed on different processor
@@ -282,7 +285,7 @@ public class ScheduleHelper {
                 if (tempTimeToWait < 0) {
                     tempTimeToWait = 0;
                 }
-                tempValue = lengthCurrentProcessor + timeLeftToWait;
+                tempValue = lengthCurrentProcessor + tempTimeToWait;
             }
            
            

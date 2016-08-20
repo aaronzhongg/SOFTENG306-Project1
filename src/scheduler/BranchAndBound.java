@@ -90,39 +90,16 @@ public class BranchAndBound {
 					hasProcessable = true;
 					for (int i = 0; i < branchingSchedule.procLengths.length; i++) {
 						// check all the available processor
-                        int timeToWait = ScheduleHelper.checkChildNode(n, currentSchedule, i);
+                        int timeToWait = ScheduleHelper.checkChildNode(n, branchingSchedule, i);
                         
-                        int tempCurrentProcLength = currentSchedule.procLengths[i];
-                        tempCurrentProcLength += (int)Double.parseDouble(n.getAttribute("Weight").toString()) + timeToWait;
-                        if (tempCurrentProcLength < ScheduleHelper.currentBestSchedule.scheduleLength) {
-							
-							//Commenting this bit out for now since the checkChildNode returns the procWaitTime
-							
-							/*// if it is a better solution
-							// calculate the waiting time for the node
-							// get current last node from scheduler as parent
-							Node parent = currentSchedule.schedule
-									.get(currentSchedule.schedule.size() - 1);
-							if (!parent.getAttribute("processor")
-									.equals(i + "")) {
-								// different processor
-								Edge parentToChild = parent.getEdgeToward(n);
-								int procWaitTime = (int) Double
-										.parseDouble(parentToChild
-												.getAttribute("Weight")
-												.toString());
-								ScheduleHelper.insertNodeToSchedule(n,
-										currentSchedule, i, procWaitTime);
-							} else {
-								// same processor no waiting time
-								ScheduleHelper.insertNodeToSchedule(n,
-										currentSchedule, i, 0);
-							}*/
+//                        int tempCurrentProcLength = branchingSchedule.procLengths[i];
+//                        tempCurrentProcLength += (int)Double.parseDouble(n.getAttribute("Weight").toString()) + timeToWait;
+                        if (timeToWait > -1) {
+                        	
 							hasInserted = true;
 							ScheduleHelper.insertNodeToSchedule(n, branchingSchedule, i, timeToWait);
 							// Recursive
-							Branch(branchingSchedule);
-
+							Branch(new Schedule(branchingSchedule.schedule, branchingSchedule.procLengths, branchingSchedule.scheduleLength));
 						}
 					}
 				}
