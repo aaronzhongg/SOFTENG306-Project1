@@ -13,23 +13,36 @@ import scheduler.Greedy;
 import scheduler.Schedule;
 import util.io;
 
-public class testValidity {
-	
-	//check parents of each node are in the schedule
-	//for each parent look that parent is in the schedule
-	//look that the distance is more then the minimum
+/**
+ * check parents of each node are in the schedule
+ * for each parent look that parent is in the schedule
+ * look that the distance is more then the minimum
+ * @author idaknow
+ *
+ */
 
-	@Test
+public class testValidity {
+
 	public void testMain() {
+		int f = 7;
 		int p = 2;
-		int fileNumber = 7;
-		
-		Graph g = create_the_graph(fileNumber);
-		Schedule s = create_the_schedule(g,p);
-		
+	//	for (int f = 7; f < 12; f++){ // loops through all files
+	//		for (int p = 1; p < 5; p++){ // loops through processors 1 to 4
+				Graph g = create_the_graph(f); // creates the graph
+				Schedule s = create_the_schedule(g,p);
+				testEachGraph(s,g);
+				// if (p == 2) || (p == 4) {
+				// assert (s.scheduleLength, checkOptimal(s,p,f);
+				//}
+	}
+	//		}
+	//	}
+	//}
+	
+	@Test
+	public void testEachGraph(Schedule s,Graph g){
 		assertTrue(checkAllNodesInGraph(s,g));
 		assertTrue(checkPrecedence(s,g));
-
 	}
 	
 	public boolean checkAllNodesInGraph(Schedule s, Graph g){
@@ -88,15 +101,15 @@ public class testValidity {
 	public String create_the_filename(int a){
 		String filename = "";
 		if (a == 7){
-			filename = "Nodes_7_OutTree";
+			filename = "TestDotFiles/Nodes_7_OutTree";
 		} else if (a == 8){
-			filename = "Nodes_8_Random";
+			filename = "TestDotFiles/Nodes_8_Random";
 		} else if (a == 9){
-			filename = "Nodes_9_SeriesParallel";
+			filename = "TestDotFiles/Nodes_9_SeriesParallel";
 		} else if (a == 10){
-			filename = "Nodes_10_Random";
+			filename = "TestDotFiles/Nodes_10_Random";
 		} else if (a == 11){
-			filename = "Nodes_11_OutTree";
+			filename = "TestDotFiles/Nodes_11_OutTree";
 		}
 		return filename;
 	}
