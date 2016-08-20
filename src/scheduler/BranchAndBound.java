@@ -32,6 +32,24 @@ public class BranchAndBound {
 		while(Branch() == false){
 			Node nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
 			currentSchedule.removeNode(currentSchedule.schedule.size() - 1);
+			
+			int updatedScheduleLength = 0;
+			for (int i = currentSchedule.schedule.size() -1 ; i > -1; i--) {
+				Node n = currentSchedule.schedule.get(i);
+				int processedOn = (int)Double.parseDouble(n.getAttribute("Processor").toString());
+				if (processedOn == (int)Double.parseDouble(nodeToBeRemoved.getAttribute("Processor").toString())) {
+					currentSchedule.procLengths[processedOn] = ScheduleHelper.getNodeWeight(g, n.getIndex()) + (int)Double.parseDouble(n.getAttribute("Start").toString());
+					currentSchedule.scheduleLength = currentSchedule.findScheduleLength();
+					updatedScheduleLength = 1;
+					break;
+				}
+			}
+			
+			if (updatedScheduleLength == 0) {
+				currentSchedule.procLengths[(int)Double.parseDouble(nodeToBeRemoved.getAttribute("Processor").toString())] = 0;
+				currentSchedule.scheduleLength = currentSchedule.findScheduleLength();
+			}
+			
 			if(currentSchedule.schedule.isEmpty()){
 				//If schedule is empty, then what we removed is a root node
 				//Remove it from the list of root nodes
@@ -106,15 +124,17 @@ public class BranchAndBound {
 			}
 
 		}
+		if (!hasProcessable) {
+			// no more children
+			ScheduleHelper.foundNewBestSolution(currentSchedule);
+		}
+		
 		//If nothing was inserted, then go back up the tree.
 		if (!hasInserted){
 			return false;
 		}
 		
-		if (!hasProcessable) {
-			// no more children
-			ScheduleHelper.foundNewBestSolution(currentSchedule);
-		}
+
 		//Return false to prevent while loop from exiting
 		return false;
 	

@@ -256,26 +256,41 @@ public class ScheduleHelper {
 		int endTime;
 		int canStartat = -1;
 		int tempValue;
-		int communication_cost = 0;
+		//int communication_cost = 0;
+		int edgeWeight;
+		int timeLeftToWait = 0;
 		for (Node parent: parentNodes){
 			startTime = (int)Double.parseDouble(parent.getAttribute("Start").toString());
 			endTime = startTime + (int)Double.parseDouble(parent.getAttribute("Weight").toString());
-
+			
+			//node is being processed on same processor as parent currently being checked
 			if ((int)Double.parseDouble(parent.getAttribute("Processor").toString()) == processorID){
 				tempValue = endTime;
-                communication_cost = 0;
+				timeLeftToWait = 0;
 			}
+			//node being processed on different processor
 			else {
+				
 				Edge parentToChild = parent.getEdgeToward(node);
-				communication_cost = (int)Double.parseDouble(parentToChild.getAttribute("Weight").toString());
-				tempValue = endTime + communication_cost;
+				edgeWeight = (int)Double.parseDouble(parentToChild.getAttribute("Weight").toString());
+				int lengthCurrentProcessor = schedule.procLengths[processorID];
+				int timeWaited = lengthCurrentProcessor - endTime;
+				timeLeftToWait = edgeWeight - timeWaited;
+				
+				// timeWaited longer than edgeWeight
+				if (timeLeftToWait < 0) {
+					timeLeftToWait = 0;
+				} 
+				tempValue = lengthCurrentProcessor + timeLeftToWait;
 			}
+			
+			
 			if (tempValue > canStartat){
 				canStartat = tempValue;
 			}
 
 		}
-		int procLength = schedule.procLengths[processorID] + communication_cost + (int)Double.parseDouble(node.getAttribute("Weight").toString());
+		int procLength = canStartat + (int)Double.parseDouble(node.getAttribute("Weight").toString());
 		for(int i : schedule.procLengths){
 			if (i > procLength){
 				procLength = i;
@@ -289,7 +304,7 @@ public class ScheduleHelper {
             //return currentBestSchedule.scheduleLength - scheduleCopy.scheduleLength;
         	
         	//Should probably return communication_cost since that is basically procWaitTime
-        	return communication_cost;
+        	return timeLeftToWait;
         }
 	}
 	
@@ -302,6 +317,7 @@ public class ScheduleHelper {
 	 */ 
 	public static void insertNodeToSchedule(Node nodeToInsert, Schedule currentSchedule, int Processor, int procWaitTime) {
 		currentSchedule.addNode(nodeToInsert, Processor, procWaitTime);
+		currentSchedule.updateProcessorLength(Processor, (int)Double.parseDouble(nodeToInsert.getAttribute("Weight").toString()) + procWaitTime);
 	}
 	
 
