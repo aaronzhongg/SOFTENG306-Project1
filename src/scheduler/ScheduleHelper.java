@@ -230,8 +230,8 @@ public class ScheduleHelper {
 	 * 
 	 * could just call this one line from Branch instead of having to call this function
 	 */
-	public static Schedule foundNewBestSolution(Schedule newBestSchedule) {
-		currentBestSchedule = newBestSchedule;
+	public static Schedule foundNewBestSolution(Schedule newBestSchedule, int procL, int scheduleL) {
+		currentBestSchedule = new Schedule(newBestSchedule, procL, scheduleL);
 		
 		return newBestSchedule;
 	}
