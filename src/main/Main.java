@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.graphstream.graph.*;
+import org.graphstream.graph.implementations.Graphs;
 
 import scheduler.*;
 import ui.MainView;
@@ -27,8 +28,8 @@ public class Main {
 
         // comment out code below before submitting.
 
-        String inputFile = "TestDotFiles/Nodes_7_OutTree.dot";
-        int processorInput = 2;
+        String inputFile = "TestDotFiles/Nodes_11_OutTree.dot";
+        int processorInput = 4;
         
 		//int processorInput = 2;
 		//String file_name = "digraph_example.dot";
@@ -48,7 +49,7 @@ public class Main {
 		Greedy greedy = new Greedy();
 		schedule = greedy.greedySearch(g, processorInput);
 		ScheduleHelper.currentBestSchedule = new Schedule(schedule.schedule, schedule.procLengths, schedule.scheduleLength);
-		
+		ScheduleHelper.bestGraph = Graphs.clone(g);
 		//temporary printing the greedy stuff
 		for(Node n:schedule.schedule){
 			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
@@ -65,7 +66,7 @@ public class Main {
 			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
 		}
 		System.out.println("Total Schedule Length: " + schedule.scheduleLength);*/
-		for(Node n:ScheduleHelper.currentBestSchedule.schedule){
+		for(Node n: ScheduleHelper.bestGraph){
 			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
 		}
 		System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);

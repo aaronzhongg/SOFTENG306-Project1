@@ -9,6 +9,7 @@ import scheduler.Greedy.QueueItem;
 import scheduler.Schedule;
 
 import org.graphstream.graph.Edge;
+import org.graphstream.graph.implementations.Graphs;
 /**
  * This class provides methods that the Schedule data structure can use
  *
@@ -17,6 +18,9 @@ public class ScheduleHelper {
 	
 	public static int[][] dependencyMatrix;
 	public static Schedule currentBestSchedule;
+	
+	//This is a cloned graph just for the currentBestSchedule
+	public static Graph bestGraph;
 	//public static Schedule scheduleCopy;
 
 	/**
@@ -231,12 +235,19 @@ public class ScheduleHelper {
 	 * 
 	 * could just call this one line from Branch instead of having to call this function
 	 */
-	public static void foundNewBestSolution(Schedule newBestSchedule) {
+	public static void foundNewBestSolution(Schedule newBestSchedule, Graph g) {
 		currentBestSchedule = new Schedule(newBestSchedule.schedule, newBestSchedule.procLengths, newBestSchedule.scheduleLength);
-//		for(Node n:ScheduleHelper.currentBestSchedule.schedule){
-//			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
-//		}
-//		System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
+		for(Node n : g){
+			for(Node bestN : bestGraph){
+				if(n.getIndex() == bestN.getIndex()){
+					Graphs.copyAttributes(n, bestN);
+				}
+			}
+		}
+/*		for(Node n:ScheduleHelper.currentBestSchedule.schedule){
+			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
+		}
+		System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);*/
 		return;
 	}
 	

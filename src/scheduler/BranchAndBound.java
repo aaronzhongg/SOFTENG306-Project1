@@ -36,22 +36,7 @@ public class BranchAndBound {
 		while(Branch(new Schedule(currentSchedule.schedule, currentSchedule.procLengths, currentSchedule.scheduleLength)) == false){
 			nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
 			currentSchedule.removeNode(currentSchedule.schedule.size() - 1);
-			int updatedScheduleLength = 0;
-			for (int i = currentSchedule.schedule.size() -1 ; i > -1; i--) {
-				Node n = currentSchedule.schedule.get(i);
-				int processedOn = (int)Double.parseDouble(n.getAttribute("Processor").toString());
-				if (processedOn == (int)Double.parseDouble(nodeToBeRemoved.getAttribute("Processor").toString())) {
-					currentSchedule.procLengths[processedOn] = ScheduleHelper.getNodeWeight(g, n.getIndex()) + (int)Double.parseDouble(n.getAttribute("Start").toString());
-					currentSchedule.scheduleLength = currentSchedule.findScheduleLength();
-					updatedScheduleLength = 1;
-					break;
-				}
-			}
-			
-			if (updatedScheduleLength == 0) {
-				currentSchedule.procLengths[(int)Double.parseDouble(nodeToBeRemoved.getAttribute("Processor").toString())] = 0;
-				currentSchedule.scheduleLength = currentSchedule.findScheduleLength();
-			}
+			updateRemoveLengthChanges(currentSchedule, nodeToBeRemoved);
 			
 			if(currentSchedule.schedule.isEmpty()){
 				//If schedule is empty, then what we removed is a root node
@@ -77,7 +62,6 @@ public class BranchAndBound {
 	 */
 	public boolean Branch(Schedule branchingSchedule) {
 		
-		boolean hasProcessable = false;
 		boolean hasInserted = false;
 
 		for (Node n : g) {
@@ -87,7 +71,6 @@ public class BranchAndBound {
 						branchingSchedule);
 				if (isProcessable) {
 					// if it is processable
-					hasProcessable = true;
 					for (int i = 0; i < branchingSchedule.procLengths.length; i++) {
 						// check all the available processor
                         int timeToWait = ScheduleHelper.checkChildNode(n, branchingSchedule, i);
@@ -99,6 +82,8 @@ public class BranchAndBound {
 							ScheduleHelper.insertNodeToSchedule(n, branchingSchedule, i, timeToWait);
 							// Recursive
 							Branch(new Schedule(branchingSchedule.schedule, branchingSchedule.procLengths, branchingSchedule.scheduleLength));
+							branchingSchedule.removeNode(branchingSchedule.schedule.size() - 1);
+							updateRemoveLengthChanges(branchingSchedule, n);
 						}
 					}
 				}
@@ -106,7 +91,7 @@ public class BranchAndBound {
 		}
 		if (branchingSchedule.schedule.size() == g.getNodeCount()) {
 			// no more children
-			ScheduleHelper.foundNewBestSolution(branchingSchedule);
+			ScheduleHelper.foundNewBestSolution(branchingSchedule, g);
 		}
 		
 		//If nothing was inserted, then go back up the tree.
@@ -118,6 +103,24 @@ public class BranchAndBound {
 		return false;
 	
 	}
-
+	
+	public void updateRemoveLengthChanges(Schedule s, Node removeNode){
+		int updatedScheduleLength = 0;
+		for (int i = s.schedule.size() -1 ; i > -1; i--) {
+			Node n = s.schedule.get(i);
+			int processedOn = (int)Double.parseDouble(n.getAttribute("Processor").toString());
+			if (processedOn == (int)Double.parseDouble(removeNode.getAttribute("Processor").toString())) {
+				s.procLengths[processedOn] = ScheduleHelper.getNodeWeight(g, n.getIndex()) + (int)Double.parseDouble(n.getAttribute("Start").toString());
+				s.scheduleLength = s.findScheduleLength();
+				updatedScheduleLength = 1;
+				break;
+			}
+		}
+		
+		if (updatedScheduleLength == 0) {
+			s.procLengths[(int)Double.parseDouble(removeNode.getAttribute("Processor").toString())] = 0;
+			s.scheduleLength = s.findScheduleLength();
+		}
+	}
 	
 }
