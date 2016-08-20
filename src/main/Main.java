@@ -70,7 +70,7 @@ public class Main {
 			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
 		}
 		System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
-        //IOProcessor.outputFile(schedule, g, inputFile); // creates the output file
+        //IOProcessor.outputFile(schedule, ScheduleHelper.bestGraph, inputFile); // creates the output file
        
         
 
