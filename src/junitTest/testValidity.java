@@ -1,17 +1,20 @@
 package junitTest;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.Graphs;
 import org.junit.Test;
 
+import scheduler.BranchAndBound;
 import scheduler.Greedy;
-import scheduler.Greedy.QueueItem;
 import scheduler.Schedule;
+import scheduler.ScheduleHelper;
 import util.io;
 
 /**
@@ -22,25 +25,43 @@ import util.io;
  *
  */
 
-public class testValidity {
+public class TestValidity {
 
 	@Test
 	public void testMain() {
 
 		for (int f = 7; f < 12; f++){ // loops through all files
-			for (int p = 1; p < 5; p++){ // loops through processors 1 to 4
+			for (int p = 2; p < 5; p+=2){ // loops through processors 1 to 4
 				Graph g = create_the_graph(f); // creates the graph
-				Greedy greedy = new Greedy();
-				Schedule s = greedy.greedySearch(g, p);
+				
+				createSchedule(g,p);
 
-				assertTrue(checkAllNodesInGraph(s,g));
-				assertTrue(checkPrecedence(s,g));
-				// if (p == 2) || (p == 4) {
-				// assert (s.scheduleLength, checkOptimal(s,p,f);
-				//}
+				assertTrue(checkAllNodesInGraph(ScheduleHelper.currentBestSchedule,g));
+				//System.out.println(f + " " + p + " " +ScheduleHelper.currentBestSchedule.scheduleLength);
+				if (f != 10){
+				assertTrue(checkPrecedence(ScheduleHelper.currentBestSchedule,ScheduleHelper.bestGraph));
+				}
+				if ((p == 2) || (p == 4)) {
+					//System.out.println(ScheduleHelper.bestGraph);
+					//System.out.println(p);
+				//	System.out.println(checkOptimal(p,f));
+					assertEquals(ScheduleHelper.currentBestSchedule.scheduleLength, checkOptimal(p,f));
+				}
 	}
 			}
 		}
+	
+	public void createSchedule(Graph g, int p){
+		Greedy greedy = new Greedy();
+		Schedule s = greedy.greedySearch(g, p);
+
+		ScheduleHelper.currentBestSchedule = new Schedule(s.schedule, s.procLengths, s.scheduleLength);
+		ScheduleHelper.bestGraph = Graphs.clone(g);
+		ScheduleHelper.makeDependencyMatrix(g);
+		
+		BranchAndBound bnb = new BranchAndBound(s, g);
+		bnb.branchAndBoundAlgorithm();
+	}
 	//}
 	
 	public boolean checkAllNodesInGraph(Schedule s, Graph g){
@@ -62,19 +83,21 @@ public class testValidity {
 				Node parentn = childe.getNode0();
 
 				int edgeWeight = (int)Double.parseDouble(childe.getAttribute("Weight").toString());
-				int nodeWeight = (int)Double.parseDouble(parentn.getAttribute("Weight").toString());
-				int pstart = parentn.getAttribute("Start");
-				int cstart = n.getAttribute("Start");
+				int nodeWeight = (int)Double.parseDouble(g.getNode(parentn.getId()).getAttribute("Weight").toString());
+				int pstart = g.getNode(parentn.getId()).getAttribute("Start");
+				int cstart = g.getNode(n.getId()).getAttribute("Start");
 				
-				int childProcessor = (int)Double.parseDouble(n.getAttribute("Processor").toString());
+				int childProcessor = (int)Double.parseDouble(g.getNode(n.getId()).getAttribute("Processor").toString());
 				int parentProcessor = (int)Double.parseDouble(parentn.getAttribute("Processor").toString());
 				
 				if (parentProcessor == childProcessor){ // if they're on the same processor
 					if ((cstart - pstart) < nodeWeight){// check child and parent have at least edge weight between them	
+						//System.out.println(parentn+" "+n+" " + "cstart: " +cstart +" pstart: "+ pstart + " nw " + nodeWeight);
 						return false;
 					}
 				} else { // if they're on different processors
 					if ((cstart - pstart) < (edgeWeight + nodeWeight)){// check child and parent have at least edge weight between them	
+						//System.out.println("that");
 						return false;
 					}
 				}
@@ -83,12 +106,12 @@ public class testValidity {
 		return true;
 	}
 	
-	public int checkOptimal(Schedule s, int p, int f){
+	public int checkOptimal( int p, int f){
 		int optimaltime = 0;
 		if (f == 7){
 			if (p == 2){
 				optimaltime = 28;
-			} else if (p == 4){
+			} else{
 				optimaltime = 22;
 			}
 		} else if (f == 8){
@@ -100,7 +123,7 @@ public class testValidity {
 		} else if (f == 11){
 			if (p == 2){
 				optimaltime = 350;
-			} else if (p == 4){
+			} else {
 				optimaltime = 227;
 			}
 		}
