@@ -26,10 +26,9 @@ public class testValidity {
 
 	@Test
 	public void testMain() {
-		int f = 7;
-		int p = 2;
-	//	for (int f = 7; f < 12; f++){ // loops through all files
-	//		for (int p = 1; p < 5; p++){ // loops through processors 1 to 4
+
+		for (int f = 7; f < 12; f++){ // loops through all files
+			for (int p = 1; p < 5; p++){ // loops through processors 1 to 4
 				Graph g = create_the_graph(f); // creates the graph
 				Greedy greedy = new Greedy();
 				Schedule s = greedy.greedySearch(g, p);
@@ -40,8 +39,8 @@ public class testValidity {
 				// assert (s.scheduleLength, checkOptimal(s,p,f);
 				//}
 	}
-	//		}
-	//	}
+			}
+		}
 	//}
 	
 	public boolean checkAllNodesInGraph(Schedule s, Graph g){
@@ -61,14 +60,13 @@ public class testValidity {
 			Iterable<Edge> childIte = g.getNode(n.getId()).getEachEnteringEdge(); // loop through all the parents
 			for (Edge childe: childIte){
 				Node parentn = childe.getNode0();
-				System.out.println(parentn);
-				System.out.println(n);
+
 				int edgeWeight = (int)Double.parseDouble(childe.getAttribute("Weight").toString());
 				int nodeWeight = (int)Double.parseDouble(parentn.getAttribute("Weight").toString());
 				int pstart = parentn.getAttribute("Start");
 				int cstart = n.getAttribute("Start");
 				
-				int childProcessor = (int)Double.parseDouble(childe.getAttribute("Processor").toString());
+				int childProcessor = (int)Double.parseDouble(n.getAttribute("Processor").toString());
 				int parentProcessor = (int)Double.parseDouble(parentn.getAttribute("Processor").toString());
 				
 				if (parentProcessor == childProcessor){ // if they're on the same processor
