@@ -29,6 +29,18 @@ public class Schedule {
 		procLengths = new int[procCount];		//makes amount of input processors
 		scheduleLength = 0;
 	}
+	
+	/**
+	 * Clone a schedule for calculation purposes
+	 * @param s
+	 * @param procl
+	 * @param scheduleL
+	 */
+	public Schedule(ArrayList<Node> s, int[]procl ,int scheduleL){
+		schedule = s;
+		procLengths = procl;		//makes amount of input processors
+		scheduleLength = scheduleL;
+	}
 
 	/**
 	 * adds an input node to the scheduler
@@ -39,7 +51,7 @@ public class Schedule {
 	public void addNode(Node n, int Processor, int procWaitTime){
 		n.setAttribute("Processor", Processor);
 		n.setAttribute("Start", procLengths[Processor] + procWaitTime);
-		schedule.add(n);
+		this.schedule.add(n);
 	}
 
 	/**

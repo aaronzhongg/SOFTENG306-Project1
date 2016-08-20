@@ -18,17 +18,17 @@ public class Main {
 	public static void main(String[] args){
 
 	    //uncomment below before submitting - just some additional robustness and error-checking
-	    if (args.length < 2){
+	    /*if (args.length < 2){
             System.out.println("Please ensure that all input parameters have been entered - Input file name and number of processors. ");
             System.exit(1);
-        }
-	    String inputFile = args[0];
-         processorInput = Integer.parseInt(args[1]);
+        }*/
+	    //String inputFile = args[0];
+        //processorInput = Integer.parseInt(args[1]);
 
         // comment out code below before submitting.
 
-//        String inputFile = "TestDotFiles/Nodes_10_Random.dot";
-//        int processorInput = 2;
+        String inputFile = "TestDotFiles/digraph_example.dot";
+        int processorInput = 2;
         
 		//int processorInput = 2;
 		//String file_name = "digraph_example.dot";
@@ -39,22 +39,35 @@ public class Main {
 
 		Graph g = IOProcessor.DOTParser(input_file, inputFile);
 		//System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
-		 //MainView MainView=new MainView(g);
-		// MainView.setVisible(true);
+		//MainView MainView=new MainView(g);
+		//MainView.setVisible(true);
 
 		// Find root nodes from the input graph
 		//ArrayList<Integer> rootNodes = ScheduleHelper.findRootNodes(g);
 		
 		Greedy greedy = new Greedy();
 		schedule = greedy.greedySearch(g, processorInput);
+		ScheduleHelper.currentBestSchedule = schedule;
 		
-		// prints answer
+		//temporary printing the greedy stuff
 		for(Node n:schedule.schedule){
 			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
 		}
 		System.out.println("Total Schedule Length: " + schedule.scheduleLength);
-
-        IOProcessor.outputFile(schedule, g, inputFile); // creates the output file
+		
+		BranchAndBound bnb = new BranchAndBound(schedule, g);
+		ScheduleHelper.makeDependencyMatrix(g);
+		bnb.branchAndBoundAlgorithm();
+		// prints answer
+	/*  for(Node n:schedule.schedule){
+			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
+		}
+		System.out.println("Total Schedule Length: " + schedule.scheduleLength);*/
+		for(Node n:ScheduleHelper.currentBestSchedule.schedule){
+			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
+		}
+		System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
+        //IOProcessor.outputFile(schedule, g, inputFile); // creates the output file
        
         
 

@@ -17,22 +17,22 @@ public class ScheduleHelper {
 	
 	public static int[][] dependencyMatrix;
 	public static Schedule currentBestSchedule;
+	//public static Schedule scheduleCopy;
 
 	/**
 	 * This method should find all node dependencies and map them to an adjacency matrix.
 	 * @param g the graph of nodes and edges
 	 * @return a 2d int array of all edges between nodes
 	 */
-	public static int[][] makeDependencyMatrix(Graph g){
+	public static void makeDependencyMatrix(Graph g){
 		
-		int[][] dependencyMatrix = new int[g.getNodeCount()][g.getNodeCount()];
+		dependencyMatrix = new int[g.getNodeCount()][g.getNodeCount()];
 		
 		for(Edge e:g.getEachEdge()){
 			int i = e.getNode0().getIndex();
 			int j = e.getNode1().getIndex();
 			dependencyMatrix[i][j] = 1;
 		}
-		return dependencyMatrix;
 	}
 
 	/**
@@ -244,9 +244,9 @@ public class ScheduleHelper {
 	 * @return true if schedule time after adding the node is less than current best total schedule time
 	 */
 	public static int checkChildNode(Node node, Schedule schedule, int processorID){
-	    Schedule scheduleCopy = schedule;
+	    //scheduleCopy = new Schedule(schedule.schedule, schedule.procLengths, schedule.scheduleLength);
 
-		ArrayList<Node> parentNodes = new ArrayList();
+		ArrayList<Node> parentNodes = new ArrayList<Node>();
 		for (Edge e : node.getEachEnteringEdge()) {
 			Node parentNode = e.getNode0();
 			parentNodes.add(parentNode);
@@ -275,12 +275,21 @@ public class ScheduleHelper {
 			}
 
 		}
-		scheduleCopy.addNode(node, processorID, communication_cost);
+		int procLength = schedule.procLengths[processorID] + communication_cost + (int)Double.parseDouble(node.getAttribute("Weight").toString());
+		for(int i : schedule.procLengths){
+			if (i > procLength){
+				procLength = i;
+			}
+		}
+		//scheduleCopy.addNode(node, processorID, communication_cost);
 		//canStartat represents the earliest start time that the input node can be scheduled on the input processor.
-		if (scheduleCopy.scheduleLength >= schedule.scheduleLength) {
+		if (procLength >= currentBestSchedule.scheduleLength) {
             return -1;
         } else {
-            return schedule.scheduleLength - scheduleCopy.scheduleLength;
+            //return currentBestSchedule.scheduleLength - scheduleCopy.scheduleLength;
+        	
+        	//Should probably return communication_cost since that is basically procWaitTime
+        	return communication_cost;
         }
 	}
 	
