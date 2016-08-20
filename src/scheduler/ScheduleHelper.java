@@ -282,7 +282,7 @@ public class ScheduleHelper {
                 if (tempTimeToWait < 0) {
                     tempTimeToWait = 0;
                 }
-                tempValue = lengthCurrentProcessor + timeLeftToWait;
+                tempValue = lengthCurrentProcessor + tempTimeToWait;
             }
            
            

@@ -27,7 +27,7 @@ public class Main {
 
         // comment out code below before submitting.
 
-        String inputFile = "TestDotFiles/Nodes_11_OutTree.dot";
+        String inputFile = "TestDotFiles/Nodes_9_SeriesParallel.dot";
         int processorInput = 2;
         
 		//int processorInput = 2;
