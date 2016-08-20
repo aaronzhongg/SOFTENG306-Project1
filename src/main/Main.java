@@ -27,7 +27,7 @@ public class Main {
 
         // comment out code below before submitting.
 
-        String inputFile = "TestDotFiles/digraph_example.dot";
+        String inputFile = "TestDotFiles/Nodes_11_OutTree.dot";
         int processorInput = 2;
         
 		//int processorInput = 2;
@@ -47,7 +47,7 @@ public class Main {
 		
 		Greedy greedy = new Greedy();
 		schedule = greedy.greedySearch(g, processorInput);
-		ScheduleHelper.currentBestSchedule = schedule;
+		ScheduleHelper.currentBestSchedule = new Schedule(schedule.schedule, schedule.procLengths, schedule.scheduleLength);
 		
 		//temporary printing the greedy stuff
 		for(Node n:schedule.schedule){

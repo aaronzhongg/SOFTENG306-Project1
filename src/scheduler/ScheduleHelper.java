@@ -231,10 +231,10 @@ public class ScheduleHelper {
 	 * 
 	 * could just call this one line from Branch instead of having to call this function
 	 */
-	public static Schedule foundNewBestSolution(Schedule newBestSchedule, int procL, int scheduleL) {
-		currentBestSchedule = new Schedule(newBestSchedule, procL, scheduleL);
+	public static void foundNewBestSolution(Schedule newBestSchedule) {
+		currentBestSchedule = new Schedule(newBestSchedule.schedule, newBestSchedule.procLengths, newBestSchedule.scheduleLength);
 		
-		return newBestSchedule;
+		return;
 	}
 	
 	/**

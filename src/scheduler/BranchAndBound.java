@@ -10,7 +10,7 @@ public class BranchAndBound {
 	Graph g;
 	
 	public BranchAndBound(Schedule s, Graph g){
-		this.currentSchedule = s;
+		this.currentSchedule = new Schedule(s.schedule, s.procLengths, s.scheduleLength);
 		this.g = g;
 	}
 	/**
@@ -113,7 +113,7 @@ public class BranchAndBound {
 		
 		if (!hasProcessable) {
 			// no more children
-			currentSchedule = ScheduleHelper.foundNewBestSolution(currentSchedule);
+			ScheduleHelper.foundNewBestSolution(currentSchedule);
 		}
 		//Return false to prevent while loop from exiting
 		return false;

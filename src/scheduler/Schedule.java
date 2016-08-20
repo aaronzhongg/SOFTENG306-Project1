@@ -37,7 +37,10 @@ public class Schedule {
 	 * @param scheduleL
 	 */
 	public Schedule(ArrayList<Node> s, int[]procl ,int scheduleL){
-		schedule = s;
+		schedule = new ArrayList<Node>();
+		for(Node n : s){
+			schedule.add(n);
+		}
 		procLengths = procl;		//makes amount of input processors
 		scheduleLength = scheduleL;
 	}
