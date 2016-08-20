@@ -90,17 +90,15 @@ public class BranchAndBound {
 					hasProcessable = true;
 					for (int i = 0; i < branchingSchedule.procLengths.length; i++) {
 						// check all the available processor
-                        int timeToWait = ScheduleHelper.checkChildNode(n, currentSchedule, i);
-                        
-                        //int tempCurrentProcLength = currentSchedule.procLengths[i];
-                        //tempCurrentProcLength += (int)Double.parseDouble(n.getAttribute("Weight").toString()) + timeToWait;
+                        int timeToWait = ScheduleHelper.checkChildNode(n, branchingSchedule, i);
+
+//                        int tempCurrentProcLength = branchingSchedule.procLengths[i];
+//                        tempCurrentProcLength += (int)Double.parseDouble(n.getAttribute("Weight").toString()) + timeToWait;
                         if (timeToWait > -1) {
-							
 							hasInserted = true;
 							ScheduleHelper.insertNodeToSchedule(n, branchingSchedule, i, timeToWait);
 							// Recursive
-							Branch(branchingSchedule);
-
+							Branch(new Schedule(branchingSchedule.schedule, branchingSchedule.procLengths, branchingSchedule.scheduleLength));
 						}
 					}
 				}

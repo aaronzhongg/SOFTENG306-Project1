@@ -27,7 +27,7 @@ public class Main {
 
         // comment out code below before submitting.
 
-        String inputFile = "TestDotFiles/Nodes_9_SeriesParallel.dot";
+        String inputFile = "TestDotFiles/Nodes_7_OutTree.dot";
         int processorInput = 2;
         
 		//int processorInput = 2;
@@ -54,6 +54,8 @@ public class Main {
 			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
 		}
 		System.out.println("Total Schedule Length: " + schedule.scheduleLength);
+		
+		
 		
 		BranchAndBound bnb = new BranchAndBound(schedule, g);
 		ScheduleHelper.makeDependencyMatrix(g);
