@@ -18,10 +18,10 @@ public class ScheduleHelper {
 	
 	public static int[][] dependencyMatrix;
 	public static Schedule currentBestSchedule;
+	//private static ArrayList<Integer> rootNodes = new ArrayList<Integer>();
 	
 	//This is a cloned graph just for the currentBestSchedule
 	public static Graph bestGraph;
-	//public static Schedule scheduleCopy;
 
 	/**
 	 * This method should find all node dependencies and map them to an adjacency matrix.
@@ -38,7 +38,7 @@ public class ScheduleHelper {
 			dependencyMatrix[i][j] = 1;
 		}
 	}
-
+	
 	/**
 	 * Finds all the root nodes of the input graph
 	 * @param g : graph
@@ -171,16 +171,16 @@ public class ScheduleHelper {
 
 			minimumProcLength = parentNodeCosts.get(0);
 			
-			int temp = 0;
+			//int temp = 0;
 			for(int i = 0; i < parentNodeCosts.size(); i++) {
 				int pNodeCost = parentNodeCosts.get(i);
 				if (pNodeCost > minimumProcLength) {
 					minimumProcLength = pNodeCost;
-					temp = i;
+					//temp = i;
 				}
 			}
 			
-			Node p = parentNodes.get(temp);
+			//Node p = parentNodes.get(temp);
 			
 			procWaitTime = minimumProcLength - nodeWeight - schedule.procLengths[q.Processor];
 			
@@ -244,10 +244,6 @@ public class ScheduleHelper {
 				}
 			}
 		}
-/*		for(Node n:ScheduleHelper.currentBestSchedule.schedule){
-			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
-		}
-		System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);*/
 		return;
 	}
 	
@@ -265,30 +261,27 @@ public class ScheduleHelper {
             Node parentNode = e.getNode0();
             parentNodes.add(parentNode);
         }
- 
-        int startTime;
-        int endTime;
+
         int canStartat = -1;
         int tempValue;
-        //int communication_cost = 0;
         int edgeWeight;
         int timeLeftToWait = 0;
+        int tempTimeToWait;
+        
         for (Node parent: parentNodes){
-            int tempTimeToWait;
-            startTime = (int)Double.parseDouble(parent.getAttribute("Start").toString());
-            endTime = startTime + (int)Double.parseDouble(parent.getAttribute("Weight").toString());
+                    
             int parentProcessor = (int)Double.parseDouble(parent.getAttribute("Processor").toString());
-            //node is being processed on same processor as parent currently being checked
-            if (parentProcessor == processorID){
+            
+            if (parentProcessor == processorID){ //node is being processed on same processor as parent currently being checked
                 tempValue = schedule.procLengths[processorID];
                 tempTimeToWait = 0;
             }
-            //node being processed on different processor
-            else {
+            else { //node being processed on different processor
                
                 Edge parentToChild = parent.getEdgeToward(node);
                 edgeWeight = (int)Double.parseDouble(parentToChild.getAttribute("Weight").toString());
                 int lengthCurrentProcessor = schedule.procLengths[processorID];
+                int endTime = (int)Double.parseDouble(parent.getAttribute("Start").toString()) + (int)Double.parseDouble(parent.getAttribute("Weight").toString());
                 int timeWaited = lengthCurrentProcessor - endTime;
                 tempTimeToWait = edgeWeight - timeWaited;
                
@@ -299,18 +292,14 @@ public class ScheduleHelper {
                 tempValue = lengthCurrentProcessor + tempTimeToWait;
             }
            
-           
             if (tempValue > canStartat){
                 canStartat = tempValue;
             }
            
-            //
             if (tempTimeToWait > timeLeftToWait) {
                 timeLeftToWait = tempTimeToWait;
             }
         }
-       
-       
        
         int procLength = canStartat + (int)Double.parseDouble(node.getAttribute("Weight").toString());
         for(int i : schedule.procLengths){
@@ -318,14 +307,10 @@ public class ScheduleHelper {
                 procLength = i;
             }
         }
-        //scheduleCopy.addNode(node, processorID, communication_cost);
-        //canStartat represents the earliest start time that the input node can be scheduled on the input processor.
+
         if (procLength >= currentBestSchedule.scheduleLength) {
             return -1;
         } else {
-            //return currentBestSchedule.scheduleLength - scheduleCopy.scheduleLength;
-           
-            //Should probably return communication_cost since that is basically procWaitTime
             return timeLeftToWait;
         }
     }

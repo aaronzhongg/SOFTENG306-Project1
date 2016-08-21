@@ -47,14 +47,14 @@ public class Schedule {
 
 	/**
 	 * adds an input node to the scheduler
-	 * @param n : Node wanting to add
+	 * @param integer : Node wanting to add
 	 * @param Processor : the processor the node will get added to
 	 * @param procWaitTime
 	 */
-	public void addNode(Node n, int Processor, int procWaitTime){
-		n.setAttribute("Processor", Processor);
-		n.setAttribute("Start", procLengths[Processor] + procWaitTime);
-		this.schedule.add(n);
+	public void addNode(Node node, int Processor, int procWaitTime){
+		node.setAttribute("Processor", Processor);
+		node.setAttribute("Start", procLengths[Processor] + procWaitTime);
+		this.schedule.add(node);
 	}
 
 	/**
