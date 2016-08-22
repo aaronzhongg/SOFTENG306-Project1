@@ -52,10 +52,10 @@ public class Main {
 		ScheduleHelper.currentBestSchedule = new Schedule(schedule.schedule, schedule.procLengths, schedule.scheduleLength);
 		ScheduleHelper.bestGraph = Graphs.clone(g);
 		//temporary printing the greedy stuff
-		for(Node n:schedule.schedule){
+/*		for(Node n:schedule.schedule){
 			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
 		}
-		System.out.println("Total Schedule Length: " + schedule.scheduleLength);
+		System.out.println("Total Schedule Length: " + schedule.scheduleLength);*/
 		
 		
 		
