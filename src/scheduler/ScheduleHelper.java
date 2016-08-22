@@ -244,6 +244,10 @@ public class ScheduleHelper {
 				}
 			}
 		}
+		for(Node n: ScheduleHelper.bestGraph){
+			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
+		}
+		System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
 		return;
 	}
 	

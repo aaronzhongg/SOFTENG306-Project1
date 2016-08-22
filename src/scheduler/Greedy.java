@@ -16,25 +16,20 @@ public class Greedy {
 
 		Schedule schedule = new Schedule(procCount);		//make a new, empty schedule
 		ArrayList<QueueItem> queue = new ArrayList<QueueItem>();	//make an empty queue
-
-		boolean firstRoot = true; //finds smallest queueItem in next loop
-		QueueItem smallest = null;
 		
-		for(Integer i:root){ //adds all root nodes to the queue, each with all processor ids
+		for(Integer i: root){ //adds all root nodes to the queue, each with all processor ids
 			for(int j = 0; j < procCount; j++ ){
 				queue.add(new QueueItem(i, j));
 			}
-			
-			if (firstRoot){ // smallest is the first item
-				smallest = queue.get(0);
-				firstRoot = false;
-			}else{
-				QueueItem q = queue.get(i); // compares smallest with this queueitem
-				if(ScheduleHelper.getNodeWeight(g, q.nodeIndex) <= ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)){
-					smallest = q;
-				}
+		}
+		
+		QueueItem smallest = queue.get(0);
+		
+		for (int i = 0; i< queue.size(); i++){
+			QueueItem q = queue.get(i);
+			if(ScheduleHelper.getNodeWeight(g, q.nodeIndex)<= ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)){
+				smallest = q;
 			}
-
 		}
 		
 		//removes the smallest root node found and removes it from the queue

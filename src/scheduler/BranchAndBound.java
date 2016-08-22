@@ -9,17 +9,15 @@ public class BranchAndBound {
 	private Schedule currentSchedule;
 	private Graph g;
 	private Node nodeToBeRemoved = null;
-	private ArrayList<Integer> rootNodesIDs;
 	
 	/**
 	 * Constructor to instantiate a new Schedule
 	 * @param s
 	 * @param g
 	 */
-	public BranchAndBound(Schedule s, Graph g, ArrayList<Integer> rootNodesIDs){
+	public BranchAndBound(Schedule s, Graph g){
 		this.currentSchedule = new Schedule(s.schedule, s.procLengths, s.scheduleLength);
 		this.g = g;
-		this.rootNodesIDs = rootNodesIDs;
 	}
 	
 	/**
@@ -30,9 +28,14 @@ public class BranchAndBound {
 	 * @param g
 	 * @return
 	 */
-	public void branchAndBoundAlgorithm() {
-		
-		nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
+	public void branchAndBoundAlgorithm() {		
+		//make a list of root nodes
+		ArrayList<Node> rootNodes = new ArrayList<Node>();
+		ArrayList<Integer> rootNodeIDs = ScheduleHelper.findRootNodes(g);
+		 
+		for(int i : rootNodeIDs){
+			rootNodes.add(g.getNode(i));
+		}
 		
 		//Start the branch and bound
 		while(Branch(new Schedule(currentSchedule.schedule, currentSchedule.procLengths, currentSchedule.scheduleLength)) == false){
@@ -44,14 +47,14 @@ public class BranchAndBound {
 			if(currentSchedule.schedule.isEmpty()){
 				//If schedule is empty, then what we removed is a root node
 				// delete the root node from the root nodes
-				rootNodesIDs.remove(nodeToBeRemoved.getIndex());
-				
-				if(rootNodesIDs.isEmpty()){
+				rootNodes.remove(nodeToBeRemoved);
+				if(rootNodes.isEmpty()){
 					//No more root nodes to process, the search is complete. the current best will be stored in ScheduleHelper
 					return;
 				}
 
-				currentSchedule.addNode(g.getNode(rootNodesIDs.get(0)), 0, 0); //gets a new root node to start branch and bound with (dif to parallel)
+				currentSchedule.addNode(rootNodes.get(0), 0, 0); //gets a new root node to start branch and bound with (dif to parallel)
+				currentSchedule.updateProcessorLength(0, (int)Double.parseDouble(rootNodes.get(0).getAttribute("Weight").toString()));
 			}
 		}
 	}
