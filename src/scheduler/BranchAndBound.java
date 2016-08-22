@@ -44,7 +44,8 @@ public class BranchAndBound {
 			if(currentSchedule.schedule.isEmpty()){
 				//If schedule is empty, then what we removed is a root node
 				// delete the root node from the root nodes
-				rootNodesIDs.remove(nodeToBeRemoved.getIndex());
+				Integer i = new Integer(nodeToBeRemoved.getIndex());
+				rootNodesIDs.remove(i);
 				
 				if(rootNodesIDs.isEmpty()){
 					//No more root nodes to process, the search is complete. the current best will be stored in ScheduleHelper
