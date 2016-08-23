@@ -59,17 +59,17 @@ public class Main {
 		for(int rootNode: rootnodes) {
 			// Make a clone to get the processableNodes after adding the root node to the schedule
 			Graph tempNewGraph = Graphs.clone(g); 
-			Schedule tempNewSchedule = new Schedule(processorInput);
-			
-			tempNewSchedule.addNode(tempNewGraph.getNode(rootNode), 0, 0);
-			tempNewSchedule.updateProcessorLength(0, (int)Double.parseDouble(tempNewGraph.getNode(rootNode).getAttribute("Weight").toString()));
+//			Schedule tempNewSchedule = new Schedule(processorInput);
+			tempNewGraph.getNode(rootNode).setAttribute("Processor", 0);
 			ArrayList<Integer> processableNodes = ScheduleHelper.processableNodes(tempNewGraph, rootNode);
 			
 			for(int processableNodeIndex: processableNodes) {
 				
 				//New graph for each processableNode
 				Graph newGraph = Graphs.clone(tempNewGraph); 		//NEED to create a new graph because GraphStream nodes
-				Schedule newSchedule = new Schedule(tempNewSchedule.schedule, tempNewSchedule.procLengths, tempNewSchedule.scheduleLength);		//New schedule with nodes from newly created Graph
+				Schedule newSchedule = new Schedule(processorInput);		//New schedule with nodes from newly created Graph
+				newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);
+				newSchedule.updateProcessorLength(0, (int)Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));
 				
 				// Add processable node into each processor
 				int tempProcessorCount = 0;
