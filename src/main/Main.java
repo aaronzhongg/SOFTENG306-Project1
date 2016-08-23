@@ -7,6 +7,7 @@ import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.Graphs;
 
 import scheduler.*;
+import scheduler.Greedy.ScheduleGraphPair;
 import ui.MainView;
 import util.io;
 import ui.Update;
@@ -47,26 +48,29 @@ public class Main {
 		// Find root nodes from the input graph
 		//ArrayList<Integer> rootNodes = ScheduleHelper.findRootNodes(g);
 		
+		ScheduleHelper.currentBestSchedule = new Schedule();
+		ScheduleHelper.bestGraph = Graphs.clone(g);
 		ScheduleHelper.currentBestSchedule.scheduleLength = 2147483647;
 		Greedy greedy = new Greedy();
 		ScheduleHelper.makeDependencyMatrix(g);
 		
+		// Create a schedule that has every combination of root node + next processable node (in each processor)
 		for(int rootNode: rootnodes) {
 			ArrayList<Integer> processableNodes = ScheduleHelper.processableNodes(g, rootNode);
 			for(int processableNodeIndex: processableNodes) {
-				Graph newGraph = Graphs.clone(g);
-				Schedule newSchedule = new Schedule();
+				
+				Graph newGraph = Graphs.clone(g); 		//NEED to create a new graph because GraphStream nodes
+				Schedule newSchedule = new Schedule();		//New schedule with nodes from newly created Graph
 				newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);
 				newSchedule.updateProcessorLength(0, (int)Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));
 				
+				// Add processable node into each processor
 				int tempProcessorCount = 0;
 				while(tempProcessorCount < processorInput) {
 					int procWaitTime = ScheduleHelper.checkChildNode(g.getNode(processableNodeIndex), newSchedule, tempProcessorCount);
 					newSchedule.addNode(g.getNode(processableNodeIndex), tempProcessorCount, procWaitTime);
-					newSchedule.updateProcessorLength(tempProcessorCount, procWaitTime + (int)Double.parseDouble(newGraph.getNode(processableNodeIndex).getAttribute("Weight").toString()));
-//					ScheduleGraphPair sgPair = greedy.greedySearch(newGraph, processorInput, newSchedule);
-					
-					CreateSchedule(newSchedule, processorInput, newGraph);
+					newSchedule.updateProcessorLength(tempProcessorCount, procWaitTime + (int)Double.parseDouble(newGraph.getNode(processableNodeIndex).getAttribute("Weight").toString()));			
+					CreateSchedule(newSchedule, processorInput, newGraph);		// This function should run on a new thread
 				}
 				
 				
@@ -74,8 +78,7 @@ public class Main {
 			
 //			schedule = greedy.greedySearch(g, processorInput, schedule);
 		}
-//		ScheduleHelper.currentBestSchedule = new Schedule(schedule.schedule, schedule.procLengths, schedule.scheduleLength);
-//		ScheduleHelper.bestGraph = Graphs.clone(g);
+
 		//temporary printing the greedy stuff
 /*		for(Node n:schedule.schedule){
 			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
@@ -105,8 +108,25 @@ public class Main {
 	//Need to start new thread 
 	public static void CreateSchedule(Schedule schedule, int processorCount, Graph g) {
 		Greedy greedy = new Greedy();
-		ScheduleGraphPair sgPair = greedy.greedySearch(g, processorCount, g);
+		ScheduleGraphPair sgPair = greedy.greedySearch(g, processorCount, schedule);
+		
+		// After greedy algorithm returns a schedule, if it is better than current best, update the bound and bestGraph
+		if (sgPair.schedule.scheduleLength < ScheduleHelper.currentBestSchedule.scheduleLength) {
+			ScheduleHelper.currentBestSchedule.scheduleLength = sgPair.schedule.scheduleLength;
+			
+			for(Node n : g){
+				for(Node bestN : ScheduleHelper.bestGraph){
+					if(n.getIndex() == bestN.getIndex()){
+						Graphs.copyAttributes(n, bestN);
+					}
+				}
+			}
+
+		}
+		
 		BranchAndBound bnb = new BranchAndBound(sgPair.schedule, sgPair.g);
 		bnb.branchAndBoundAlgorithm();
+		
+		
 	}
 }
