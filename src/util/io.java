@@ -73,7 +73,7 @@ public class io {
         return g;
     }
 
-    public void outputFile(Schedule schedule, Graph inputGraph, String inputFileName, String outputFileName){
+    public void outputFile(Schedule schedule, Graph inputGraph, String outputFileName){
 //        for (Node n: schedule.schedule){
 //            for (Node graphnode: inputGraph.getNodeSet()){
 //                if (n.getId() == graphnode.getId()){
@@ -83,18 +83,15 @@ public class io {
 //
 //            }
 //        }
-        String[] split = inputFileName.split(".dot");
-        String nameWithoutSuffix = split[0];
-        File outputFileWithoutSuffix = new File(nameWithoutSuffix);
-        outputFileName = "/tmp/" + outputFileName + "-output.dot";
+        String output = "/tmp/" + outputFileName;
         FileSinkDOT fs = new FileSinkDOT(true);
-        File outputFile = new File(outputFileName);
+        File outputFile = new File(output);
         FileOutputStream fos = null;
         try {
             outputFile.createNewFile();
             fos = new FileOutputStream(outputFile);
             fs.writeAll(inputGraph, fos);
-            System.out.println("Output file saved to: " + outputFileName);
+            System.out.println("Output file saved to: " + output);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
