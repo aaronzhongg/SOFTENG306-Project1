@@ -47,10 +47,35 @@ public class Main {
 		// Find root nodes from the input graph
 		//ArrayList<Integer> rootNodes = ScheduleHelper.findRootNodes(g);
 		
+		ScheduleHelper.currentBestSchedule.scheduleLength = 2147483647;
 		Greedy greedy = new Greedy();
-		schedule = greedy.greedySearch(g, processorInput, rootnodes);
-		ScheduleHelper.currentBestSchedule = new Schedule(schedule.schedule, schedule.procLengths, schedule.scheduleLength);
-		ScheduleHelper.bestGraph = Graphs.clone(g);
+		ScheduleHelper.makeDependencyMatrix(g);
+		
+		for(int rootNode: rootnodes) {
+			ArrayList<Integer> processableNodes = ScheduleHelper.processableNodes(g, rootNode);
+			for(int processableNodeIndex: processableNodes) {
+				Graph newGraph = Graphs.clone(g);
+				Schedule newSchedule = new Schedule();
+				newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);
+				newSchedule.updateProcessorLength(0, (int)Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));
+				
+				int tempProcessorCount = 0;
+				while(tempProcessorCount < processorInput) {
+					int procWaitTime = ScheduleHelper.checkChildNode(g.getNode(processableNodeIndex), newSchedule, tempProcessorCount);
+					newSchedule.addNode(g.getNode(processableNodeIndex), tempProcessorCount, procWaitTime);
+					newSchedule.updateProcessorLength(tempProcessorCount, procWaitTime + (int)Double.parseDouble(newGraph.getNode(processableNodeIndex).getAttribute("Weight").toString()));
+//					ScheduleGraphPair sgPair = greedy.greedySearch(newGraph, processorInput, newSchedule);
+					
+					CreateSchedule(newSchedule, processorInput, newGraph);
+				}
+				
+				
+			}
+			
+//			schedule = greedy.greedySearch(g, processorInput, schedule);
+		}
+//		ScheduleHelper.currentBestSchedule = new Schedule(schedule.schedule, schedule.procLengths, schedule.scheduleLength);
+//		ScheduleHelper.bestGraph = Graphs.clone(g);
 		//temporary printing the greedy stuff
 /*		for(Node n:schedule.schedule){
 			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
@@ -59,21 +84,29 @@ public class Main {
 		
 		
 		
-		BranchAndBound bnb = new BranchAndBound(schedule, g);
-		ScheduleHelper.makeDependencyMatrix(g);
-		bnb.branchAndBoundAlgorithm();
+//		BranchAndBound bnb = new BranchAndBound(schedule, g);
+		
+//		bnb.branchAndBoundAlgorithm();
 		// prints answer
 	/*  for(Node n:schedule.schedule){
 			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
 		}
 		System.out.println("Total Schedule Length: " + schedule.scheduleLength);*/
-		for(Node n: ScheduleHelper.bestGraph){
-			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
-		}
-		System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
-        IOProcessor.outputFile(schedule, ScheduleHelper.bestGraph, inputFile); // creates the output file
-       
+//		for(Node n: ScheduleHelper.bestGraph){
+//			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
+//		}
+//		System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
+//        IOProcessor.outputFile(schedule, ScheduleHelper.bestGraph, inputFile); // creates the output file
+//       
         
 
+	}
+	
+	//Need to start new thread 
+	public static void CreateSchedule(Schedule schedule, int processorCount, Graph g) {
+		Greedy greedy = new Greedy();
+		ScheduleGraphPair sgPair = greedy.greedySearch(g, processorCount, g);
+		BranchAndBound bnb = new BranchAndBound(sgPair.schedule, sgPair.g);
+		bnb.branchAndBoundAlgorithm();
 	}
 }
