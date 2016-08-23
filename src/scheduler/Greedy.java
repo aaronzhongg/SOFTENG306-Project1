@@ -1,132 +1,144 @@
-package scheduler;
-
-import java.util.ArrayList;
-import org.graphstream.graph.Graph;
-
-public class Greedy {
-
-	/**
+package scheduler;//####[1]####
+//####[1]####
+import java.util.ArrayList;//####[3]####
+import org.graphstream.graph.Graph;//####[4]####
+//####[4]####
+//-- ParaTask related imports//####[4]####
+import pt.runtime.*;//####[4]####
+import java.util.concurrent.ExecutionException;//####[4]####
+import java.util.concurrent.locks.*;//####[4]####
+import java.lang.reflect.*;//####[4]####
+import pt.runtime.GuiThread;//####[4]####
+import java.util.concurrent.BlockingQueue;//####[4]####
+import java.util.ArrayList;//####[4]####
+import java.util.List;//####[4]####
+//####[4]####
+public class Greedy {//####[6]####
+    static{ParaTask.init();}//####[6]####
+    /*  ParaTask helper method to access private/protected slots *///####[6]####
+    public void __pt__accessPrivateSlot(Method m, Object instance, TaskID arg, Object interResult ) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {//####[6]####
+        if (m.getParameterTypes().length == 0)//####[6]####
+            m.invoke(instance);//####[6]####
+        else if ((m.getParameterTypes().length == 1))//####[6]####
+            m.invoke(instance, arg);//####[6]####
+        else //####[6]####
+            m.invoke(instance, arg, interResult);//####[6]####
+    }//####[6]####
+//####[15]####
+    /**
 	 * Greedy Search searches through the graph, according to the queue, adding nodes to the schedule that will increment each schedule time by the least amount
 	 * Then adds the process-able nodes to the queue and goes through the queue again
 	 * @param g : input graph
 	 * @param procCount : amount of processors
 	 * @returns : when gone through whole queue (i.e. all nodes in graph)
-	 */
-	public Schedule greedySearch(Graph g, int procCount, ArrayList<Integer> root){
-
-		Schedule schedule = new Schedule(procCount);		//make a new, empty schedule
-		ArrayList<QueueItem> queue = new ArrayList<QueueItem>();	//make an empty queue
-		
-		for(Integer i: root){ //adds all root nodes to the queue, each with all processor ids
-			for(int j = 0; j < procCount; j++ ){
-				queue.add(new QueueItem(i, j));
-			}
-		}
-		
-		QueueItem smallest = queue.get(0);
-		
-		for (int i = 0; i< queue.size(); i++){
-			QueueItem q = queue.get(i);
-			if(ScheduleHelper.getNodeWeight(g, q.nodeIndex)<= ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)){
-				smallest = q;
-			}
-		}
-		
-		//removes the smallest root node found and removes it from the queue
-		for (int popIndex = queue.size() -1 ; popIndex > -1; popIndex--) {
-			if (queue.get(popIndex).nodeIndex == smallest.nodeIndex) {
-				queue.remove(popIndex);
-			}
-		}
-
-		schedule.addNode(g.getNode(smallest.nodeIndex), smallest.Processor, 0); //adds the smallest root node to the schedule of the smallest processor
-		schedule.updateProcessorLength(smallest.Processor, ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)); //changes processor length of added smallest root node
-
-		//updates GUI
-		//update.updateColor(smallest.nodeIndex, smallest.Processor, g);//updates the color
-		//g.getNode(smallest.nodeIndex).addAttribute("ui.style", "text-style:bold-italic; text-size:18;");
-
-		//goes through all children of the smallest root nodes and 
-		ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);
-		for(int i:childrenNodes){
-			for(int j = 0; j < procCount; j++ ){
-				queue.add(new QueueItem(i, j));	
-			}
-		}
-
-		// loops through the whole queue
-		while(!queue.isEmpty()){
-
-			int[] procInfo;
-			int procWaitTime = 0;
-			int newProcLength;	
-			int scheduleLength;
-			int smallestWeightChange = 2147483647; //first one to compare with, give the initial weight change as the maximum possible
-			int processorWeightInc = 0;
-
-			for(int i = 0; i < queue.size(); i++){ //loops through queue
-				QueueItem q = queue.get(i);
-				procInfo = ScheduleHelper.scheduleNode(schedule, q, g);
-				newProcLength = procInfo[0];	//new length of the processor after adding this particular node
-				scheduleLength = schedule.findScheduleLength();		// current length of schedule
-
-				if(newProcLength - scheduleLength <= smallestWeightChange){ //checks if this item to the schedule is the smallest weight change
-					procWaitTime = procInfo[1];
-					smallest = q;
-					smallestWeightChange = newProcLength - scheduleLength;
-					processorWeightInc = newProcLength - schedule.procLengths[q.Processor];	
-
-					//GUI //g.getNode(q.nodeIndex).addAttribute("ui.style", "fill-color: rgb(0,100,255);");
-				}
-			}
-
-			for (int popIndex = queue.size() -1 ; popIndex > -1; popIndex--) { //removes the node from the queue that makes the smallest dif
-				if (queue.get(popIndex).nodeIndex == smallest.nodeIndex) {
-					queue.remove(popIndex);
-				}
-			}
-
-			//adds smallest node to schedule
-			schedule.addNode(g.getNode(smallest.nodeIndex), smallest.Processor, procWaitTime);
-			schedule.updateProcessorLength(smallest.Processor, processorWeightInc);
-
-			//TEST //System.out.println("TEST i="+t+" :  Node id: " + smallest.nodeIndex + " ProcID: " + smallest.Processor );
-
-			childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex); //adds processable children to queue
-			for(int i:childrenNodes){
-				for(int j = 0; j < procCount; j++ ){
-					queue.add(new QueueItem(i, j));
-				}
-			}
-
-			//update.updateColor(smallest.nodeIndex,smallest.Processor,g); //GUI
-		}
-
-		/* NOTE
-		 * Possible outcomes:
-		 * node is root = just add weight
-		 * node is child, only dependent on 1 parent
-		 * node is child, depends on more than 1 parent
-		 */
-
-		return schedule;
-	}
-
-	/**
+	 *///####[15]####
+    public Schedule greedySearch(Graph g, int procCount, ArrayList<Integer> root) {//####[15]####
+        Schedule schedule = new Schedule(procCount);//####[17]####
+        ArrayList<QueueItem> queue = new ArrayList<QueueItem>();//####[18]####
+        for (Integer i : root) //####[20]####
+        {//####[20]####
+            for (int j = 0; j < procCount; j++) //####[21]####
+            {//####[21]####
+                queue.add(new QueueItem(i, j));//####[22]####
+            }//####[23]####
+        }//####[24]####
+        QueueItem smallest = queue.get(0);//####[26]####
+        for (int i = 0; i < queue.size(); i++) //####[28]####
+        {//####[28]####
+            QueueItem q = queue.get(i);//####[29]####
+            if (ScheduleHelper.getNodeWeight(g, q.nodeIndex) <= ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)) //####[30]####
+            {//####[30]####
+                smallest = q;//####[31]####
+            }//####[32]####
+        }//####[33]####
+        for (int popIndex = queue.size() - 1; popIndex > -1; popIndex--) //####[36]####
+        {//####[36]####
+            if (queue.get(popIndex).nodeIndex == smallest.nodeIndex) //####[37]####
+            {//####[37]####
+                queue.remove(popIndex);//####[38]####
+            }//####[39]####
+        }//####[40]####
+        schedule.addNode(g.getNode(smallest.nodeIndex), smallest.Processor, 0);//####[42]####
+        schedule.updateProcessorLength(smallest.Processor, ScheduleHelper.getNodeWeight(g, smallest.nodeIndex));//####[43]####
+        ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);//####[50]####
+        for (int i : childrenNodes) //####[51]####
+        {//####[51]####
+            for (int j = 0; j < procCount; j++) //####[52]####
+            {//####[52]####
+                queue.add(new QueueItem(i, j));//####[53]####
+            }//####[54]####
+        }//####[55]####
+        while (!queue.isEmpty()) //####[58]####
+        {//####[58]####
+            int[] procInfo;//####[60]####
+            int procWaitTime = 0;//####[61]####
+            int newProcLength;//####[62]####
+            int scheduleLength;//####[63]####
+            int smallestWeightChange = 2147483647;//####[64]####
+            int processorWeightInc = 0;//####[65]####
+            for (int i = 0; i < queue.size(); i++) //####[67]####
+            {//####[67]####
+                QueueItem q = queue.get(i);//####[68]####
+                procInfo = ScheduleHelper.scheduleNode(schedule, q, g);//####[69]####
+                newProcLength = procInfo[0];//####[70]####
+                scheduleLength = schedule.findScheduleLength();//####[71]####
+                if (newProcLength - scheduleLength <= smallestWeightChange) //####[73]####
+                {//####[73]####
+                    procWaitTime = procInfo[1];//####[74]####
+                    smallest = q;//####[75]####
+                    smallestWeightChange = newProcLength - scheduleLength;//####[76]####
+                    processorWeightInc = newProcLength - schedule.procLengths[q.Processor];//####[77]####
+                }//####[80]####
+            }//####[81]####
+            for (int popIndex = queue.size() - 1; popIndex > -1; popIndex--) //####[83]####
+            {//####[83]####
+                if (queue.get(popIndex).nodeIndex == smallest.nodeIndex) //####[84]####
+                {//####[84]####
+                    queue.remove(popIndex);//####[85]####
+                }//####[86]####
+            }//####[87]####
+            schedule.addNode(g.getNode(smallest.nodeIndex), smallest.Processor, procWaitTime);//####[90]####
+            schedule.updateProcessorLength(smallest.Processor, processorWeightInc);//####[91]####
+            childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);//####[95]####
+            for (int i : childrenNodes) //####[96]####
+            {//####[96]####
+                for (int j = 0; j < procCount; j++) //####[97]####
+                {//####[97]####
+                    queue.add(new QueueItem(i, j));//####[98]####
+                }//####[99]####
+            }//####[100]####
+        }//####[103]####
+        return schedule;//####[112]####
+    }//####[113]####
+//####[119]####
+    /**
 	 * This class is used by processable nodes method
 	 * Adds items to the queue, adding node index and processor ID
-	 */
-	public class QueueItem{
-		public int nodeIndex;
-		public int Processor;
-
-		public QueueItem(int n){
-			nodeIndex = n;
-			Processor = -1;	//default value, -1 means it has not been processed yet.
-		}
-		public QueueItem(int n, int p){
-			nodeIndex = n;
-			Processor = p;
-		}
-	}
-}
+	 *///####[119]####
+    public class QueueItem {//####[119]####
+//####[119]####
+        /*  ParaTask helper method to access private/protected slots *///####[119]####
+        public void __pt__accessPrivateSlot(Method m, Object instance, TaskID arg, Object interResult ) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {//####[119]####
+            if (m.getParameterTypes().length == 0)//####[119]####
+                m.invoke(instance);//####[119]####
+            else if ((m.getParameterTypes().length == 1))//####[119]####
+                m.invoke(instance, arg);//####[119]####
+            else //####[119]####
+                m.invoke(instance, arg, interResult);//####[119]####
+        }//####[119]####
+//####[120]####
+        public int nodeIndex;//####[120]####
+//####[121]####
+        public int Processor;//####[121]####
+//####[123]####
+        public QueueItem(int n) {//####[123]####
+            nodeIndex = n;//####[124]####
+            Processor = -1;//####[125]####
+        }//####[126]####
+//####[127]####
+        public QueueItem(int n, int p) {//####[127]####
+            nodeIndex = n;//####[128]####
+            Processor = p;//####[129]####
+        }//####[130]####
+    }//####[130]####
+}//####[130]####
