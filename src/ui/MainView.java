@@ -6,14 +6,13 @@ import java.awt.Component;
 import javax.swing.JFrame;
 
 
-
 import org.graphstream.graph.*;
 import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 public class MainView extends JFrame{
 	private Graph g;
-	//private InfoPanel infoPanel;
+	private InfoPanel infoPanel;
 
 public MainView(Graph g){
 	this.g=g;
@@ -27,7 +26,8 @@ public MainView(Graph g){
 	View view = viewer.addDefaultView(false); 
 
 	add((Component)view,BorderLayout.CENTER);
-
+	infoPanel=new InfoPanel();
+	add(infoPanel,BorderLayout.EAST);
 	setVisible(true);
 }
 

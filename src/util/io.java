@@ -46,9 +46,8 @@ public class io {
 
     }
 
-    public Graph DOTParser(File input_file, String file_name){
-        Graph g = new DefaultGraph("g");
-        FileSource fs = new FileSourceDOT();
+    public Graph DOTParser(File input_file, String file_name,Graph g){
+               FileSource fs = new FileSourceDOT();
 
         fs.addSink(g);
         
@@ -60,12 +59,12 @@ public class io {
             fs.removeSink(g);
         }
         
-        //Add Processor attribute to every node
+        //Add processorID attribute to every node
         for (int i = 0; i < g.getNodeCount(); i++) {
-        	g.getNode(i).addAttribute("Processor", -1);
+        	g.getNode(i).addAttribute("processorID", -1);
         	g.getNode(i).addAttribute("Start" , -1);
-        	//g.getNode(i).addAttribute("ui.label", "Node : "+g.getNode(i).getId());
-      //  g.getNode(i).addAttribute("ui.class",g.getNode(i).getAttribute("Processor")+"");
+        	g.getNode(i).addAttribute("ui.label", "  "+g.getNode(i).getId());
+      //  g.getNode(i).addAttribute("ui.class",g.getNode(i).getAttribute("processorID")+"");
         
         }
        
@@ -78,7 +77,7 @@ public class io {
 //            for (Node graphnode: inputGraph.getNodeSet()){
 //                if (n.getId() == graphnode.getId()){
 //                    //graphnode.addAttribute("Start", n.getAttribute("Start").toString());
-//                    //graphnode.addAttribute("Processor", n.getAttribute("Processor").toString());
+//                    //graphnode.addAttribute("Processor", n.getAttribute("processorID").toString());
 //                }
 //
 //            }
@@ -94,7 +93,6 @@ public class io {
             outputFile.createNewFile();
             fos = new FileOutputStream(outputFile);
             fs.writeAll(inputGraph, fos);
-            System.out.println("Output file saved to: " + outputFileName);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

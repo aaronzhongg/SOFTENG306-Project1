@@ -10,7 +10,8 @@ public class Update {
 		this.processorNum=processorNum;
 	}
 	public void updateColor(int id,int processor,Graph g){
-	switch (processor){
+					
+			switch (processor){
 			case 1: 
 				g.getNode(id).addAttribute("ui.style", "fill-color: red;");
 				break;
@@ -33,7 +34,14 @@ public class Update {
 				g.getNode(id).addAttribute("ui.style", "fill-color: brown;");
 				break;
 			}
+			//System.out.println(processor+"??");
+			
+			
+			
+			//System.out.println(color);
+			
 		}
+		
 		
 		
 	}
