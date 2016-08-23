@@ -31,7 +31,7 @@ public class Main {
 
         // comment out code below before submitting.
 
-        String inputFile = "TestDotFiles/Nodes_10_Random.dot";
+        String inputFile = "TestDotFiles/Nodes_7_OutTree.dot";
         int processorInput = 2;
         
 		File input_file = new File(inputFile);
@@ -48,21 +48,28 @@ public class Main {
 		// Find root nodes from the input graph
 		//ArrayList<Integer> rootNodes = ScheduleHelper.findRootNodes(g);
 		
-		ScheduleHelper.currentBestSchedule = new Schedule();
+		ScheduleHelper.currentBestSchedule = new Schedule(processorInput);
 		ScheduleHelper.bestGraph = Graphs.clone(g);
 		ScheduleHelper.currentBestSchedule.scheduleLength = 2147483647;
 		Greedy greedy = new Greedy();
 		ScheduleHelper.makeDependencyMatrix(g);
 		
+	
 		// Create a schedule that has every combination of root node + next processable node (in each processor)
 		for(int rootNode: rootnodes) {
-			ArrayList<Integer> processableNodes = ScheduleHelper.processableNodes(g, rootNode);
+			// Make a clone to get the processableNodes after adding the root node to the schedule
+			Graph tempNewGraph = Graphs.clone(g); 
+			Schedule tempNewSchedule = new Schedule(processorInput);
+			
+			tempNewSchedule.addNode(tempNewGraph.getNode(rootNode), 0, 0);
+			tempNewSchedule.updateProcessorLength(0, (int)Double.parseDouble(tempNewGraph.getNode(rootNode).getAttribute("Weight").toString()));
+			ArrayList<Integer> processableNodes = ScheduleHelper.processableNodes(tempNewGraph, rootNode);
+			
 			for(int processableNodeIndex: processableNodes) {
 				
-				Graph newGraph = Graphs.clone(g); 		//NEED to create a new graph because GraphStream nodes
-				Schedule newSchedule = new Schedule();		//New schedule with nodes from newly created Graph
-				newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);
-				newSchedule.updateProcessorLength(0, (int)Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));
+				//New graph for each processableNode
+				Graph newGraph = Graphs.clone(tempNewGraph); 		//NEED to create a new graph because GraphStream nodes
+				Schedule newSchedule = new Schedule(tempNewSchedule.schedule, tempNewSchedule.procLengths, tempNewSchedule.scheduleLength);		//New schedule with nodes from newly created Graph
 				
 				// Add processable node into each processor
 				int tempProcessorCount = 0;
@@ -95,12 +102,12 @@ public class Main {
 			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
 		}
 		System.out.println("Total Schedule Length: " + schedule.scheduleLength);*/
-//		for(Node n: ScheduleHelper.bestGraph){
-//			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
-//		}
-//		System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
+		for(Node n: ScheduleHelper.bestGraph){
+			System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
+		}
+		System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
 //        IOProcessor.outputFile(schedule, ScheduleHelper.bestGraph, inputFile); // creates the output file
-//       
+       
         
 
 	}
