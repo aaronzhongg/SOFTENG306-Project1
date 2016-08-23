@@ -44,7 +44,7 @@ public class BranchAndBound {
 			currentSchedule.removeNode(currentSchedule.schedule.size() - 1);
 			updateRemoveLengthChanges(currentSchedule, nodeToBeRemoved);
 			
-			if(currentSchedule.schedule.isEmpty()){
+			if(currentSchedule.schedule.size() == 1){
 				//If schedule is empty, then what we removed is a root node
 				// delete the root node from the root nodes
 //				rootNodes.remove(nodeToBeRemoved);
