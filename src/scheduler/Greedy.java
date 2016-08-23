@@ -2,6 +2,7 @@ package scheduler;
 
 import java.util.ArrayList;
 import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
 
 public class Greedy {
 
@@ -24,28 +25,41 @@ public class Greedy {
 			}
 		}*/
 		
-		//Grab all processable nodes for the root of the schedule and add to the queue
-		ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, schedule.schedule.get(0).getIndex());
-		for(int i:childrenNodes){
-			for(int j = 0; j < procCount; j++ ){
-				queue.add(new QueueItem(i, j));	
+		for (Node n : g) {// loops through all the nodes
+			if (!schedule.schedule.contains(n)) {// new schedule doesn't contain it
+				// check all the node that is not in the schedule
+				boolean isProcessable = ScheduleHelper.isProcessable(n,schedule);
+				if (isProcessable) { // if it is processable
+					
+					for (int i = 0; i < schedule.procLengths.length; i++) { // check all the available processor
+						queue.add(new QueueItem(n.getIndex(),i));
+					}
+				}
 			}
 		}
-		
-		//pop the indexes of the second node in the graph
-		for (int popIndex = queue.size() -1 ; popIndex > -1; popIndex--) { //removes the node from the queue that makes the smallest dif
-			if (queue.get(popIndex).nodeIndex == schedule.schedule.get(1).getIndex()) {
-				queue.remove(popIndex);
-			}
-		}
-		
-		//Grab processable nodes again for the second node
-		childrenNodes = ScheduleHelper.processableNodes(g, schedule.schedule.get(1).getIndex());
-		for(int i:childrenNodes){
-			for(int j = 0; j < procCount; j++ ){
-				queue.add(new QueueItem(i, j));	
-			}
-		}
+//						
+//		//Grab all processable nodes for the root of the schedule and add to the queue
+//		ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, schedule.schedule.get(0).getIndex());
+//		for(int i:childrenNodes){
+//			for(int j = 0; j < procCount; j++ ){
+//				queue.add(new QueueItem(i, j));	
+//			}
+//		}
+////		
+//		//pop the indexes of the second node in the graph
+//		for (int popIndex = queue.size() -1 ; popIndex > -1; popIndex--) { //removes the node from the queue that makes the smallest dif
+//			if (queue.get(popIndex).nodeIndex == schedule.schedule.get(1).getIndex()) {
+//				queue.remove(popIndex);
+//			}
+//		}
+//		
+//		//Grab processable nodes again for the second node
+//		childrenNodes = ScheduleHelper.processableNodes(g, schedule.schedule.get(1).getIndex());
+//		for(int i:childrenNodes){
+//			for(int j = 0; j < procCount; j++ ){
+//				queue.add(new QueueItem(i, j));	
+//			}
+//		}
 		
 		
 		QueueItem smallest = queue.get(0);
@@ -88,7 +102,7 @@ public class Greedy {
 
 			//TEST //System.out.println("TEST i="+t+" :  Node id: " + smallest.nodeIndex + " ProcID: " + smallest.Processor );
 
-			childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex); //adds processable children to queue
+			ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex); //adds processable children to queue
 			for(int i:childrenNodes){
 				for(int j = 0; j < procCount; j++ ){
 					queue.add(new QueueItem(i, j));
