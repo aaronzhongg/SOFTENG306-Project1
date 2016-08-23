@@ -19,48 +19,17 @@ public class Greedy {
 		//Schedule schedule = new Schedule(procCount);		//make a new, empty schedule
 		ArrayList<QueueItem> queue = new ArrayList<QueueItem>();	//make an empty queue
 		
-		/*for(Integer i: root){ //adds all root nodes to the queue, each with all processor ids
-			for(int j = 0; j < procCount; j++ ){
-				queue.add(new QueueItem(i, j));
-			}
-		}*/
-		
 		for (Node n : g) {// loops through all the nodes
 			if (!schedule.schedule.contains(n)) {// new schedule doesn't contain it
 				// check all the node that is not in the schedule
 				boolean isProcessable = ScheduleHelper.isProcessable(n,schedule);
 				if (isProcessable) { // if it is processable
-					
 					for (int i = 0; i < schedule.procLengths.length; i++) { // check all the available processor
 						queue.add(new QueueItem(n.getIndex(),i));
 					}
 				}
 			}
-		}
-//						
-//		//Grab all processable nodes for the root of the schedule and add to the queue
-//		ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, schedule.schedule.get(0).getIndex());
-//		for(int i:childrenNodes){
-//			for(int j = 0; j < procCount; j++ ){
-//				queue.add(new QueueItem(i, j));	
-//			}
-//		}
-////		
-//		//pop the indexes of the second node in the graph
-//		for (int popIndex = queue.size() -1 ; popIndex > -1; popIndex--) { //removes the node from the queue that makes the smallest dif
-//			if (queue.get(popIndex).nodeIndex == schedule.schedule.get(1).getIndex()) {
-//				queue.remove(popIndex);
-//			}
-//		}
-//		
-//		//Grab processable nodes again for the second node
-//		childrenNodes = ScheduleHelper.processableNodes(g, schedule.schedule.get(1).getIndex());
-//		for(int i:childrenNodes){
-//			for(int j = 0; j < procCount; j++ ){
-//				queue.add(new QueueItem(i, j));	
-//			}
-//		}
-		
+		}		
 		
 		QueueItem smallest = queue.get(0);
 
@@ -111,13 +80,6 @@ public class Greedy {
 
 			//update.updateColor(smallest.nodeIndex,smallest.Processor,g); //GUI
 		}
-
-		/* NOTE
-		 * Possible outcomes:
-		 * node is root = just add weight
-		 * node is child, only dependent on 1 parent
-		 * node is child, depends on more than 1 parent
-		 */
 		
 		ScheduleGraphPair sng = new ScheduleGraphPair(schedule, g);
 		return sng;

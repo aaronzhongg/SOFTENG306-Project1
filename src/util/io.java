@@ -63,10 +63,7 @@ public class io {
         //Add Processor attribute to every node
         for (int i = 0; i < g.getNodeCount(); i++) {
         	g.getNode(i).addAttribute("Processor", -1);
-        	g.getNode(i).addAttribute("Start" , -1);
-        	//g.getNode(i).addAttribute("ui.label", "Node : "+g.getNode(i).getId());
-      //  g.getNode(i).addAttribute("ui.class",g.getNode(i).getAttribute("Processor")+"");
-        
+        	g.getNode(i).addAttribute("Start" , -1);   
         }
        
         //g.display();
@@ -74,15 +71,7 @@ public class io {
     }
 
     public void outputFile(Schedule schedule, Graph inputGraph, String outputFileName){
-//        for (Node n: schedule.schedule){
-//            for (Node graphnode: inputGraph.getNodeSet()){
-//                if (n.getId() == graphnode.getId()){
-//                    //graphnode.addAttribute("Start", n.getAttribute("Start").toString());
-//                    //graphnode.addAttribute("Processor", n.getAttribute("Processor").toString());
-//                }
-//
-//            }
-//        }
+
         String output = "/tmp/" + outputFileName;
         FileSinkDOT fs = new FileSinkDOT(true);
         File outputFile = new File(output);
