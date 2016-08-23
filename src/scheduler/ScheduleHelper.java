@@ -9,12 +9,36 @@ import scheduler.Greedy.QueueItem;
 import scheduler.Schedule;
 
 import org.graphstream.graph.Edge;
+import org.graphstream.graph.implementations.Graphs;
 /**
  * This class provides methods that the Schedule data structure can use
  *
  */
 public class ScheduleHelper {
+	
+	public static int[][] dependencyMatrix;
+	public static Schedule currentBestSchedule;
+	//private static ArrayList<Integer> rootNodes = new ArrayList<Integer>();
+	
+	//This is a cloned graph just for the currentBestSchedule
+	public static Graph bestGraph;
 
+	/**
+	 * This method should find all node dependencies and map them to an adjacency matrix.
+	 * @param g the graph of nodes and edges
+	 * @return a 2d int array of all edges between nodes
+	 */
+	public static void makeDependencyMatrix(Graph g){
+		
+		dependencyMatrix = new int[g.getNodeCount()][g.getNodeCount()];
+		
+		for(Edge e:g.getEachEdge()){
+			int i = e.getNode0().getIndex();
+			int j = e.getNode1().getIndex();
+			dependencyMatrix[i][j] = 1;
+		}
+	}
+	
 	/**
 	 * Finds all the root nodes of the input graph
 	 * @param g : graph
@@ -46,6 +70,7 @@ public class ScheduleHelper {
 
 	/**
 	 * After a node has been processed, this method is used to return all new nodes that can be processed
+	 * This is used for the Greedy algorithm. For the branch and bound algorithm use CheckChildNodes
 	 * @param g
 	 * @param nodeIndex
 	 * @return
@@ -67,7 +92,7 @@ public class ScheduleHelper {
 			for (Edge childEdge: childIte) {
 				Node parentNode = childEdge.getNode0();
 
-				if ((int)Double.parseDouble(parentNode.getAttribute("processorID").toString()) == -1) { //checks if parent processed
+				if ((int)Double.parseDouble(parentNode.getAttribute("Processor").toString()) == -1) { //checks if parent processed
 					nodeProcessable = false;
 					break;
 				}
@@ -96,7 +121,7 @@ public class ScheduleHelper {
 		ArrayList<Integer> parentNodeCosts = new ArrayList<Integer>(); // This stores the cost of putting the queue item into the specified pid when coming from each parent node
 		ArrayList<Node> parentNodes = new ArrayList<Node>(); // Stores the parent node queue item comes from
 		
-
+		
 		if (g.getNode(q.nodeIndex).getInDegree() != 0) { //if it's not a root
 			int parentNodeFinishedProcessing = 0;
 			//need to find when the longest parent node finished processing
@@ -110,11 +135,11 @@ public class ScheduleHelper {
 			//Get the post-processed processorLength of the queueitem from each of the parent nodes
 			for (Edge e : g.getNode(q.nodeIndex).getEachEnteringEdge()) {
 				Node parentNode = e.getNode0();
-				int parentProcessor = (int)Double.parseDouble(parentNode.getAttribute("processorID").toString());
+				int parentProcessor = (int)Double.parseDouble(parentNode.getAttribute("Processor").toString());
 				int edgeWeight = (int)Double.parseDouble(e.getAttribute("Weight").toString());	
 				
 				//if parent node was processed on the same processor the edge weight is 0
-				if (q.processorID == parentProcessor) {	
+				if (q.Processor == parentProcessor) {	
 					edgeWeight = 0;
 				}
 				
@@ -125,20 +150,20 @@ public class ScheduleHelper {
 				}					
 
 				//if the parent node finished processing longer than the weight of the edge to the child then can add automatically to the processor
-				if (schedule.procLengths[q.processorID] - parentNodeFinishedProcessing >= edgeWeight){
+				if (schedule.procLengths[q.Processor] - parentNodeFinishedProcessing >= edgeWeight){
 					
-					parentNodeCosts.add(schedule.procLengths[q.processorID] + nodeWeight);
+					parentNodeCosts.add(schedule.procLengths[q.Processor] + nodeWeight);
 					parentNodes.add(parentNode);
 					
 				} else {	//find out how long need to wait before can add to processor
 					
 					//time left to wait
-					int timeToWait = edgeWeight - (schedule.procLengths[q.processorID] - parentNodeFinishedProcessing);
+					int timeToWait = edgeWeight - (schedule.procLengths[q.Processor] - currentParentNodeFinish);
 
 					if (timeToWait < 0) {
 						timeToWait = 0;
 					}
-					parentNodeCosts.add(schedule.procLengths[q.processorID] + nodeWeight + timeToWait);
+					parentNodeCosts.add(schedule.procLengths[q.Processor] + nodeWeight + timeToWait);
 					parentNodes.add(parentNode);
 				}
 				
@@ -146,25 +171,161 @@ public class ScheduleHelper {
 
 			minimumProcLength = parentNodeCosts.get(0);
 			
-			int temp = 0;
-			for(int i = 0; i < parentNodeCosts.size() - 1; i++) {
+			//int temp = 0;
+			for(int i = 0; i < parentNodeCosts.size(); i++) {
 				int pNodeCost = parentNodeCosts.get(i);
-				if (pNodeCost < minimumProcLength) {
+				if (pNodeCost > minimumProcLength) {
 					minimumProcLength = pNodeCost;
-					temp = i;
+					//temp = i;
 				}
 			}
 			
-			Node p = parentNodes.get(temp);
+			//Node p = parentNodes.get(temp);
 			
-			procWaitTime = minimumProcLength - nodeWeight - schedule.procLengths[q.processorID];
+			procWaitTime = minimumProcLength - nodeWeight - schedule.procLengths[q.Processor];
 			
 		} else { // if it's a root node, length is the node weight plus the processor length of the processor
-			minimumProcLength = getNodeWeight(g, q.nodeIndex) + schedule.procLengths[q.processorID];
+			minimumProcLength = getNodeWeight(g, q.nodeIndex) + schedule.procLengths[q.Processor];
 		}
 		
 		int[] newProcLengthAndTimeToWait = {minimumProcLength, procWaitTime};
 		return newProcLengthAndTimeToWait;
 
 	}
+
+	/**
+	 * Check whether a node is processable (all of it's parents exist in the currentSchedule) check dependency from dependency matrix (from ScheduleHelper)
+	 * nodeToCheck.getIndex() gives you the index. dependencyMatrix[i][j] i is parent j is child (nodeToCheck is the child)
+	 * @param nodeToBeChecked
+	 * @param currentSchedule
+	 * @return true if nodeToBeChecked is processable (all of it's parents exist in the schedule), false otherwise
+	 * 
+	 */
+	public static boolean isProcessable(Node nodeToBeChecked, Schedule currentSchedule) {
+		int indexOfCheckNode = nodeToBeChecked.getIndex();// gets the index of the node to be checked
+		
+		boolean nodeProcessable = true;
+		
+		for (int i = 0; i<dependencyMatrix[0].length; i++){ //loops through all the parents, check if the nodeToBeChecked is the child
+			if (dependencyMatrix[i][indexOfCheckNode] == 1){
+				
+				boolean parentInSchedule = false;
+				// check i is in the schedule
+				for (Node parent : currentSchedule.schedule){ //loops through whole schedule
+					if (parent.getIndex() == i){ // if parent in schedule return true
+						parentInSchedule = true;
+						break;
+					}
+				}
+				
+				if (!parentInSchedule){ // if parent is not in the schedule return false
+					nodeProcessable = false;
+					break;
+				}	
+			}
+		}
+		
+		return nodeProcessable;
+	}
+	
+	/**
+	 * Replace the current best schedule with the new best schedule and replace the current best bound with new best bound (bound = schedule length)
+	 * @param newBestSchedule
+	 * @return return a copy of the newBestSchedule
+	 * 
+	 * could just call this one line from Branch instead of having to call this function
+	 */
+	public static void foundNewBestSolution(Schedule newBestSchedule, Graph g) {
+		currentBestSchedule = new Schedule(newBestSchedule.schedule, newBestSchedule.procLengths, newBestSchedule.scheduleLength);
+		for(Node n : g){
+			for(Node bestN : bestGraph){
+				if(n.getIndex() == bestN.getIndex()){
+					Graphs.copyAttributes(n, bestN);
+				}
+			}
+		}
+		return;
+	}
+	
+	/**
+	 * Check the cost of adding the child node into the schedule 
+	 * @param node
+	 * @param schedule (current best schedule)
+	 * @return true if schedule time after adding the node is less than current best total schedule time
+	 */
+    public static int checkChildNode(Node node, Schedule schedule, int processorID){
+        //scheduleCopy = new Schedule(schedule.schedule, schedule.procLengths, schedule.scheduleLength);
+ 
+        ArrayList<Node> parentNodes = new ArrayList<Node>();
+        for (Edge e : node.getEachEnteringEdge()) {
+            Node parentNode = e.getNode0();
+            parentNodes.add(parentNode);
+        }
+
+        int canStartat = -1;
+        int tempValue;
+        int edgeWeight;
+        int timeLeftToWait = 0;
+        int tempTimeToWait;
+        
+        for (Node parent: parentNodes){
+                    
+            int parentProcessor = (int)Double.parseDouble(parent.getAttribute("Processor").toString());
+            
+            if (parentProcessor == processorID){ //node is being processed on same processor as parent currently being checked
+                tempValue = schedule.procLengths[processorID];
+                tempTimeToWait = 0;
+            }
+            else { //node being processed on different processor
+               
+                Edge parentToChild = parent.getEdgeToward(node);
+                edgeWeight = (int)Double.parseDouble(parentToChild.getAttribute("Weight").toString());
+                int lengthCurrentProcessor = schedule.procLengths[processorID];
+                int endTime = (int)Double.parseDouble(parent.getAttribute("Start").toString()) + (int)Double.parseDouble(parent.getAttribute("Weight").toString());
+                int timeWaited = lengthCurrentProcessor - endTime;
+                tempTimeToWait = edgeWeight - timeWaited;
+               
+                // timeWaited longer than edgeWeight
+                if (tempTimeToWait < 0) {
+                    tempTimeToWait = 0;
+                }
+                tempValue = lengthCurrentProcessor + tempTimeToWait;
+            }
+           
+            if (tempValue > canStartat){
+                canStartat = tempValue;
+            }
+           
+            if (tempTimeToWait > timeLeftToWait) {
+                timeLeftToWait = tempTimeToWait;
+            }
+        }
+       
+        int procLength = canStartat + (int)Double.parseDouble(node.getAttribute("Weight").toString());
+        for(int i : schedule.procLengths){
+            if (i > procLength){
+                procLength = i;
+            }
+        }
+
+        if (procLength >= currentBestSchedule.scheduleLength) {
+            return -1;
+        } else {
+            return timeLeftToWait;
+        }
+    }
+	
+	/**
+	 * Insert the node into schedule 
+	 * @param nodeToInsert
+	 * @param currentSchedule
+	 * 
+	 * could just call this one line from Branch instead of having to call this function
+	 */ 
+	public static void insertNodeToSchedule(Node nodeToInsert, Schedule currentSchedule, int Processor, int procWaitTime) {
+		currentSchedule.addNode(nodeToInsert, Processor, procWaitTime);
+		currentSchedule.updateProcessorLength(Processor, (int)Double.parseDouble(nodeToInsert.getAttribute("Weight").toString()) + procWaitTime);
+	}
+	
+
 }
