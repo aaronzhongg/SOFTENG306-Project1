@@ -35,8 +35,12 @@ public class BranchAndBound {
 //		 
 //		for(int i : rootNodeIDs){
 //			rootNodes.add(g.getNode(i));
-//		}
+////		}
 		
+		nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
+		currentSchedule.removeNode(currentSchedule.schedule.size() - 1);
+		updateRemoveLengthChanges(currentSchedule, nodeToBeRemoved);
+
 		//Start the branch and bound
 		while(Branch(new Schedule(currentSchedule.schedule, currentSchedule.procLengths, currentSchedule.scheduleLength)) == false){
 			

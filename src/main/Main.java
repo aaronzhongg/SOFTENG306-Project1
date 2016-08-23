@@ -31,9 +31,8 @@ public class Main {
         //processorInput = Integer.parseInt(args[1]);
 
         // comment out code below before submitting.
-
-        String inputFile = "TestDotFiles/Nodes_11_OutTree.dot";
-        int processorInput = 2;
+        String inputFile = "TestDotFiles/Nodes_10_Random.dot";
+        int processorInput = 4;
         
 		File input_file = new File(inputFile);
 		io IOProcessor = new io();
@@ -136,15 +135,12 @@ public class Main {
 		Greedy greedy = new Greedy();
 		ScheduleGraphPair sgPair = greedy.greedySearch(g, processorCount, schedule);
 //		
-//		for(Node n: sgPair.schedule.schedule){
-//		System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
-//	}
-//	System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
+
 		// After greedy algorithm returns a schedule, if it is better than current best, update the bound and bestGraph
 		if (sgPair.schedule.scheduleLength < ScheduleHelper.currentBestSchedule.scheduleLength) {
 			ScheduleHelper.currentBestSchedule.scheduleLength = sgPair.schedule.scheduleLength;
 			
-			for(Node n : g){
+			for(Node n : sgPair.g){
 				for(Node bestN : ScheduleHelper.bestGraph){
 					if(n.getIndex() == bestN.getIndex()){
 						Graphs.copyAttributes(n, bestN);
@@ -153,6 +149,11 @@ public class Main {
 			}
 
 		}
+		
+//		for(Node n: sgPair.schedule.schedule){
+//		System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
+//	}
+//	System.out.println("Total Schedule Length: " + sgPair.schedule.scheduleLength);
 		
 		BranchAndBound bnb = new BranchAndBound(sgPair.schedule, sgPair.g);
 		bnb.branchAndBoundAlgorithm();
