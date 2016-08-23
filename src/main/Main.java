@@ -18,6 +18,8 @@ import java.util.concurrent.locks.*;//####[15]####
 import java.lang.reflect.*;//####[15]####
 import pt.runtime.GuiThread;//####[15]####
 import java.util.concurrent.BlockingQueue;//####[15]####
+import java.util.ArrayList;//####[15]####
+import java.util.List;//####[15]####
 //####[15]####
 /**
  * Created by jay on 5/08/16.
@@ -59,14 +61,14 @@ public class Main {//####[20]####
             int i = 2;//####[45]####
             while (i < args.length) //####[46]####
             {//####[46]####
-                if (args[i] == "-p") //####[47]####
+                if (args[i].equals("-p")) //####[47]####
                 {//####[47]####
                     i++;//####[48]####
                     nThreads = Integer.parseInt(args[i]);//####[49]####
-                } else if (args[i] == "-v") //####[50]####
+                } else if (args[i].equals("-v")) //####[50]####
                 {//####[50]####
                     vis = true;//####[51]####
-                } else if (args[i] == "-o") //####[52]####
+                } else if (args[i].equals("-o")) //####[52]####
                 {//####[52]####
                     i++;//####[53]####
                     outputFile = args[i];//####[54]####
