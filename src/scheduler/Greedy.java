@@ -10,49 +10,45 @@ public class Greedy {
 	 * Then adds the process-able nodes to the queue and goes through the queue again
 	 * @param g : input graph
 	 * @param procCount : amount of processors
+	 * @param schedule : a schedule with 2 nodes already inserted. This will be unique for each instance of greedy
 	 * @returns : when gone through whole queue (i.e. all nodes in graph)
 	 */
-	public Schedule greedySearch(Graph g, int procCount, ArrayList<Integer> root){
+	public ScheduleGraphPair greedySearch(Graph g, int procCount, Schedule schedule){
 
-		Schedule schedule = new Schedule(procCount);		//make a new, empty schedule
+		//Schedule schedule = new Schedule(procCount);		//make a new, empty schedule
 		ArrayList<QueueItem> queue = new ArrayList<QueueItem>();	//make an empty queue
 		
-		for(Integer i: root){ //adds all root nodes to the queue, each with all processor ids
+		/*for(Integer i: root){ //adds all root nodes to the queue, each with all processor ids
 			for(int j = 0; j < procCount; j++ ){
 				queue.add(new QueueItem(i, j));
 			}
-		}
+		}*/
 		
-		QueueItem smallest = queue.get(0);
-		
-		for (int i = 0; i< queue.size(); i++){
-			QueueItem q = queue.get(i);
-			if(ScheduleHelper.getNodeWeight(g, q.nodeIndex)<= ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)){
-				smallest = q;
-			}
-		}
-		
-		//removes the smallest root node found and removes it from the queue
-		for (int popIndex = queue.size() -1 ; popIndex > -1; popIndex--) {
-			if (queue.get(popIndex).nodeIndex == smallest.nodeIndex) {
-				queue.remove(popIndex);
-			}
-		}
-
-		schedule.addNode(g.getNode(smallest.nodeIndex), smallest.Processor, 0); //adds the smallest root node to the schedule of the smallest processor
-		schedule.updateProcessorLength(smallest.Processor, ScheduleHelper.getNodeWeight(g, smallest.nodeIndex)); //changes processor length of added smallest root node
-
-		//updates GUI
-		//update.updateColor(smallest.nodeIndex, smallest.Processor, g);//updates the color
-		//g.getNode(smallest.nodeIndex).addAttribute("ui.style", "text-style:bold-italic; text-size:18;");
-
-		//goes through all children of the smallest root nodes and 
-		ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex);
+		//Grab all processable nodes for the root of the schedule and add to the queue
+		ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, schedule.schedule.get(0).getIndex());
 		for(int i:childrenNodes){
 			for(int j = 0; j < procCount; j++ ){
 				queue.add(new QueueItem(i, j));	
 			}
 		}
+		
+		//pop the indexes of the second node in the graph
+		for (int popIndex = queue.size() -1 ; popIndex > -1; popIndex--) { //removes the node from the queue that makes the smallest dif
+			if (queue.get(popIndex).nodeIndex == schedule.schedule.get(1).getIndex()) {
+				queue.remove(popIndex);
+			}
+		}
+		
+		//Grab processable nodes again for the second node
+		childrenNodes = ScheduleHelper.processableNodes(g, schedule.schedule.get(1).getIndex());
+		for(int i:childrenNodes){
+			for(int j = 0; j < procCount; j++ ){
+				queue.add(new QueueItem(i, j));	
+			}
+		}
+		
+		
+		QueueItem smallest = queue.get(0);
 
 		// loops through the whole queue
 		while(!queue.isEmpty()){
@@ -108,8 +104,9 @@ public class Greedy {
 		 * node is child, only dependent on 1 parent
 		 * node is child, depends on more than 1 parent
 		 */
-
-		return schedule;
+		
+		ScheduleGraphPair sng = new ScheduleGraphPair(schedule, g);
+		return sng;
 	}
 
 	/**
@@ -127,6 +124,17 @@ public class Greedy {
 		public QueueItem(int n, int p){
 			nodeIndex = n;
 			Processor = p;
+		}
+	}
+	
+	//Simple schedule graph pair returned by greedy. Required for multi-threading since each thread needs its own graph
+	public class ScheduleGraphPair{
+		public Schedule schedule;
+		public Graph g;
+		
+		public ScheduleGraphPair(Schedule s, Graph g){
+			this.schedule = s;
+			this.g = g;
 		}
 	}
 }
