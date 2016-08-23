@@ -1,48 +1,120 @@
-package ui;
+package src.ui;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
 
-import scheduler.Greedy.QueueItem;
+import src.main.Main;
+import src.scheduler.Greedy.QueueItem;
+import src.scheduler.Schedule;
 
 public class Update {
+	//private File file;
 	private int processorNum;
-	public Update(int processorNum ){
+	private ArrayList<String> change;
+	private ArrayList<Node> schedule;
+	
+	public Update(int processorNum, ArrayList<Node> schedule ){
 		this.processorNum=processorNum;
+		//file= new File("/Users/Jing/Desktop/newworkspace/SOFTENG306-Project1-feature-branch-and-bound/tmp/change.txt");
+		change=new ArrayList<String>();
+		this.schedule=schedule;
 	}
-	public void updateColor(int id,int processor,Graph g){
-					
+	public void updateProcessorColor(Graph gVis){
+		for(Node n:schedule){
+			int processor=n.getAttribute("Processor");
+			Main.gVis.getNode(n.getId()).addAttribute("ui.label", n.getId()+" Processor: "+processor);
 			switch (processor){
-			case 1: 
-				g.getNode(id).addAttribute("ui.style", "fill-color: red;");
-				break;
-			case 2:
-				g.getNode(id).addAttribute("ui.style", "fill-color: blue;");
-				break;
-			case 3:
-				g.getNode(id).addAttribute("ui.style", "fill-color: yellow;");
-				break;
-			case 4:
-				g.getNode(id).addAttribute("ui.style", "fill-color: green;");
-				break;
-			case 5:
-				g.getNode(id).addAttribute("ui.style", "fill-color: magenta;");
-				break;
-			case 6:
-				g.getNode(id).addAttribute("ui.style", "fill-color: cyan;");
-				break;
-			case 7:
-				g.getNode(id).addAttribute("ui.style", "fill-color: brown;");
-				break;
-			}
-			//System.out.println(processor+"??");
+					case 0: 
+						Main.gVis.getNode(n.getId()).addAttribute("ui.style", "fill-color: red;");
+						break;
+					case 1:
+						Main.gVis.getNode(n.getId()).addAttribute("ui.style", "fill-color: blue;");
+						break;
+					case 2:
+						Main.gVis.getNode(n.getId()).addAttribute("ui.style", "fill-color: yellow;");
+					case 3:
+						Main.gVis.getNode(n.getId()).addAttribute("ui.style", "fill-color: brown;");
+						break;
+					case 4:
+						Main.gVis.getNode(n.getId()).addAttribute("ui.style", "fill-color: magenta;");
+						break;
 			
-			
-			
-			//System.out.println(color);
+						
+					}
 			
 		}
 		
+
+		}
+	
+	public void updateColor(String id,String color){
+		change.add(id+","+color+";");
+		Main.gVis.getNode(id).addAttribute("ui.style",  "fill-color:"+color+";");
+	}
 		
+	
+//	public void saveChange(String change){
+		
+//  try {
+//		// if file doesnt exists, then create it
+//		if (!file.exists()) {
+//			file.createNewFile();
+//		}
+//		
+//			FileWriter fw = new FileWriter(file.getAbsoluteFile(),true);
+//		BufferedWriter bw = new BufferedWriter(fw);
+//		bw.write(change+'\n');
+//			bw.close();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+//	}
+	
+	
+	public void replayChange(int delay) throws InterruptedException{
+		for (Node n : Main.gVis) {
+			n.addAttribute("ui.style","fill-color:gray;");
+			n.addAttribute("ui.label", " "+n.getId());
+		}
+		
+
+	for(int i=0; i<change.size();i++){
+		//System.out.println(change.size());
+		long startTime=System.currentTimeMillis();
+		while(System.currentTimeMillis()-startTime<delay){
+			
+		}
+	   String[] temp=change.get(i).split(",");
+	 //  System.out.println(temp[0]+temp[1]);
+	   if(temp.length>2){
+		   Main.gVis.getNode(temp[1]).addAttribute("ui.label", temp[1]+" Processor: "+temp[2]);
+		   
+	   }
+	   else{
+	   Main.gVis.getNode(temp[0]).addAttribute("ui.style", "fill-color:"+temp[1]);
+	   }
+	}
+	
+	updateProcessorColor(Main.gVis);
+	}
+	public void updateSchedule(ArrayList<Node> schedule) {
+		for(int i=0; i<schedule.size();i++){
+			Main.gVis.getNode(schedule.get(i).getId()).addAttribute("ui.style", "fill-color:green;");
+		}
+	}
+	public void updateProcessor(String id, int i) {
+		Main.gVis.getNode(id).addAttribute("ui.label", id+" Processor: "+i);
+		change.add("label,"+id+","+i);
+		
+	}
 		
 	}
 	

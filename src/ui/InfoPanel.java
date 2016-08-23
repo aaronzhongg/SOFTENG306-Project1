@@ -1,57 +1,50 @@
-package ui;
+package src.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Date;
 
-import javafx.event.ActionEvent;
-
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.Timer;
 
-import main.Main;
+import src.main.Main;
 
 public class InfoPanel extends JPanel implements ActionListener{
-	
-	private JLabel time;
-	
-public 	InfoPanel(){
-	this.setLayout(new BorderLayout(0,0));
-	 time= new JLabel(" Total Time : 0 milisec ");
-	 
-     Timer timer = new Timer(10, this);
-     timer.setInitialDelay(0);
-     timer.start();
-	
-	
-   // JLabel pathLength = new JLabel(" Total Path Length: 0  ");
-    
-    
-	this.add(time,BorderLayout.NORTH);
-	
-	//this.add(pathLength,BorderLayout.CENTER);
-	
-	
-	
-	
-}
-
-public void actionPerformed(java.awt.event.ActionEvent e) {
-	long currentTime = System.currentTimeMillis();
-	long difference = currentTime - Main.initialTime;
-	if(Main.endTime!=0){
-	difference=	Main.endTime-Main.initialTime;
+	private JLabel time,timeValue;
+	public InfoPanel(){
+		this.setSize(200, 500);
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		time=new JLabel("Total Time : ");
+		timeValue=new JLabel("0 MilliSec");
+		JPanel timeP=new JPanel();
+		timeP.setSize(200, 100);
+		timeP.add(time);
+		timeP.add(timeValue);
+		
+		Timer timer = new Timer(10, this);
+	     timer.setInitialDelay(0);
+	     timer.start();
+		
+		JLabel current=new JLabel(" Current Schedule Length: 0 ");
+		JPanel scheduleP=new JPanel();
+		scheduleP.setSize(200, 100);
+		scheduleP.add(current);
+		
+		
+		add(timeP);
+		add(scheduleP);
 	}
-	 time.setText( " Total Time : "+difference+"  milisec ");
-	
-}
 
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		long currentTime = System.currentTimeMillis();
+		long difference = currentTime - Main.initialTime;
+		if(Main.endTime!=0){
+		difference=	Main.endTime-Main.initialTime;
+		}
+		 timeValue.setText(difference+" MilliSec");
+		
+	}
 
-
-
-	
-	
 }
