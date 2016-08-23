@@ -75,9 +75,10 @@ public class Main {
 				int tempProcessorCount = 0;
 				while(tempProcessorCount < processorInput) {
 					int procWaitTime = ScheduleHelper.checkChildNode(g.getNode(processableNodeIndex), newSchedule, tempProcessorCount);
-					newSchedule.addNode(g.getNode(processableNodeIndex), tempProcessorCount, procWaitTime);
+					newSchedule.addNode(newGraph.getNode(processableNodeIndex), tempProcessorCount, procWaitTime);
 					newSchedule.updateProcessorLength(tempProcessorCount, procWaitTime + (int)Double.parseDouble(newGraph.getNode(processableNodeIndex).getAttribute("Weight").toString()));			
 					CreateSchedule(newSchedule, processorInput, newGraph);		// This function should run on a new thread
+					tempProcessorCount++;
 				}
 				
 				
