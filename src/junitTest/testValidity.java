@@ -31,45 +31,48 @@ import scheduler.Greedy.ScheduleGraphPair;
 import ui.MainView;
 import util.io;
 
-
 /**
- * check parents of each node are in the schedule
+ * TEST VALID and OPTOMISED
+ * STEPS:
+ * Check parents of each node are in the schedule
  * for each parent look that parent is in the schedule
  * look that the distance is more then the minimum
  * @author idaknow
- *
  */
-
 public class testValidity {
 
-	boolean isParallel = true;
+	boolean isParallel = true; //change this to test different ones
 	
+	/**
+	 * Main test class, where each file 7012 is tested on processors 1 -7
+	 * These f and p values can be edited to suit the tester's needs
+	 **/
 	@Test
 	public void testMain() {
-
+		
 		for (int f = 7; f < 12; f++){ // loops through all files
-			for (int p = 1; p < 7; p+=2){ // loops through processors 1 to 4
+			for (int p = 1; p < 7; p++){ // loops through processors 1 to 7
+				
 				Graph g = create_the_graph(f); // creates the graph
 
+				//USES CODE FROM MAIN to do all our calculations
 				createSchedule(g,p);
 
+				// THIS TEST WAS USED FOR EARLIER TESTING
 				//assertTrue(checkAllNodesInGraph(ScheduleHelper.currentBestSchedule,g));
-				//System.out.println(f + " " + p + " " +ScheduleHelper.currentBestSchedule.scheduleLength);
-				if (f != 10){
-					assertTrue(checkPrecedence(ScheduleHelper.currentBestSchedule,ScheduleHelper.bestGraph));
-				}
-				if ((p == 2) || (p == 4)) {
-					//System.out.println(ScheduleHelper.bestGraph);
-					//System.out.println(p);
-					//	System.out.println(checkOptimal(p,f));
+				
+				assertTrue("Precedence check failed for file "+f+ " with  " + p + "processors",checkPrecedence(ScheduleHelper.currentBestSchedule,ScheduleHelper.bestGraph));
+			
+				if ((p == 2) || (p == 4)) { // uses given optimal times to compare against
 					assertEquals("The Schedule is not optimal for file "+ f + " with " + p + " processors",ScheduleHelper.currentBestSchedule.scheduleLength, checkOptimal(p,f));
 				}
 			}
 		}
 	}
-/**
- * This contains the code from the MAIN method
- * **/
+	
+	/**
+	 * This contains the code from the MAIN method in the Main.main we are testing
+	 * **/
 	public void createSchedule(Graph g, int p){
 		ArrayList<Integer> rootnodes = ScheduleHelper.findRootNodes(g);
 
@@ -79,14 +82,12 @@ public class testValidity {
 		Greedy greedy = new Greedy();
 		ScheduleHelper.makeDependencyMatrix(g);
 
-
 		// Create a schedule that has every combination of root node + next processable node (in each processor)
 		for(int rootNode: rootnodes) {
 			Graph tempNewGraph = Graphs.clone(g); 
 			Schedule tempNewSchedule = new Schedule(p);
 			tempNewSchedule.addNode(tempNewGraph.getNode(rootNode), 0, 0);
 			tempNewGraph.getNode(rootNode).setAttribute("Processor", 0);
-			//			ArrayList<Integer> processableNodes = ScheduleHelper.processableNodes(tempNewGraph, rootNode);
 			ArrayList<Integer> processableNodes = new ArrayList<Integer>();
 
 			for (Node n : tempNewGraph) {// loops through all the nodes
@@ -103,7 +104,6 @@ public class testValidity {
 
 				// in PARALLEL
 				if (isParallel){
-					// if(nThreads > 0){ TO DO: CHANGE PROCESSORINPUT to NTHREADS???
 					int tempProcessorCount = 0;
 					TaskIDGroup<TaskID<Void>> taskGroup = new TaskIDGroup<TaskID<Void>>(p);
 					while(tempProcessorCount < p) {
@@ -112,7 +112,6 @@ public class testValidity {
 						Schedule newSchedule = new Schedule(p);		//New schedule with nodes from newly created Graph
 						newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);
 						newSchedule.updateProcessorLength(0, (int)Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));
-
 
 						int procWaitTime = ScheduleHelper.checkChildNode(newGraph.getNode(processableNodeIndex), newSchedule, tempProcessorCount);
 						if (procWaitTime > -1 ) {
@@ -124,19 +123,16 @@ public class testValidity {
 						}
 						tempProcessorCount++;
 					}
-					try {
-						taskGroup.waitTillFinished();
-						//for (Iterator <TaskID<?>> i = taskGroup.groupMembers(); i.hasNext();){System.out.println((i.next()).);}
-					}catch (Exception e){}
+					try {taskGroup.waitTillFinished();}catch (Exception e){}
 
-					// in SEQUENTIAL
-				} else { // note - still initalises a paratask
+				
+				} else { // in SEQUENTIAL
 
 					// Add processable node into each processor
 					int tempProcessorCount = 0;
 					while(tempProcessorCount < p) {
 						//New graph for each processableNode
-						Graph newGraph = Graphs.clone(tempNewGraph); 		//NEED to create a new graph because GraphStream nodes
+						Graph newGraph = Graphs.clone(tempNewGraph); 		//create a new graph because GraphStream nodes
 						Schedule newSchedule = new Schedule(p);		//New schedule with nodes from newly created Graph
 						newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);
 						newSchedule.updateProcessorLength(0, (int)Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));
@@ -157,6 +153,10 @@ public class testValidity {
 		}
 	}
 
+	/**
+	 * Tests that all the nodes in the graph are in the schedule
+	 * returns true if correct
+	 * **/
 	public boolean checkAllNodesInGraph(Schedule s, Graph g){
 		boolean allNodesInGraph = true;
 		for(Node n : g){
@@ -168,6 +168,9 @@ public class testValidity {
 		return allNodesInGraph;
 	}
 
+	/**
+	 * Checks the precedence
+	 * **/
 	public boolean checkPrecedence(Schedule s, Graph g){
 
 		for (Node n : g){
@@ -199,6 +202,9 @@ public class testValidity {
 		return true;
 	}
 
+	/**
+	 * Compares optimal times provided with schedule output
+	 * **/
 	public int checkOptimal( int p, int f){
 		int optimaltime = 0;
 		if (f == 7){
@@ -223,6 +229,10 @@ public class testValidity {
 		return optimaltime;
 	}
 
+	/**
+	 * loops through all the different file names provided on canvas.
+	 * @int a : could be edited to suit testers needs
+	 * **/
 	public String create_the_filename(int a){
 		String filename = "";
 		if (a == 7){
@@ -239,6 +249,9 @@ public class testValidity {
 		return filename;
 	}
 
+	/**
+	 * creates the graph from the testing input file
+	 * **/
 	public Graph create_the_graph(int fileNumber) { //change name
 		//initialise everything
 		String file_name = create_the_filename(fileNumber);
