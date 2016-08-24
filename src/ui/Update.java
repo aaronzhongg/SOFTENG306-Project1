@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
@@ -17,13 +19,13 @@ import scheduler.ScheduleHelper;
 public class Update {
 	//private File file;
 	private int processorNum;
-	private ArrayList<String> change;
+	private List<String> change;
 	private ArrayList<Node> schedule;
 	
 	public Update(int processorNum){
 		this.processorNum=processorNum;
 		//file= new File("/Users/Jing/Desktop/newworkspace/SOFTENG306-Project1-feature-branch-and-bound/tmp/change.txt");
-		change=new ArrayList<String>();
+		change=Collections.synchronizedList( new ArrayList<String>());
 		//this.schedule=schedule;
 	}
 	public void setSchedule( ArrayList<Node> schedule ){
@@ -41,7 +43,7 @@ public class Update {
 						Main.gVis.getNode(n.getId()).addAttribute("ui.style", "fill-color: blue;");
 						break;
 					case 2:
-						Main.gVis.getNode(n.getId()).addAttribute("ui.style", "fill-color: yellow;");
+						Main.gVis.getNode(n.getId()).addAttribute("ui.style", "fill-color: orange;");
 					case 3:
 						Main.gVis.getNode(n.getId()).addAttribute("ui.style", "fill-color: brown;");
 						break;
@@ -104,7 +106,7 @@ public class Update {
 		while(System.currentTimeMillis()-startTime<delay){
 			
 		}
-	   String[] temp=change.get(i).split(",");
+	   String[] temp=((String) change.get(i)).split(",");
 	 //  System.out.println(temp[0]+temp[1]);
 	   if(temp.length>2){
 		   Main.gVis.getNode(temp[1]).addAttribute("ui.label", temp[1]+" Processor: "+temp[2]);
