@@ -17,7 +17,7 @@ import org.graphstream.stream.file.FileSourceDOT;
  * should be included in the "util" package.
  */
 public class io {
-
+private Graph gVis;
 
     public void processInput(File input_file) {
         String line;
@@ -48,9 +48,11 @@ public class io {
 
     public Graph DOTParser(File input_file, String file_name){
         Graph g = new DefaultGraph("g");
+        this.gVis=new DefaultGraph("g");
         FileSource fs = new FileSourceDOT();
 
         fs.addSink(g);
+        fs.addSink(gVis);
         
         try{
             fs.readAll(file_name);
@@ -64,6 +66,10 @@ public class io {
         for (int i = 0; i < g.getNodeCount(); i++) {
         	g.getNode(i).addAttribute("Processor", -1);
         	g.getNode(i).addAttribute("Start" , -1);   
+        	gVis.getNode(i).addAttribute("ui.label", " "+g.getNode(i).getId());
+        	gVis.getNode(i).addAttribute("ui.class",g.getNode(i).getAttribute("Processor")+"");
+        	gVis.getNode(i).addAttribute("Processor", -1);
+        	gVis.getNode(i).addAttribute("Start" , -1);
         }
        
         //g.display();
@@ -88,5 +94,8 @@ public class io {
         }
 
 
+    }
+    public Graph getVisGraph(){
+    	return this.gVis;
     }
 }

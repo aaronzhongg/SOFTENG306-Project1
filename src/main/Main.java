@@ -4,801 +4,812 @@ import java.io.File;//####[3]####
 import java.util.ArrayList;//####[4]####
 import org.graphstream.graph.*;//####[6]####
 import org.graphstream.graph.implementations.Graphs;//####[7]####
-import pt.runtime.TaskID;//####[9]####
-import pt.runtime.TaskIDGroup;//####[10]####
-import scheduler.*;//####[12]####
-import scheduler.Greedy.ScheduleGraphPair;//####[13]####
-import ui.MainView;//####[14]####
-import util.io;//####[15]####
-//####[15]####
-//-- ParaTask related imports//####[15]####
-import pt.runtime.*;//####[15]####
-import java.util.concurrent.ExecutionException;//####[15]####
-import java.util.concurrent.locks.*;//####[15]####
-import java.lang.reflect.*;//####[15]####
-import pt.runtime.GuiThread;//####[15]####
-import java.util.concurrent.BlockingQueue;//####[15]####
-import java.util.ArrayList;//####[15]####
-import java.util.List;//####[15]####
-//####[15]####
+import scheduler.*;//####[8]####
+import scheduler.Greedy.ScheduleGraphPair;//####[9]####
+import ui.*;//####[10]####
+import util.io;//####[11]####
+//####[11]####
+//-- ParaTask related imports//####[11]####
+import pt.runtime.*;//####[11]####
+import java.util.concurrent.ExecutionException;//####[11]####
+import java.util.concurrent.locks.*;//####[11]####
+import java.lang.reflect.*;//####[11]####
+import pt.runtime.GuiThread;//####[11]####
+import java.util.concurrent.BlockingQueue;//####[11]####
+import java.util.ArrayList;//####[11]####
+import java.util.List;//####[11]####
+//####[11]####
 /**
  * Created by jay on 5/08/16.
- *///####[19]####
-public class Main {//####[20]####
-    static{ParaTask.init();}//####[20]####
-    /*  ParaTask helper method to access private/protected slots *///####[20]####
-    public void __pt__accessPrivateSlot(Method m, Object instance, TaskID arg, Object interResult ) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {//####[20]####
-        if (m.getParameterTypes().length == 0)//####[20]####
-            m.invoke(instance);//####[20]####
-        else if ((m.getParameterTypes().length == 1))//####[20]####
-            m.invoke(instance, arg);//####[20]####
-        else //####[20]####
-            m.invoke(instance, arg, interResult);//####[20]####
-    }//####[20]####
+ *///####[15]####
+public class Main {//####[16]####
+    static{ParaTask.init();}//####[16]####
+    /*  ParaTask helper method to access private/protected slots *///####[16]####
+    public void __pt__accessPrivateSlot(Method m, Object instance, TaskID arg, Object interResult ) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {//####[16]####
+        if (m.getParameterTypes().length == 0)//####[16]####
+            m.invoke(instance);//####[16]####
+        else if ((m.getParameterTypes().length == 1))//####[16]####
+            m.invoke(instance, arg);//####[16]####
+        else //####[16]####
+            m.invoke(instance, arg, interResult);//####[16]####
+    }//####[16]####
+//####[18]####
+    public static int processorInput;//####[18]####
+//####[19]####
+    public static Graph gVis;//####[19]####
+//####[20]####
+    public static Update update;//####[20]####
+//####[21]####
+    public static long initialTime, endTime;//####[21]####
 //####[22]####
-    public static int processorInput;//####[22]####
-//####[27]####
+    public static boolean inParallel = false;//####[22]####
+//####[23]####
+    public static boolean vis = false;//####[23]####
+//####[28]####
     /**
 	 * main
-	 *///####[27]####
-    public static void main(String[] args) {//####[27]####
-        boolean vis = false;//####[29]####
+	 *///####[28]####
+    public static void main(String[] args) {//####[28]####
+        MainView mainView = null;//####[29]####
         int nThreads = 0;//####[30]####
-        if (args.length < 2) //####[33]####
-        {//####[33]####
-            System.out.println("Please ensure that all input parameters have been entered - Input file name and number of processors. ");//####[34]####
-            System.exit(1);//####[35]####
-        }//####[36]####
-        String inputFile = args[0];//####[37]####
-        String[] split = inputFile.split(".dot");//####[38]####
-        String inputWithoutExtension = split[0];//####[39]####
-        File input = new File(inputWithoutExtension);//####[40]####
-        String inputFileName = input.getName();//####[41]####
-        String outputFile = inputFileName + "-output.dot";//####[42]####
-        processorInput = Integer.parseInt(args[1]);//####[43]####
-        if (args.length > 2) //####[44]####
-        {//####[44]####
-            int i = 2;//####[45]####
-            while (i < args.length) //####[46]####
-            {//####[46]####
-                if (args[i].equals("-p")) //####[47]####
-                {//####[47]####
-                    i++;//####[48]####
-                    nThreads = Integer.parseInt(args[i]);//####[49]####
-                } else if (args[i].equals("-v")) //####[50]####
-                {//####[50]####
-                    vis = true;//####[51]####
-                } else if (args[i].equals("-o")) //####[52]####
-                {//####[52]####
-                    i++;//####[53]####
-                    outputFile = args[i];//####[54]####
-                }//####[55]####
-                i++;//####[56]####
-            }//####[57]####
-        }//####[58]####
-        if (vis) //####[60]####
+        if (true) //####[60]####
         {//####[60]####
-        }//####[62]####
-        File input_file = new File(inputFile);//####[68]####
-        io IOProcessor = new io();//####[69]####
-        Schedule schedule;//####[70]####
+            inParallel = true;//####[61]####
+            vis = false;//####[62]####
+        }//####[63]####
+        String inputFile = "TestDotFiles/Nodes_11_OutTree.dot";//####[66]####
+        int processorInput = 4;//####[67]####
+        File input_file = new File(inputFile);//####[69]####
+        io IOProcessor = new io();//####[70]####
+        Schedule schedule;//####[71]####
         Graph g = IOProcessor.DOTParser(input_file, inputFile);//####[73]####
-        ArrayList<Integer> rootnodes = ScheduleHelper.findRootNodes(g);//####[74]####
-        ScheduleHelper.currentBestSchedule = new Schedule(processorInput);//####[79]####
-        ScheduleHelper.bestGraph = Graphs.clone(g);//####[80]####
-        ScheduleHelper.currentBestSchedule.scheduleLength = 2147483647;//####[82]####
-        Greedy greedy = new Greedy();//####[83]####
-        ScheduleHelper.makeDependencyMatrix(g);//####[84]####
-        for (int rootNode : rootnodes) //####[88]####
-        {//####[88]####
-            Graph tempNewGraph = Graphs.clone(g);//####[90]####
-            Schedule tempNewSchedule = new Schedule(processorInput);//####[91]####
-            tempNewSchedule.addNode(tempNewGraph.getNode(rootNode), 0, 0);//####[92]####
-            tempNewGraph.getNode(rootNode).setAttribute("Processor", 0);//####[93]####
-            ArrayList<Integer> processableNodes = new ArrayList<Integer>();//####[95]####
-            for (Node n : tempNewGraph) //####[97]####
-            {//####[97]####
-                if (!tempNewSchedule.schedule.contains(n)) //####[98]####
-                {//####[98]####
-                    boolean isProcessable = ScheduleHelper.isProcessable(n, tempNewSchedule);//####[100]####
-                    if (isProcessable) //####[101]####
-                    {//####[101]####
-                        processableNodes.add(n.getIndex());//####[102]####
-                    }//####[103]####
-                }//####[104]####
-            }//####[105]####
-            for (int processableNodeIndex : processableNodes) //####[107]####
-            {//####[107]####
-                if (true) //####[110]####
-                {//####[110]####
-                    int tempProcessorCount = 0;//####[112]####
-                    TaskIDGroup<TaskID<Void>> taskGroup = new TaskIDGroup<TaskID<Void>>(processorInput);//####[113]####
-                    while (tempProcessorCount < processorInput) //####[114]####
-                    {//####[114]####
-                        Graph newGraph = Graphs.clone(tempNewGraph);//####[116]####
-                        Schedule newSchedule = new Schedule(processorInput);//####[117]####
-                        newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);//####[118]####
-                        newSchedule.updateProcessorLength(0, (int) Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));//####[119]####
-                        int procWaitTime = ScheduleHelper.checkChildNode(newGraph.getNode(processableNodeIndex), newSchedule, tempProcessorCount);//####[122]####
-                        if (procWaitTime > -1) //####[123]####
-                        {//####[123]####
-                            newSchedule.addNode(newGraph.getNode(processableNodeIndex), tempProcessorCount, procWaitTime);//####[125]####
-                            newSchedule.updateProcessorLength(tempProcessorCount, procWaitTime + (int) Double.parseDouble(newGraph.getNode(processableNodeIndex).getAttribute("Weight").toString()));//####[126]####
-                            TaskID<Void> id = CreateScheduleTask(newSchedule, processorInput, newGraph);//####[127]####
-                            taskGroup.add(id);//####[128]####
-                        }//####[129]####
-                        tempProcessorCount++;//####[130]####
-                    }//####[131]####
-                    try {//####[132]####
-                        taskGroup.waitTillFinished();//####[133]####
-                    } catch (Exception e) {//####[135]####
-                    }//####[135]####
-                } else {//####[138]####
-                    int tempProcessorCount = 0;//####[141]####
-                    while (tempProcessorCount < processorInput) //####[142]####
-                    {//####[142]####
-                        Graph newGraph = Graphs.clone(tempNewGraph);//####[144]####
-                        Schedule newSchedule = new Schedule(processorInput);//####[145]####
-                        newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);//####[146]####
-                        newSchedule.updateProcessorLength(0, (int) Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));//####[147]####
-                        int procWaitTime = ScheduleHelper.checkChildNode(newGraph.getNode(processableNodeIndex), newSchedule, tempProcessorCount);//####[150]####
-                        if (procWaitTime > -1) //####[151]####
-                        {//####[151]####
-                            newSchedule.addNode(newGraph.getNode(processableNodeIndex), tempProcessorCount, procWaitTime);//####[153]####
-                            newSchedule.updateProcessorLength(tempProcessorCount, procWaitTime + (int) Double.parseDouble(newGraph.getNode(processableNodeIndex).getAttribute("Weight").toString()));//####[154]####
-                            CreateSchedule(newSchedule, processorInput, newGraph);//####[155]####
-                        }//####[156]####
-                        tempProcessorCount++;//####[157]####
-                    }//####[158]####
-                }//####[160]####
-            }//####[161]####
-            for (Node n : ScheduleHelper.bestGraph) //####[164]####
-            {//####[164]####
-                System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));//####[165]####
-            }//####[166]####
-            System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);//####[167]####
-            IOProcessor.outputFile(ScheduleHelper.currentBestSchedule, ScheduleHelper.bestGraph, outputFile);//####[168]####
-        }//####[169]####
-    }//####[170]####
-//####[175]####
-    private static volatile Method __pt__CreateScheduleTask_Schedule_int_Graph_method = null;//####[175]####
-    private synchronized static void __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet() {//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            try {//####[175]####
-                __pt__CreateScheduleTask_Schedule_int_Graph_method = ParaTaskHelper.getDeclaredMethod(new ParaTaskHelper.ClassGetter().getCurrentClass(), "__pt__CreateScheduleTask", new Class[] {//####[175]####
-                    Schedule.class, int.class, Graph.class//####[175]####
-                });//####[175]####
-            } catch (Exception e) {//####[175]####
-                e.printStackTrace();//####[175]####
-            }//####[175]####
-        }//####[175]####
-    }//####[175]####
+        if (vis) //####[75]####
+        {//####[75]####
+            gVis = IOProcessor.getVisGraph();//####[77]####
+            update = new Update(processorInput);//####[78]####
+            mainView = new MainView(gVis);//####[79]####
+            mainView.setVisible(true);//####[80]####
+        }//####[83]####
+        initialTime = System.currentTimeMillis();//####[85]####
+        endTime = 0;//####[86]####
+        ArrayList<Integer> rootnodes = ScheduleHelper.findRootNodes(g);//####[90]####
+        ScheduleHelper.currentBestSchedule = new Schedule(processorInput);//####[95]####
+        ScheduleHelper.bestGraph = Graphs.clone(g);//####[96]####
+        ScheduleHelper.currentBestSchedule.scheduleLength = 2147483647;//####[98]####
+        Greedy greedy = new Greedy();//####[99]####
+        ScheduleHelper.makeDependencyMatrix(g);//####[100]####
+        for (int rootNode : rootnodes) //####[104]####
+        {//####[104]####
+            Graph tempNewGraph = Graphs.clone(g);//####[106]####
+            Schedule tempNewSchedule = new Schedule(processorInput);//####[107]####
+            tempNewSchedule.addNode(tempNewGraph.getNode(rootNode), 0, 0);//####[108]####
+            tempNewGraph.getNode(rootNode).setAttribute("Processor", 0);//####[109]####
+            if (vis) //####[110]####
+            {//####[110]####
+                update.updateColor(rootNode + "", "black");//####[110]####
+            }//####[110]####
+            ArrayList<Integer> processableNodes = new ArrayList<Integer>();//####[114]####
+            for (Node n : tempNewGraph) //####[116]####
+            {//####[116]####
+                if (!tempNewSchedule.schedule.contains(n)) //####[117]####
+                {//####[117]####
+                    boolean isProcessable = ScheduleHelper.isProcessable(n, tempNewSchedule);//####[119]####
+                    if (isProcessable) //####[120]####
+                    {//####[120]####
+                        processableNodes.add(n.getIndex());//####[121]####
+                    }//####[122]####
+                }//####[123]####
+            }//####[124]####
+            for (int processableNodeIndex : processableNodes) //####[126]####
+            {//####[126]####
+                if (inParallel) //####[129]####
+                {//####[129]####
+                    int tempProcessorCount = 0;//####[131]####
+                    TaskIDGroup<TaskID<Void>> taskGroup = new TaskIDGroup<TaskID<Void>>(processorInput);//####[132]####
+                    while (tempProcessorCount < processorInput) //####[133]####
+                    {//####[133]####
+                        Graph newGraph = Graphs.clone(tempNewGraph);//####[136]####
+                        Schedule newSchedule = new Schedule(processorInput);//####[137]####
+                        newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);//####[138]####
+                        newSchedule.updateProcessorLength(0, (int) Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));//####[139]####
+                        int procWaitTime = ScheduleHelper.checkChildNode(newGraph.getNode(processableNodeIndex), newSchedule, tempProcessorCount);//####[142]####
+                        if (procWaitTime > -1) //####[143]####
+                        {//####[143]####
+                            if (vis) //####[144]####
+                            {//####[144]####
+                                update.updateColor(processableNodeIndex + "", "green");//####[145]####
+                                update.updateProcessor(processableNodeIndex + "", tempProcessorCount);//####[146]####
+                            }//####[147]####
+                            newSchedule.addNode(newGraph.getNode(processableNodeIndex), tempProcessorCount, procWaitTime);//####[149]####
+                            newSchedule.updateProcessorLength(tempProcessorCount, procWaitTime + (int) Double.parseDouble(newGraph.getNode(processableNodeIndex).getAttribute("Weight").toString()));//####[150]####
+                            TaskID<Void> id = CreateScheduleTask(newSchedule, processorInput, newGraph);//####[151]####
+                            taskGroup.add(id);//####[152]####
+                        }//####[153]####
+                        tempProcessorCount++;//####[154]####
+                    }//####[155]####
+                    try {//####[156]####
+                        taskGroup.waitTillFinished();//####[157]####
+                    } catch (Exception e) {//####[159]####
+                    }//####[159]####
+                } else {//####[162]####
+                    int tempProcessorCount = 0;//####[166]####
+                    while (tempProcessorCount < processorInput) //####[167]####
+                    {//####[167]####
+                        Graph newGraph = Graphs.clone(tempNewGraph);//####[169]####
+                        Schedule newSchedule = new Schedule(processorInput);//####[170]####
+                        newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);//####[171]####
+                        newSchedule.updateProcessorLength(0, (int) Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));//####[172]####
+                        int procWaitTime = ScheduleHelper.checkChildNode(newGraph.getNode(processableNodeIndex), newSchedule, tempProcessorCount);//####[175]####
+                        if (procWaitTime > -1) //####[176]####
+                        {//####[176]####
+                            if (vis) //####[177]####
+                            {//####[177]####
+                                update.updateColor(processableNodeIndex + "", "green");//####[177]####
+                                update.updateProcessor(processableNodeIndex + "", tempProcessorCount);//####[178]####
+                            }//####[178]####
+                            newSchedule.addNode(newGraph.getNode(processableNodeIndex), tempProcessorCount, procWaitTime);//####[180]####
+                            newSchedule.updateProcessorLength(tempProcessorCount, procWaitTime + (int) Double.parseDouble(newGraph.getNode(processableNodeIndex).getAttribute("Weight").toString()));//####[181]####
+                            CreateSchedule(newSchedule, processorInput, newGraph);//####[182]####
+                        }//####[183]####
+                        tempProcessorCount++;//####[184]####
+                    }//####[185]####
+                }//####[187]####
+            }//####[192]####
+            if (vis) //####[195]####
+            {//####[195]####
+                update.updateProcessorColor(ScheduleHelper.bestGraph);//####[198]####
+                mainView.updateSchedule(ScheduleHelper.currentBestSchedule.scheduleLength);//####[200]####
+                mainView.start.setEnabled(true);//####[201]####
+            }//####[202]####
+            endTime = System.currentTimeMillis();//####[203]####
+            System.out.println(endTime - initialTime);//####[204]####
+            for (Node n : ScheduleHelper.bestGraph) //####[207]####
+            {//####[207]####
+                System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));//####[208]####
+            }//####[209]####
+            System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);//####[210]####
+            IOProcessor.outputFile(ScheduleHelper.currentBestSchedule, ScheduleHelper.bestGraph, "input-OUTPUT");//####[211]####
+        }//####[212]####
+    }//####[213]####
+//####[218]####
+    private static volatile Method __pt__CreateScheduleTask_Schedule_int_Graph_method = null;//####[218]####
+    private synchronized static void __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet() {//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            try {//####[218]####
+                __pt__CreateScheduleTask_Schedule_int_Graph_method = ParaTaskHelper.getDeclaredMethod(new ParaTaskHelper.ClassGetter().getCurrentClass(), "__pt__CreateScheduleTask", new Class[] {//####[218]####
+                    Schedule.class, int.class, Graph.class//####[218]####
+                });//####[218]####
+            } catch (Exception e) {//####[218]####
+                e.printStackTrace();//####[218]####
+            }//####[218]####
+        }//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, int processorCount, Graph graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, int processorCount, Graph graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, int processorCount, Graph graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, int processorCount, Graph graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, int processorCount, Graph graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, int processorCount, Graph graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, int processorCount, Graph graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setTaskIdArgIndexes(0);//####[175]####
-        taskinfo.addDependsOn(schedule);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, int processorCount, Graph graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setTaskIdArgIndexes(0);//####[218]####
+        taskinfo.addDependsOn(schedule);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, int processorCount, Graph graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, int processorCount, Graph graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, int processorCount, Graph graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(0);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, int processorCount, Graph graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(0);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, TaskID<Integer> processorCount, Graph graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, TaskID<Integer> processorCount, Graph graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, TaskID<Integer> processorCount, Graph graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setTaskIdArgIndexes(1);//####[175]####
-        taskinfo.addDependsOn(processorCount);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, TaskID<Integer> processorCount, Graph graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setTaskIdArgIndexes(1);//####[218]####
+        taskinfo.addDependsOn(processorCount);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, TaskID<Integer> processorCount, Graph graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, TaskID<Integer> processorCount, Graph graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, TaskID<Integer> processorCount, Graph graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setTaskIdArgIndexes(0, 1);//####[175]####
-        taskinfo.addDependsOn(schedule);//####[175]####
-        taskinfo.addDependsOn(processorCount);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, TaskID<Integer> processorCount, Graph graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setTaskIdArgIndexes(0, 1);//####[218]####
+        taskinfo.addDependsOn(schedule);//####[218]####
+        taskinfo.addDependsOn(processorCount);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, TaskID<Integer> processorCount, Graph graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, TaskID<Integer> processorCount, Graph graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, TaskID<Integer> processorCount, Graph graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(0);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setTaskIdArgIndexes(1);//####[175]####
-        taskinfo.addDependsOn(processorCount);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, TaskID<Integer> processorCount, Graph graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(0);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setTaskIdArgIndexes(1);//####[218]####
+        taskinfo.addDependsOn(processorCount);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, BlockingQueue<Integer> processorCount, Graph graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, BlockingQueue<Integer> processorCount, Graph graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, BlockingQueue<Integer> processorCount, Graph graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(1);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, BlockingQueue<Integer> processorCount, Graph graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(1);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, BlockingQueue<Integer> processorCount, Graph graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, BlockingQueue<Integer> processorCount, Graph graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, BlockingQueue<Integer> processorCount, Graph graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(1);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setTaskIdArgIndexes(0);//####[175]####
-        taskinfo.addDependsOn(schedule);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, BlockingQueue<Integer> processorCount, Graph graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(1);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setTaskIdArgIndexes(0);//####[218]####
+        taskinfo.addDependsOn(schedule);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, BlockingQueue<Integer> processorCount, Graph graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, BlockingQueue<Integer> processorCount, Graph graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, BlockingQueue<Integer> processorCount, Graph graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(0, 1);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, BlockingQueue<Integer> processorCount, Graph graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(0, 1);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, int processorCount, TaskID<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, int processorCount, TaskID<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, int processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setTaskIdArgIndexes(2);//####[175]####
-        taskinfo.addDependsOn(graph);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, int processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setTaskIdArgIndexes(2);//####[218]####
+        taskinfo.addDependsOn(graph);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, int processorCount, TaskID<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, int processorCount, TaskID<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, int processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setTaskIdArgIndexes(0, 2);//####[175]####
-        taskinfo.addDependsOn(schedule);//####[175]####
-        taskinfo.addDependsOn(graph);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, int processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setTaskIdArgIndexes(0, 2);//####[218]####
+        taskinfo.addDependsOn(schedule);//####[218]####
+        taskinfo.addDependsOn(graph);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, int processorCount, TaskID<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, int processorCount, TaskID<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, int processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(0);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setTaskIdArgIndexes(2);//####[175]####
-        taskinfo.addDependsOn(graph);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, int processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(0);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setTaskIdArgIndexes(2);//####[218]####
+        taskinfo.addDependsOn(graph);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, TaskID<Integer> processorCount, TaskID<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, TaskID<Integer> processorCount, TaskID<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, TaskID<Integer> processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setTaskIdArgIndexes(1, 2);//####[175]####
-        taskinfo.addDependsOn(processorCount);//####[175]####
-        taskinfo.addDependsOn(graph);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, TaskID<Integer> processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setTaskIdArgIndexes(1, 2);//####[218]####
+        taskinfo.addDependsOn(processorCount);//####[218]####
+        taskinfo.addDependsOn(graph);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, TaskID<Integer> processorCount, TaskID<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, TaskID<Integer> processorCount, TaskID<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, TaskID<Integer> processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setTaskIdArgIndexes(0, 1, 2);//####[175]####
-        taskinfo.addDependsOn(schedule);//####[175]####
-        taskinfo.addDependsOn(processorCount);//####[175]####
-        taskinfo.addDependsOn(graph);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, TaskID<Integer> processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setTaskIdArgIndexes(0, 1, 2);//####[218]####
+        taskinfo.addDependsOn(schedule);//####[218]####
+        taskinfo.addDependsOn(processorCount);//####[218]####
+        taskinfo.addDependsOn(graph);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, TaskID<Integer> processorCount, TaskID<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, TaskID<Integer> processorCount, TaskID<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, TaskID<Integer> processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(0);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setTaskIdArgIndexes(1, 2);//####[175]####
-        taskinfo.addDependsOn(processorCount);//####[175]####
-        taskinfo.addDependsOn(graph);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, TaskID<Integer> processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(0);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setTaskIdArgIndexes(1, 2);//####[218]####
+        taskinfo.addDependsOn(processorCount);//####[218]####
+        taskinfo.addDependsOn(graph);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, BlockingQueue<Integer> processorCount, TaskID<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, BlockingQueue<Integer> processorCount, TaskID<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, BlockingQueue<Integer> processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(1);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setTaskIdArgIndexes(2);//####[175]####
-        taskinfo.addDependsOn(graph);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, BlockingQueue<Integer> processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(1);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setTaskIdArgIndexes(2);//####[218]####
+        taskinfo.addDependsOn(graph);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, BlockingQueue<Integer> processorCount, TaskID<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, BlockingQueue<Integer> processorCount, TaskID<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, BlockingQueue<Integer> processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(1);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setTaskIdArgIndexes(0, 2);//####[175]####
-        taskinfo.addDependsOn(schedule);//####[175]####
-        taskinfo.addDependsOn(graph);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, BlockingQueue<Integer> processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(1);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setTaskIdArgIndexes(0, 2);//####[218]####
+        taskinfo.addDependsOn(schedule);//####[218]####
+        taskinfo.addDependsOn(graph);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, BlockingQueue<Integer> processorCount, TaskID<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, BlockingQueue<Integer> processorCount, TaskID<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, BlockingQueue<Integer> processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(0, 1);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setTaskIdArgIndexes(2);//####[175]####
-        taskinfo.addDependsOn(graph);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, BlockingQueue<Integer> processorCount, TaskID<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(0, 1);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setTaskIdArgIndexes(2);//####[218]####
+        taskinfo.addDependsOn(graph);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, int processorCount, BlockingQueue<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, int processorCount, BlockingQueue<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, int processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(2);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, int processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(2);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, int processorCount, BlockingQueue<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, int processorCount, BlockingQueue<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, int processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(2);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setTaskIdArgIndexes(0);//####[175]####
-        taskinfo.addDependsOn(schedule);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, int processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(2);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setTaskIdArgIndexes(0);//####[218]####
+        taskinfo.addDependsOn(schedule);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, int processorCount, BlockingQueue<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, int processorCount, BlockingQueue<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, int processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(0, 2);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, int processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(0, 2);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, TaskID<Integer> processorCount, BlockingQueue<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, TaskID<Integer> processorCount, BlockingQueue<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, TaskID<Integer> processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(2);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setTaskIdArgIndexes(1);//####[175]####
-        taskinfo.addDependsOn(processorCount);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, TaskID<Integer> processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(2);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setTaskIdArgIndexes(1);//####[218]####
+        taskinfo.addDependsOn(processorCount);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, TaskID<Integer> processorCount, BlockingQueue<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, TaskID<Integer> processorCount, BlockingQueue<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, TaskID<Integer> processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(2);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setTaskIdArgIndexes(0, 1);//####[175]####
-        taskinfo.addDependsOn(schedule);//####[175]####
-        taskinfo.addDependsOn(processorCount);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, TaskID<Integer> processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(2);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setTaskIdArgIndexes(0, 1);//####[218]####
+        taskinfo.addDependsOn(schedule);//####[218]####
+        taskinfo.addDependsOn(processorCount);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, TaskID<Integer> processorCount, BlockingQueue<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, TaskID<Integer> processorCount, BlockingQueue<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, TaskID<Integer> processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(0, 2);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setTaskIdArgIndexes(1);//####[175]####
-        taskinfo.addDependsOn(processorCount);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, TaskID<Integer> processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(0, 2);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setTaskIdArgIndexes(1);//####[218]####
+        taskinfo.addDependsOn(processorCount);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, BlockingQueue<Integer> processorCount, BlockingQueue<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, BlockingQueue<Integer> processorCount, BlockingQueue<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(Schedule schedule, BlockingQueue<Integer> processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(1, 2);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(Schedule schedule, BlockingQueue<Integer> processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(1, 2);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, BlockingQueue<Integer> processorCount, BlockingQueue<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, BlockingQueue<Integer> processorCount, BlockingQueue<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, BlockingQueue<Integer> processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(1, 2);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setTaskIdArgIndexes(0);//####[175]####
-        taskinfo.addDependsOn(schedule);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(TaskID<Schedule> schedule, BlockingQueue<Integer> processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(1, 2);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setTaskIdArgIndexes(0);//####[218]####
+        taskinfo.addDependsOn(schedule);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, BlockingQueue<Integer> processorCount, BlockingQueue<Graph> graph) {//####[175]####
-        //-- execute asynchronously by enqueuing onto the taskpool//####[175]####
-        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, BlockingQueue<Integer> processorCount, BlockingQueue<Graph> graph) {//####[218]####
+        //-- execute asynchronously by enqueuing onto the taskpool//####[218]####
+        return CreateScheduleTask(schedule, processorCount, graph, new TaskInfo());//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, BlockingQueue<Integer> processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[175]####
-        // ensure Method variable is set//####[175]####
-        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[175]####
-            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[175]####
-        }//####[175]####
-        taskinfo.setQueueArgIndexes(0, 1, 2);//####[175]####
-        taskinfo.setIsPipeline(true);//####[175]####
-        taskinfo.setParameters(schedule, processorCount, graph);//####[175]####
-        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[175]####
-        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[175]####
-    }//####[175]####
+	 *///####[218]####
+    public static TaskID<Void> CreateScheduleTask(BlockingQueue<Schedule> schedule, BlockingQueue<Integer> processorCount, BlockingQueue<Graph> graph, TaskInfo taskinfo) {//####[218]####
+        // ensure Method variable is set//####[218]####
+        if (__pt__CreateScheduleTask_Schedule_int_Graph_method == null) {//####[218]####
+            __pt__CreateScheduleTask_Schedule_int_Graph_ensureMethodVarSet();//####[218]####
+        }//####[218]####
+        taskinfo.setQueueArgIndexes(0, 1, 2);//####[218]####
+        taskinfo.setIsPipeline(true);//####[218]####
+        taskinfo.setParameters(schedule, processorCount, graph);//####[218]####
+        taskinfo.setMethod(__pt__CreateScheduleTask_Schedule_int_Graph_method);//####[218]####
+        return TaskpoolFactory.getTaskpool().enqueue(taskinfo);//####[218]####
+    }//####[218]####
     /**
 	 * Called when making tasks
-	 *///####[175]####
-    public static void __pt__CreateScheduleTask(Schedule schedule, int processorCount, Graph graph) {//####[175]####
-        CreateSchedule(schedule, processorCount, graph);//####[176]####
-    }//####[177]####
-//####[177]####
-//####[182]####
+	 *///####[218]####
+    public static void __pt__CreateScheduleTask(Schedule schedule, int processorCount, Graph graph) {//####[218]####
+        CreateSchedule(schedule, processorCount, graph);//####[220]####
+    }//####[222]####
+//####[222]####
+//####[227]####
     /**
 	 * Called when sequential
-	 *///####[182]####
-    public static void CreateSchedule(Schedule schedule, int processorCount, Graph g) {//####[182]####
-        Greedy greedy = new Greedy();//####[183]####
-        ScheduleGraphPair sgPair = greedy.greedySearch(g, processorCount, schedule);//####[184]####
-        if (sgPair.schedule.scheduleLength < ScheduleHelper.currentBestSchedule.scheduleLength) //####[187]####
-        {//####[187]####
-            ScheduleHelper.currentBestSchedule.scheduleLength = sgPair.schedule.scheduleLength;//####[188]####
-            for (Node n : sgPair.g) //####[190]####
-            {//####[190]####
-                for (Node bestN : ScheduleHelper.bestGraph) //####[191]####
-                {//####[191]####
-                    if (n.getIndex() == bestN.getIndex()) //####[192]####
-                    {//####[192]####
-                        Graphs.copyAttributes(n, bestN);//####[193]####
-                    }//####[194]####
-                }//####[195]####
-            }//####[196]####
-        }//####[197]####
-        BranchAndBound bnb = new BranchAndBound(sgPair.schedule, sgPair.g);//####[199]####
-        bnb.branchAndBoundAlgorithm();//####[200]####
-    }//####[202]####
-}//####[202]####
+	 *///####[227]####
+    public static void CreateSchedule(Schedule schedule, int processorCount, Graph g) {//####[227]####
+        Greedy greedy = new Greedy();//####[228]####
+        ScheduleGraphPair sgPair = greedy.greedySearch(g, processorCount, schedule);//####[229]####
+        if (sgPair.schedule.scheduleLength < ScheduleHelper.currentBestSchedule.scheduleLength) //####[232]####
+        {//####[232]####
+            ScheduleHelper.currentBestSchedule.scheduleLength = sgPair.schedule.scheduleLength;//####[233]####
+            for (Node n : sgPair.g) //####[235]####
+            {//####[235]####
+                for (Node bestN : ScheduleHelper.bestGraph) //####[236]####
+                {//####[236]####
+                    if (n.getIndex() == bestN.getIndex()) //####[237]####
+                    {//####[237]####
+                        Graphs.copyAttributes(n, bestN);//####[238]####
+                    }//####[239]####
+                }//####[240]####
+            }//####[241]####
+        }//####[242]####
+        BranchAndBound bnb = new BranchAndBound(sgPair.schedule, sgPair.g);//####[245]####
+        bnb.branchAndBoundAlgorithm();//####[246]####
+    }//####[248]####
+}//####[248]####
