@@ -18,10 +18,7 @@ public class ScheduleHelper {
 	
 	public static int[][] dependencyMatrix;
 	public static Schedule currentBestSchedule;
-	//private static ArrayList<Integer> rootNodes = new ArrayList<Integer>();
-	
-	//This is a cloned graph just for the currentBestSchedule
-	public static Graph bestGraph;
+	public static Graph bestGraph; //This is a cloned graph just for the currentBestSchedule
 
 	/**
 	 * This method should find all node dependencies and map them to an adjacency matrix.
@@ -166,22 +163,17 @@ public class ScheduleHelper {
 					parentNodeCosts.add(schedule.procLengths[q.Processor] + nodeWeight + timeToWait);
 					parentNodes.add(parentNode);
 				}
-				
 			}
 
 			minimumProcLength = parentNodeCosts.get(0);
 			
-			//int temp = 0;
 			for(int i = 0; i < parentNodeCosts.size(); i++) {
 				int pNodeCost = parentNodeCosts.get(i);
 				if (pNodeCost > minimumProcLength) {
 					minimumProcLength = pNodeCost;
-					//temp = i;
 				}
 			}
-			
-			//Node p = parentNodes.get(temp);
-			
+
 			procWaitTime = minimumProcLength - nodeWeight - schedule.procLengths[q.Processor];
 			
 		} else { // if it's a root node, length is the node weight plus the processor length of the processor

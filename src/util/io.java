@@ -17,7 +17,7 @@ import org.graphstream.stream.file.FileSourceDOT;
  * should be included in the "util" package.
  */
 public class io {
-
+private Graph gVis;
 
     public void processInput(File input_file) {
         String line;
@@ -48,9 +48,11 @@ public class io {
 
     public Graph DOTParser(File input_file, String file_name){
         Graph g = new DefaultGraph("g");
+        this.gVis=new DefaultGraph("g");
         FileSource fs = new FileSourceDOT();
 
         fs.addSink(g);
+        fs.addSink(gVis);
         
         try{
             fs.readAll(file_name);
@@ -63,38 +65,28 @@ public class io {
         //Add Processor attribute to every node
         for (int i = 0; i < g.getNodeCount(); i++) {
         	g.getNode(i).addAttribute("Processor", -1);
-        	g.getNode(i).addAttribute("Start" , -1);
-        	//g.getNode(i).addAttribute("ui.label", "Node : "+g.getNode(i).getId());
-      //  g.getNode(i).addAttribute("ui.class",g.getNode(i).getAttribute("Processor")+"");
-        
+        	g.getNode(i).addAttribute("Start" , -1);   
+        	gVis.getNode(i).addAttribute("ui.label", " "+g.getNode(i).getId());
+        	gVis.getNode(i).addAttribute("ui.class",g.getNode(i).getAttribute("Processor")+"");
+        	gVis.getNode(i).addAttribute("Processor", -1);
+        	gVis.getNode(i).addAttribute("Start" , -1);
         }
        
         //g.display();
         return g;
     }
 
-    public void outputFile(Schedule schedule, Graph inputGraph, String inputFileName){
-//        for (Node n: schedule.schedule){
-//            for (Node graphnode: inputGraph.getNodeSet()){
-//                if (n.getId() == graphnode.getId()){
-//                    //graphnode.addAttribute("Start", n.getAttribute("Start").toString());
-//                    //graphnode.addAttribute("Processor", n.getAttribute("Processor").toString());
-//                }
-//
-//            }
-//        }
-        String[] split = inputFileName.split(".dot");
-        String nameWithoutSuffix = split[0];
-        File outputFileWithoutSuffix = new File(nameWithoutSuffix);
-        String outputFileName = "/tmp/" + outputFileWithoutSuffix.getName() + "-output.dot";
+    public void outputFile(Schedule schedule, Graph inputGraph, String outputFileName){
+
+        String output = "/tmp/" + outputFileName;
         FileSinkDOT fs = new FileSinkDOT(true);
-        File outputFile = new File(outputFileName);
+        File outputFile = new File(output);
         FileOutputStream fos = null;
         try {
             outputFile.createNewFile();
             fos = new FileOutputStream(outputFile);
             fs.writeAll(inputGraph, fos);
-            System.out.println("Output file saved to: " + outputFileName);
+            System.out.println("Output file saved to: " + output);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -102,5 +94,8 @@ public class io {
         }
 
 
+    }
+    public Graph getVisGraph(){
+    	return this.gVis;
     }
 }
