@@ -13,25 +13,25 @@ Please see our github wiki for meeting minutes, the link to our google docs for 
 
 Developed by: 
   Aaron Zhong
-      GitHub username:
-      Student ID: 
-      UPI: 
+      (GitHub username:
+      , Student ID: 
+      , UPI: )
   Alex Li
-      GitHub username:
-      Student ID: 
-      UPI: 
+      (GitHub username:
+      , Student ID: 
+      , UPI: )
   Ida De Smet :
-      GitHub username: idaknow, ides542
-      Student ID: 9199116
-      UPI: ides542
+      (GitHub username: idaknow, ides542, 
+      Student ID: 9199116, 
+      UPI: ides542)
   Jay Pandya : 
-      GitHub username: bawse
-      Student ID: 
-      UPI: 
+      (GitHub username: bawse, 
+      Student ID: ,
+      UPI: )
   Sherry Wang :
-      GitHub username:
-      Student ID: 
-      UPI: 
+      (GitHub username: ,
+      Student ID: ,
+      UPI: )
 
 Notes:
 
