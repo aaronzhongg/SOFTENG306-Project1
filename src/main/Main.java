@@ -30,8 +30,8 @@ public class Main {
 
         // comment out code below before submitting.
 
-        String inputFile = "TestDotFiles/Nodes_10_Random.dot";
-        int processorInput = 2;
+        String inputFile = "TestDotFiles/Nodes_11_OutTree.dot";
+        int processorInput = 4;
         
 		File input_file = new File(inputFile);
 		io IOProcessor = new io();

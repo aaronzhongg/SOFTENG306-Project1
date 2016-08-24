@@ -62,8 +62,9 @@ public class io {
         
         //Add Processor attribute to every node
         for (int i = 0; i < g.getNodeCount(); i++) {
-        	g.getNode(i).addAttribute("Processor", -1);
-        	g.getNode(i).addAttribute("Start" , -1);
+        	int j = -1;
+        	g.getNode(i).addAttribute("Processor", j);
+        	g.getNode(i).addAttribute("Start" , j);
         	//g.getNode(i).addAttribute("ui.label", "Node : "+g.getNode(i).getId());
       //  g.getNode(i).addAttribute("ui.class",g.getNode(i).getAttribute("Processor")+"");
         
