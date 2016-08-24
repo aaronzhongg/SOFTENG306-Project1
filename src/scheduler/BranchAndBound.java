@@ -9,6 +9,7 @@ public class BranchAndBound {
 	private Schedule currentSchedule;
 	private Graph g;
 	private Node nodeToBeRemoved = null;
+	private Node original=null;
 
 	/**
 	 * Constructor to instantiate a new Schedule
@@ -29,7 +30,7 @@ public class BranchAndBound {
 	 * @return
 	 */
 	public void branchAndBoundAlgorithm() {		
-
+		original=nodeToBeRemoved ;
 		nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
 		currentSchedule.removeNode(currentSchedule.schedule.size() - 1);
 		updateRemoveLengthChanges(currentSchedule, nodeToBeRemoved);
@@ -39,15 +40,16 @@ public class BranchAndBound {
 
 			nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
 			if (Main.vis){
-				if(!Main.inParallel){
+				
 					Main.update.updateColor(nodeToBeRemoved.getId(),"yellow");
-					Main.update.updateColor(nodeToBeRemoved.getId(),"gray");
-				}}
+					Main.update.updateColor(original.getId(),"gray");
+				}
 
 			currentSchedule.removeNode(currentSchedule.schedule.size() - 1);
 			updateRemoveLengthChanges(currentSchedule, nodeToBeRemoved);
 
 			if(currentSchedule.schedule.size() == 1){
+				Main.update.updateColor(nodeToBeRemoved.getId(),"gray");
 				return;
 			}
 		}
