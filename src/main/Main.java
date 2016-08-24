@@ -52,9 +52,42 @@ public class Main {//####[16]####
     public static void main(String[] args) {//####[28]####
         MainView mainView = null;//####[29]####
         int nThreads = 1;//####[31]####
-        String inputFile = "TestDotFiles/Nodes_8_Random.dot";//####[65]####
-        String outputFile = inputFile + "-output.dot";//####[66]####
-        int processorInput = 5;//####[67]####
+        if (args.length < 2) //####[34]####
+        {//####[34]####
+            System.out.println("Please ensure that all input parameters have been entered - Input file name and number of processors. ");//####[35]####
+            System.exit(1);//####[36]####
+        }//####[37]####
+        String inputFile = args[0];//####[38]####
+        String[] split = inputFile.split(".dot");//####[39]####
+        String inputWithoutExtension = split[0];//####[40]####
+        File input = new File(inputWithoutExtension);//####[41]####
+        String inputFileName = input.getName();//####[42]####
+        String outputFile = inputFileName + "-output.dot";//####[43]####
+        processorInput = Integer.parseInt(args[1]);//####[44]####
+        if (args.length > 2) //####[45]####
+        {//####[45]####
+            int i = 2;//####[46]####
+            while (i < args.length) //####[47]####
+            {//####[47]####
+                if (args[i].equals("-p")) //####[48]####
+                {//####[48]####
+                    i++;//####[49]####
+                    nThreads = Integer.parseInt(args[i]);//####[50]####
+                    if (nThreads > 0) //####[51]####
+                    {//####[51]####
+                        inParallel = true;//####[52]####
+                    }//####[53]####
+                } else if (args[i].equals("-v")) //####[54]####
+                {//####[54]####
+                    vis = true;//####[55]####
+                } else if (args[i].equals("-o")) //####[56]####
+                {//####[56]####
+                    i++;//####[57]####
+                    outputFile = args[i];//####[58]####
+                }//####[59]####
+                i++;//####[60]####
+            }//####[61]####
+        }//####[62]####
         File input_file = new File(inputFile);//####[69]####
         io IOProcessor = new io();//####[70]####
         Schedule schedule;//####[71]####
@@ -170,6 +203,7 @@ public class Main {//####[16]####
                 System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));//####[189]####
             }//####[190]####
             System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);//####[191]####
+            IOProcessor.outputFile(ScheduleHelper.currentBestSchedule, ScheduleHelper.bestGraph, outputFile);//####[192]####
         }//####[193]####
     }//####[194]####
 //####[199]####
