@@ -46,11 +46,9 @@ public class testValidity {
 	
 	@Test
 	public void testMain() {
-		
-	
 
 		for (int f = 7; f < 12; f++){ // loops through all files
-			for (int p = 2; p < 5; p+=2){ // loops through processors 1 to 4
+			for (int p = 1; p < 7; p+=2){ // loops through processors 1 to 4
 				Graph g = create_the_graph(f); // creates the graph
 
 				createSchedule(g,p);
@@ -64,21 +62,19 @@ public class testValidity {
 					//System.out.println(ScheduleHelper.bestGraph);
 					//System.out.println(p);
 					//	System.out.println(checkOptimal(p,f));
-					assertEquals(ScheduleHelper.currentBestSchedule.scheduleLength, checkOptimal(p,f));
+					assertEquals("The Schedule is not optimal for file "+ f + " with " + p + " processors",ScheduleHelper.currentBestSchedule.scheduleLength, checkOptimal(p,f));
 				}
 			}
 		}
 	}
-
+/**
+ * This contains the code from the MAIN method
+ * **/
 	public void createSchedule(Graph g, int p){
 		ArrayList<Integer> rootnodes = ScheduleHelper.findRootNodes(g);
-		//System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
-		//MainView MainView=new MainView(g);
-		//MainView.setVisible(true);
 
 		ScheduleHelper.currentBestSchedule = new Schedule(p);
 		ScheduleHelper.bestGraph = Graphs.clone(g);
-		//		g.display();
 		ScheduleHelper.currentBestSchedule.scheduleLength = 2147483647;
 		Greedy greedy = new Greedy();
 		ScheduleHelper.makeDependencyMatrix(g);
@@ -86,7 +82,6 @@ public class testValidity {
 
 		// Create a schedule that has every combination of root node + next processable node (in each processor)
 		for(int rootNode: rootnodes) {
-			// Make a clone to get the processableNodes after adding the root node to the schedule
 			Graph tempNewGraph = Graphs.clone(g); 
 			Schedule tempNewSchedule = new Schedule(p);
 			tempNewSchedule.addNode(tempNewGraph.getNode(rootNode), 0, 0);
