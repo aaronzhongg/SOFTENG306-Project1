@@ -128,7 +128,7 @@ public class BranchAndBound {
 		}
 
 		if (updatedScheduleLength == 0) { 
-			s.procLengths[removeNode.getAttribute("Processor")] = 0;
+			s.procLengths[(int)removeNode.getAttribute("Processor")] = 0;
 			s.scheduleLength = s.findScheduleLength();
 		}
 	}
