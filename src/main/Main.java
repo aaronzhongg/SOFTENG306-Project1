@@ -51,7 +51,7 @@ public class Main {//####[16]####
 	 *///####[28]####
     public static void main(String[] args) {//####[28]####
         MainView mainView = null;//####[30]####
-        int nThreads = 0;//####[31]####
+        int nThreads = 1;//####[31]####
         if (args.length < 2) //####[36]####
         {//####[36]####
             System.out.println("Please ensure that all input parameters have been entered - Input file name and number of processors. ");//####[37]####
@@ -99,6 +99,7 @@ public class Main {//####[16]####
             mainView = new MainView(gVis);//####[82]####
             mainView.setVisible(true);//####[83]####
         }//####[84]####
+        initialTime = System.currentTimeMillis();//####[87]####
         endTime = 0;//####[88]####
         ArrayList<Integer> rootnodes = ScheduleHelper.findRootNodes(g);//####[90]####
         ScheduleHelper.currentBestSchedule = new Schedule(processorInput);//####[92]####
@@ -196,7 +197,7 @@ public class Main {//####[16]####
                 mainView.updateSchedule(ScheduleHelper.currentBestSchedule.scheduleLength);//####[187]####
                 mainView.start.setEnabled(true);//####[188]####
             }//####[189]####
-            System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);//####[198]####
+            endTime = System.currentTimeMillis();//####[190]####
         }//####[202]####
     }//####[203]####
 //####[208]####
@@ -813,31 +814,31 @@ public class Main {//####[16]####
 	 * Called when making tasks
 	 *///####[208]####
     public static void __pt__CreateScheduleTask(Schedule schedule, int processorCount, Graph graph) {//####[208]####
-        CreateSchedule(schedule, processorCount, graph);//####[210]####
-    }//####[212]####
-//####[212]####
-//####[217]####
+        CreateSchedule(schedule, processorCount, graph);//####[209]####
+    }//####[210]####
+//####[210]####
+//####[215]####
     /**
 	 * Called when sequential
-	 *///####[217]####
-    public static void CreateSchedule(Schedule schedule, int processorCount, Graph g) {//####[217]####
-        Greedy greedy = new Greedy();//####[218]####
-        ScheduleGraphPair sgPair = greedy.greedySearch(g, processorCount, schedule);//####[219]####
-        if (sgPair.schedule.scheduleLength < ScheduleHelper.currentBestSchedule.scheduleLength) //####[222]####
-        {//####[222]####
-            ScheduleHelper.currentBestSchedule.scheduleLength = sgPair.schedule.scheduleLength;//####[223]####
-            for (Node n : sgPair.g) //####[225]####
-            {//####[225]####
-                for (Node bestN : ScheduleHelper.bestGraph) //####[226]####
-                {//####[226]####
-                    if (n.getIndex() == bestN.getIndex()) //####[227]####
-                    {//####[227]####
-                        Graphs.copyAttributes(n, bestN);//####[228]####
-                    }//####[229]####
-                }//####[230]####
-            }//####[231]####
-        }//####[232]####
-        BranchAndBound bnb = new BranchAndBound(sgPair.schedule, sgPair.g);//####[235]####
-        bnb.branchAndBoundAlgorithm();//####[236]####
-    }//####[238]####
-}//####[238]####
+	 *///####[215]####
+    public static void CreateSchedule(Schedule schedule, int processorCount, Graph g) {//####[215]####
+        Greedy greedy = new Greedy();//####[216]####
+        ScheduleGraphPair sgPair = greedy.greedySearch(g, processorCount, schedule);//####[217]####
+        if (sgPair.schedule.scheduleLength < ScheduleHelper.currentBestSchedule.scheduleLength) //####[220]####
+        {//####[220]####
+            ScheduleHelper.currentBestSchedule.scheduleLength = sgPair.schedule.scheduleLength;//####[221]####
+            for (Node n : sgPair.g) //####[223]####
+            {//####[223]####
+                for (Node bestN : ScheduleHelper.bestGraph) //####[224]####
+                {//####[224]####
+                    if (n.getIndex() == bestN.getIndex()) //####[225]####
+                    {//####[225]####
+                        Graphs.copyAttributes(n, bestN);//####[226]####
+                    }//####[227]####
+                }//####[228]####
+            }//####[229]####
+        }//####[230]####
+        BranchAndBound bnb = new BranchAndBound(sgPair.schedule, sgPair.g);//####[233]####
+        bnb.branchAndBoundAlgorithm();//####[234]####
+    }//####[236]####
+}//####[236]####

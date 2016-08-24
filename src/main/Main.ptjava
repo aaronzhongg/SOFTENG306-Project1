@@ -28,7 +28,7 @@ public class Main {
 	public static void main(String[] args){
 		
 		MainView mainView= null;
-		int nThreads = 0;
+		int nThreads = 1;
 
 
 
@@ -67,7 +67,7 @@ public class Main {
 		// comment out code below before submitting.
 		//String inputFile = "TestDotFiles/Nodes_8_Random.dot";
 		//String outputFile = inputFile + "-output.dot";
-		//int processorInput = 5;
+		//int processorInput = 3;
 
 
 		File input_file = new File(inputFile);
@@ -84,7 +84,7 @@ public class Main {
 		}
 
 		//time test
-//		initialTime = System.currentTimeMillis();
+		initialTime = System.currentTimeMillis();
 		endTime=0;
 
 		ArrayList<Integer> rootnodes = ScheduleHelper.findRootNodes(g);
@@ -187,7 +187,7 @@ public class Main {
 				mainView.updateSchedule(ScheduleHelper.currentBestSchedule.scheduleLength);
 				mainView.start.setEnabled(true);
 			}
-			//endTime=System.currentTimeMillis();
+			endTime=System.currentTimeMillis();
 
 		//	System.out.println(endTime-initialTime);
 
@@ -195,7 +195,7 @@ public class Main {
 		//	for(Node n: ScheduleHelper.bestGraph){
 			//	System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
 			//}
-			System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
+			//System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
 
 			//	IOProcessor.outputFile(ScheduleHelper.currentBestSchedule, ScheduleHelper.bestGraph, outputFile); // creates the output file
 
@@ -206,9 +206,7 @@ public class Main {
 	 * Called when making tasks
 	 */
 	TASK public static void CreateScheduleTask(Schedule schedule, int processorCount, Graph graph){
-		//Main.conflict=true;
 		CreateSchedule(schedule, processorCount, graph);
-		//Main.conflict=false;
 	}
 
 	/**
