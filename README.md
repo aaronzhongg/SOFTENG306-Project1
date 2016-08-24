@@ -1,9 +1,12 @@
 SOFTENG306 Project 1 - 2016 Semester Two
 Team 11
+NOTE: In order to run scheduler.jar, please use the path to JRE 1.8 in UG4. By default, "java -jar scheduler.jar" will use JRE 1.7 - and will throw an UnsupportedClassVersion Exception. Therefore, in order to run the scheduler, please use the following command to run the scheduler.jar file:
+
+/usr/lib/jvm/jre1.8.0_45/bin/java -jar scheduler.jar [input file] [no of processors] [OPTIONS] 
 
 Our final code can be found on our Master branch. The stages of development include
 To build the code, referenced libraries/ external jars required are:
-  JRE Library (must be jdk 1.8)
+  JRE Library (must be JRE/JDK 1.8)
   ParallelTask (PTRuntime.jar & PTJavaPlugin-src.2.1.0.zip)
   GraphStream (gs-core-1.3.jar)
 
@@ -17,7 +20,7 @@ Developed by:
       , Student ID: 
       , UPI: )
   Alex Li
-      (GitHub username:
+      (GitHub username: humbis
       , Student ID: 
       , UPI: )
   Ida De Smet :
@@ -26,8 +29,8 @@ Developed by:
       UPI: ides542)
   Jay Pandya : 
       (GitHub username: bawse, 
-      Student ID: ,
-      UPI: )
+      Student ID: 6785814,
+      UPI: jpan889)
   Sherry Wang :
       (GitHub username: ,
       Student ID: ,
