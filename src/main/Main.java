@@ -199,6 +199,7 @@ public class Main {//####[16]####
             }//####[189]####
             endTime = System.currentTimeMillis();//####[190]####
         }//####[202]####
+        IOProcessor.outputFile(ScheduleHelper.currentBestSchedule, ScheduleHelper.bestGraph, outputFile); // creates the output file
     }//####[203]####
 //####[208]####
     private static volatile Method __pt__CreateScheduleTask_Schedule_int_Graph_method = null;//####[208]####

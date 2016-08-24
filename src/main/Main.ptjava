@@ -197,7 +197,7 @@ public class Main {
 			//}
 			//System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
 
-			//	IOProcessor.outputFile(ScheduleHelper.currentBestSchedule, ScheduleHelper.bestGraph, outputFile); // creates the output file
+			IOProcessor.outputFile(ScheduleHelper.currentBestSchedule, ScheduleHelper.bestGraph, outputFile); // creates the output file
 
 		}
 	}

@@ -27,7 +27,7 @@ protected void paintComponent(Graphics g){
 	g.fillOval((6*w/10), 20, 15, 15);
 	g.setColor(Color.black);
 	g.drawString("Node processing Branch And Bound", (6*w/10)+30, 32);
-	g.drawString("Result graph shows different colors of node according to the differnet processors.",w/10,62);
+	g.drawString("Result graph shows different colors of node according to the different processors.",w/10,62);
 	
 }
 }
