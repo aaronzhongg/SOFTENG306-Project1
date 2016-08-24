@@ -50,7 +50,7 @@ public class BranchAndBound {
 			updateRemoveLengthChanges(currentSchedule, nodeToBeRemoved);
 
 			if(currentSchedule.schedule.size() == 1){
-				Main.update.updateColor(nodeToBeRemoved.getId(),"gray");
+				if (Main.vis) {Main.update.updateColor(nodeToBeRemoved.getId(),"gray");}
 				return;
 			}
 		}
