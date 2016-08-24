@@ -26,10 +26,9 @@ public class Main {
 	 * main
 	 */
 	public static void main(String[] args){
+		
 		MainView mainView= null;
-
-
-		int nThreads = 4;
+		int nThreads = 0;
 
 
 
@@ -85,7 +84,7 @@ public class Main {
 		}
 
 		//time test
-		initialTime = System.currentTimeMillis();
+//		initialTime = System.currentTimeMillis();
 		endTime=0;
 
 		ArrayList<Integer> rootnodes = ScheduleHelper.findRootNodes(g);
@@ -188,14 +187,14 @@ public class Main {
 				mainView.updateSchedule(ScheduleHelper.currentBestSchedule.scheduleLength);
 				mainView.start.setEnabled(true);
 			}
-			endTime=System.currentTimeMillis();
+			//endTime=System.currentTimeMillis();
 
-			System.out.println(endTime-initialTime);
+		//	System.out.println(endTime-initialTime);
 
 			// COMMENT OUT/ DELETE BEFORE SUBMISSION
-			for(Node n: ScheduleHelper.bestGraph){
-				System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
-			}
+		//	for(Node n: ScheduleHelper.bestGraph){
+			//	System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
+			//}
 			System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
 
 			//	IOProcessor.outputFile(ScheduleHelper.currentBestSchedule, ScheduleHelper.bestGraph, outputFile); // creates the output file
