@@ -20,7 +20,7 @@ public class Main {
 	public static Update update;
 	public static long initialTime,endTime;
 	public static boolean inParallel=true;
-	public static boolean vis = true;
+	public static boolean vis = false;
 
 	/**
 	 * main

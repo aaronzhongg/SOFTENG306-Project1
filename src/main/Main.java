@@ -44,7 +44,7 @@ public class Main {//####[16]####
 //####[22]####
     public static boolean inParallel = true;//####[22]####
 //####[23]####
-    public static boolean vis = true;//####[23]####
+    public static boolean vis = false;//####[23]####
 //####[28]####
     /**
 	 * main
