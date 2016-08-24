@@ -17,13 +17,13 @@ import scheduler.ScheduleHelper;
 public class Update {
 	//private File file;
 	private int processorNum;
-	private ArrayList<String> change;
+	private List<String> change;
 	private ArrayList<Node> schedule;
 	
 	public Update(int processorNum){
 		this.processorNum=processorNum;
 		//file= new File("/Users/Jing/Desktop/newworkspace/SOFTENG306-Project1-feature-branch-and-bound/tmp/change.txt");
-		change=new ArrayList<String>();
+		change=Collections.synchronizedList( new ArrayList<String>());
 		//this.schedule=schedule;
 	}
 	public void setSchedule( ArrayList<Node> schedule ){
