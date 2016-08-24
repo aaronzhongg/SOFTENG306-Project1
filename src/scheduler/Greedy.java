@@ -49,7 +49,7 @@ public class Greedy {
 				newProcLength = procInfo[0];	//new length of the processor after adding this particular node
 				scheduleLength = schedule.findScheduleLength();		// current length of schedule
 
-				if(newProcLength - scheduleLength <= smallestWeightChange){ //checks if this item to the schedule is the smallest weight change
+				if(newProcLength - scheduleLength < smallestWeightChange){ //checks if this item to the schedule is the smallest weight change
 					procWaitTime = procInfo[1];
 					smallest = q;
 					smallestWeightChange = newProcLength - scheduleLength;
