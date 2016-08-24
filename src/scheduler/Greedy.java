@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 
+/**
+ * This class contains all the functions used for the greedy algorithm
+ * This class works to form a valid schedule output
+ * contains basic milestone deliverable code
+ */
 public class Greedy {
 
 	/**
@@ -31,7 +36,7 @@ public class Greedy {
 			}
 		}		
 		
-		QueueItem smallest = queue.get(0);
+		QueueItem smallest = queue.get(0); // intialises the smallest queueitem as the first one
 
 		// loops through the whole queue
 		while(!queue.isEmpty()){
@@ -57,7 +62,7 @@ public class Greedy {
 				}
 			}
 
-			for (int popIndex = queue.size() -1 ; popIndex > -1; popIndex--) { //removes the node from the queue that makes the smallest dif
+			for (int popIndex = queue.size() -1 ; popIndex > -1; popIndex--) { //removes the node from the queue that makes the smallest difference
 				if (queue.get(popIndex).nodeIndex == smallest.nodeIndex) {
 					queue.remove(popIndex);
 				}
@@ -66,8 +71,6 @@ public class Greedy {
 			//adds smallest node to schedule
 			schedule.addNode(g.getNode(smallest.nodeIndex), smallest.Processor, procWaitTime);
 			schedule.updateProcessorLength(smallest.Processor, processorWeightInc);
-
-			//TEST //System.out.println("TEST i="+t+" :  Node id: " + smallest.nodeIndex + " ProcID: " + smallest.Processor );
 
 			ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex); //adds processable children to queue
 			for(int i:childrenNodes){
@@ -99,7 +102,8 @@ public class Greedy {
 		}
 	}
 	
-	//Simple schedule graph pair returned by greedy. Required for multi-threading since each thread needs its own graph
+	/**Simple schedule graph pair returned by greedy. Required for multi-threading since each thread needs its own graph
+	 */
 	public class ScheduleGraphPair{
 		public Schedule schedule;
 		public Graph g;

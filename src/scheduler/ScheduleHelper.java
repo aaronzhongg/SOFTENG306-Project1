@@ -12,7 +12,6 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.implementations.Graphs;
 /**
  * This class provides methods that the Schedule data structure can use
- *
  */
 public class ScheduleHelper {
 	
@@ -21,12 +20,12 @@ public class ScheduleHelper {
 	public static Graph bestGraph; //This is a cloned graph just for the currentBestSchedule
 
 	/**
-	 * This method should find all node dependencies and map them to an adjacency matrix.
+	 * This method finds all node dependencies and map them to an adjacency matrix.
+	 * This function can then be used to check if a node is processable
 	 * @param g the graph of nodes and edges
 	 * @return a 2d int array of all edges between nodes
 	 */
 	public static void makeDependencyMatrix(Graph g){
-		
 		dependencyMatrix = new int[g.getNodeCount()][g.getNodeCount()];
 		
 		for(Edge e:g.getEachEdge()){
@@ -65,7 +64,6 @@ public class ScheduleHelper {
 		return (int)d;
 	}
 
-
 	/**
 	 * After a node has been processed, this method is used to return all new nodes that can be processed
 	 * This is used for the Greedy algorithm. For the branch and bound algorithm use CheckChildNodes
@@ -90,7 +88,7 @@ public class ScheduleHelper {
 			for (Edge childEdge: childIte) {
 				Node parentNode = childEdge.getNode0();
 
-				if ((int)(parentNode.getAttribute("Processor")) == -1) { //checks if parent processed
+				if ((int)(parentNode.getAttribute("Processor")) == -1) { //checks if the parent have been processed
 					nodeProcessable = false;
 					break;
 				}
@@ -121,6 +119,7 @@ public class ScheduleHelper {
 		
 		
 		if (g.getNode(q.nodeIndex).getInDegree() != 0) { //if it's not a root
+			
 			int parentNodeFinishedProcessing = 0;
 			//need to find when the longest parent node finished processing
 			for (Edge e : g.getNode(q.nodeIndex).getEachEnteringEdge()) {
@@ -130,6 +129,7 @@ public class ScheduleHelper {
 					parentNodeFinishedProcessing = tempValue;
 				}
 			}
+			
 			//Get the post-processed processorLength of the queueitem from each of the parent nodes
 			for (Edge e : g.getNode(q.nodeIndex).getEachEnteringEdge()) {
 				Node parentNode = e.getNode0();
@@ -248,8 +248,7 @@ public class ScheduleHelper {
 	 * @return true if schedule time after adding the node is less than current best total schedule time
 	 */
     public static int checkChildNode(Node node, Schedule schedule, int processorID){
-        //scheduleCopy = new Schedule(schedule.schedule, schedule.procLengths, schedule.scheduleLength);
- 
+    	
         ArrayList<Node> parentNodes = new ArrayList<Node>();
         for (Edge e : node.getEachEnteringEdge()) {
             Node parentNode = e.getNode0();
@@ -262,7 +261,7 @@ public class ScheduleHelper {
         int timeLeftToWait = 0;
         int tempTimeToWait;
         
-        for (Node parent: parentNodes){
+        for (Node parent: parentNodes){ // loops through all  parent nodes
                     
             int parentProcessor = (int)parent.getAttribute("Processor");
             
