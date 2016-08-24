@@ -2,6 +2,8 @@ package ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.ItemSelectable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,7 +34,7 @@ import scheduler.ScheduleHelper;
 import main.Main;
 public class MainView extends JFrame implements ActionListener{
 	private Graph g;
-	private int speed=300;
+	private int speed=20;
 	private Thread replayThread;
 	private JLabel time,timeValue;
 	private int length=0;
@@ -44,8 +46,17 @@ public class MainView extends JFrame implements ActionListener{
 
 public MainView(Graph g){
 	this.g=g;
-	String location="file://"+System.getProperty("user.dir")+"/StyleSheet.css";
-	g.addAttribute("ui.stylesheet", "url('"+location+"')");
+	g.addAttribute("ui.stylesheet", "node {"+
+	"size: 10px, 15px;"+
+	"shape: box;"+
+	"fill-color: gray;"+
+	"stroke-mode: plain;"+
+	"stroke-color: yellow;"+
+	"text-style:bold;"+
+	"text-alignment:at-right;"+
+	"text-offset:40;"+
+	"text-size:15;"+
+"}");
 	setLayout(new BorderLayout());
 	setDefaultCloseOperation(EXIT_ON_CLOSE);
 	this.setBounds(200, 200, 800, 500);
@@ -60,15 +71,11 @@ public MainView(Graph g){
 	JLabel delay=new JLabel("Time Delay: ");
 	JLabel milli=new JLabel(" Millisec");
 	String[] speedStrings = { "20", "50", "100", "300","500" };
-	final JComboBox speedCmbo = new JComboBox(speedStrings);
-	speedCmbo.setSelectedIndex(3);
+	final JComboBox<String> speedCmbo = new JComboBox<String>(speedStrings);
+	speedCmbo.setSelectedIndex(0);
 	ItemListener itemListener = new ItemListener() {
 	      public void itemStateChanged(ItemEvent itemEvent) {
 	        int state = itemEvent.getStateChange();
-	       // System.out.println((state == ItemEvent.SELECTED) ? "Selected" : "Deselected");
-	        System.out.println("Item: " + speedCmbo.getSelectedItem());
-	       // ItemSelectable is = itemEvent.getItemSelectable();
-	       // System.out.println(", Selected: " + selectedString(is));
 	        speed=  Integer.parseInt((String) speedCmbo.getSelectedItem()) ;
 	      }
 	    };
@@ -86,7 +93,7 @@ public MainView(Graph g){
 			  start.setEnabled(false);
 		      stop.setEnabled(true);
 		  
-			  System.out.println("speed: "+speed);
+			  
 		 
 			  
 			  replayThread.start();
@@ -122,7 +129,7 @@ public MainView(Graph g){
     timer.start();
     
 	 current=new JLabel("     Schedule Length: 0 ");
-	JPanel scheduleP=new JPanel();
+	
 	timeP.add(current);
 	
 
@@ -131,15 +138,11 @@ public MainView(Graph g){
 	buttonP.add(delay);
 	buttonP.add(speedCmbo);
 	buttonP.add(milli);
-	JPanel text=new JPanel();
-	//JTextArea result=new JTextArea();
 	
-	//JScrollPane sp = new JScrollPane(result);
-	//sp.setSize(450,200);
-	//text.add(result);
 	
-	JPanel key=new JPanel();
+	KeyPanel key=new KeyPanel();
 	
+	key.setPreferredSize(new Dimension(500,80));
 	
 	
 	
@@ -147,7 +150,7 @@ public MainView(Graph g){
 	info.setLayout(new BorderLayout());
 	info.add(buttonP,BorderLayout.NORTH);
 	info.add(timeP,BorderLayout.CENTER);
-	
+	info.add(key,BorderLayout.SOUTH);
 	
 	//info.add(sp,BorderLayout.SOUTH);
 	

@@ -19,15 +19,16 @@ public class Main {
 	public static Graph gVis;
 	public static Update update;
 	public static long initialTime,endTime;
-	public static boolean inParallel=false;
-	public static boolean vis = false;
+	public static boolean inParallel=true;
+	public static boolean vis = true;
 
 	/**
 	 * main
 	 */
 	public static void main(String[] args){
 		MainView mainView= null;
-		int nThreads = 0;
+
+		int nThreads = 4;
 
 		//uncomment below before submitting - just some additional robustness and error-checking
 		/*if (args.length < 2){
@@ -47,6 +48,9 @@ public class Main {
 				if (args[i].equals("-p")){
 					i++;
 					nThreads = Integer.parseInt(args[i]);
+					if (nThreads > 0){
+						inParallel = true;
+					}
 				} else if (args[i].equals("-v")){
 					vis = true;
 				} else if (args[i].equals("-o")){
@@ -57,19 +61,14 @@ public class Main {
 			}
 		}*/
 
-		if (true){
-			inParallel = true;
-			vis = false;
-		}
-
 		// comment out code below before submitting.
-		String inputFile = "TestDotFiles/Nodes_11_OutTree.dot";
+		String inputFile = "TestDotFiles/Nodes_10_Random.dot";
+		String outputFile = inputFile + "-output.dot";
 		int processorInput = 4;
 
 		File input_file = new File(inputFile);
 		io IOProcessor = new io();
 		Schedule schedule;
-		//ScheduleHelper scheduleHelper = new ScheduleHelper();
 		Graph g = IOProcessor.DOTParser(input_file, inputFile);
 
 		if (vis){
@@ -78,27 +77,19 @@ public class Main {
 			update=new Update(processorInput);
 			mainView=new MainView(gVis);
 			mainView.setVisible(true);
-			
-			//initial time
 		}
-//time test
-initialTime = System.currentTimeMillis();
-			endTime=0;
 
-
+		//time test
+		initialTime = System.currentTimeMillis();
+		endTime=0;
 
 		ArrayList<Integer> rootnodes = ScheduleHelper.findRootNodes(g);
-		//System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
-		//MainView MainView=new MainView(g);
-		//MainView.setVisible(true);
 
 		ScheduleHelper.currentBestSchedule = new Schedule(processorInput);
 		ScheduleHelper.bestGraph = Graphs.clone(g);
-		//		g.display();
 		ScheduleHelper.currentBestSchedule.scheduleLength = 2147483647;
 		Greedy greedy = new Greedy();
 		ScheduleHelper.makeDependencyMatrix(g);
-
 
 		// Create a schedule that has every combination of root node + next processable node (in each processor)
 		for(int rootNode: rootnodes) {
@@ -109,8 +100,6 @@ initialTime = System.currentTimeMillis();
 			tempNewGraph.getNode(rootNode).setAttribute("Processor", 0);
 			if (vis) { update.updateColor(rootNode+"","black");}
 
-
-			//			ArrayList<Integer> processableNodes = ScheduleHelper.processableNodes(tempNewGraph, rootNode);
 			ArrayList<Integer> processableNodes = new ArrayList<Integer>();
 
 			for (Node n : tempNewGraph) {// loops through all the nodes
@@ -127,42 +116,43 @@ initialTime = System.currentTimeMillis();
 
 				// in PARALLEL
 				if (inParallel){
-					// if(nThreads > 0){ TO DO: CHANGE PROCESSORINPUT to NTHREADS???
-					int tempProcessorCount = 0;
-					TaskIDGroup<TaskID<Void>> taskGroup = new TaskIDGroup<TaskID<Void>>(processorInput);
-					while(tempProcessorCount < processorInput) {
-
-						//New graph for each processableNode
-						Graph newGraph = Graphs.clone(tempNewGraph); 		//NEED to create a new graph because GraphStream nodes
-						Schedule newSchedule = new Schedule(processorInput);		//New schedule with nodes from newly created Graph
-						newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);
-						newSchedule.updateProcessorLength(0, (int)Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));
-
-
-						int procWaitTime = ScheduleHelper.checkChildNode(newGraph.getNode(processableNodeIndex), newSchedule, tempProcessorCount);
-						if (procWaitTime > -1 ) {
-							if (vis){
-								update.updateColor(processableNodeIndex+"","green");
-								update.updateProcessor(processableNodeIndex+"",tempProcessorCount);
-							}
-
-							newSchedule.addNode(newGraph.getNode(processableNodeIndex), tempProcessorCount, procWaitTime);
-							newSchedule.updateProcessorLength(tempProcessorCount, procWaitTime + (int)Double.parseDouble(newGraph.getNode(processableNodeIndex).getAttribute("Weight").toString()));			
-							TaskID<Void> id = CreateScheduleTask(newSchedule, processorInput, newGraph); // This function should run on a new thread
-							taskGroup.add(id);
-						}
-						tempProcessorCount++;
+					if (nThreads > processorInput){
+						nThreads = processorInput;
 					}
-					try {
-						taskGroup.waitTillFinished();
-						//for (Iterator <TaskID<?>> i = taskGroup.groupMembers(); i.hasNext();){System.out.println((i.next()).);}
-					}catch (Exception e){}
+					int tempProcessorCount = 0;
+					
+					while (tempProcessorCount < processorInput){
+						TaskIDGroup<TaskID<Void>> taskGroup = new TaskIDGroup<TaskID<Void>>(nThreads);
+						for (int i = 0; ((i < nThreads) && (tempProcessorCount< processorInput)); i++){
+							Graph newGraph = Graphs.clone(tempNewGraph); 		//NEED to create a new graph because GraphStream nodes
+							Schedule newSchedule = new Schedule(processorInput);		//New schedule with nodes from newly created Graph
+							newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);
+							newSchedule.updateProcessorLength(0, (int)Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));
+
+
+							int procWaitTime = ScheduleHelper.checkChildNode(newGraph.getNode(processableNodeIndex), newSchedule, tempProcessorCount);
+							if (procWaitTime > -1 ) {
+								if (vis){
+									update.updateColor(processableNodeIndex+"","green");
+									update.updateProcessor(processableNodeIndex+"",tempProcessorCount);
+								}
+
+								newSchedule.addNode(newGraph.getNode(processableNodeIndex), tempProcessorCount, procWaitTime);
+								newSchedule.updateProcessorLength(tempProcessorCount, procWaitTime + (int)Double.parseDouble(newGraph.getNode(processableNodeIndex).getAttribute("Weight").toString()));			
+								TaskID<Void> id = CreateScheduleTask(newSchedule, processorInput, newGraph); // This function should run on a new thread
+								taskGroup.add(id);
+							}
+							tempProcessorCount++;
+						}
+						try {
+							taskGroup.waitTillFinished();
+							//for (Iterator <TaskID<?>> i = taskGroup.groupMembers(); i.hasNext();){System.out.println((i.next()).);}
+						}catch (Exception e){}
+					}
 
 					// in SEQUENTIAL
 				} else {
 					// note - still initalises a paratask
-					//	update.updateColor(processableNodeIndex+"","cyan");
-					// Add processable node into each processor
 					int tempProcessorCount = 0;
 					while(tempProcessorCount < processorInput) {
 						//New graph for each processableNode
@@ -185,30 +175,22 @@ initialTime = System.currentTimeMillis();
 					}
 
 				}
-
-
-
-
 			}
 
 
 			if (vis){
-				//end time?
-				
 				update.updateProcessorColor(ScheduleHelper.bestGraph);
-				//update.updateSchedular
 				mainView.updateSchedule(ScheduleHelper.currentBestSchedule.scheduleLength);
 				mainView.start.setEnabled(true);
 			}
-endTime=System.currentTimeMillis();
-System.out.println(endTime-initialTime);
-			//	update.updateSchedule(ScheduleHelper.bestGraph);
+			endTime=System.currentTimeMillis();
+			System.out.println(endTime-initialTime);
 			// COMMENT OUT/ DELETE BEFORE SUBMISSION
 			for(Node n: ScheduleHelper.bestGraph){
 				System.out.println("Node id: " + n.getId() + " ProcID: " + n.getAttribute("Processor") + " Starts at: " + n.getAttribute("Start") + " Node Weight: " + n.getAttribute("Weight"));
 			}
 			System.out.println("Total Schedule Length: " + ScheduleHelper.currentBestSchedule.scheduleLength);
-			IOProcessor.outputFile(ScheduleHelper.currentBestSchedule, ScheduleHelper.bestGraph, "input-OUTPUT"); // creates the output file
+			//	IOProcessor.outputFile(ScheduleHelper.currentBestSchedule, ScheduleHelper.bestGraph, outputFile); // creates the output file
 		}
 	}
 

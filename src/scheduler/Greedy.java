@@ -49,13 +49,11 @@ public class Greedy {
 				newProcLength = procInfo[0];	//new length of the processor after adding this particular node
 				scheduleLength = schedule.findScheduleLength();		// current length of schedule
 
-				if(newProcLength - scheduleLength <= smallestWeightChange){ //checks if this item to the schedule is the smallest weight change
+				if(newProcLength - scheduleLength < smallestWeightChange){ //checks if this item to the schedule is the smallest weight change
 					procWaitTime = procInfo[1];
 					smallest = q;
 					smallestWeightChange = newProcLength - scheduleLength;
 					processorWeightInc = newProcLength - schedule.procLengths[q.Processor];	
-
-					//GUI //g.getNode(q.nodeIndex).addAttribute("ui.style", "fill-color: rgb(0,100,255);");
 				}
 			}
 
@@ -77,8 +75,6 @@ public class Greedy {
 					queue.add(new QueueItem(i, j));
 				}
 			}
-
-			//update.updateColor(smallest.nodeIndex,smallest.Processor,g); //GUI
 		}
 		
 		ScheduleGraphPair sng = new ScheduleGraphPair(schedule, g);
