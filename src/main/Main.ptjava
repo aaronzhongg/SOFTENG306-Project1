@@ -228,7 +228,6 @@ public class Main {
 		// performs branch and bound on valid schedule output from greedy
 		BranchAndBound bnb = new BranchAndBound(sgPair.schedule, sgPair.g);
 		bnb.branchAndBoundAlgorithm();
-
 	}
 }
 

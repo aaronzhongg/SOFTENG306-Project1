@@ -13,8 +13,8 @@ public class BranchAndBound {
 
 	/**
 	 * Constructor to instantiate a new Schedule
-	 * @param s
-	 * @param g
+	 * @param s : Schedule
+	 * @param g : Graph
 	 */
 	public BranchAndBound(Schedule s, Graph g){
 		this.currentSchedule = new Schedule(s.schedule, s.procLengths, s.scheduleLength);
@@ -22,42 +22,44 @@ public class BranchAndBound {
 	}
 
 	/**
-	 * The function that should initialise the branch and bound algorithm, While branch is giving a false (ie no better solution), loop the following:
-	 * Take away last node from schedule, if this is the first node of the schedule, then check if any other root nodes that have not been processed as the first node in the schedule.
-	 * If all root nodes have being processed, then we have the optimal solution hopefully.
-	 * @param schedule
-	 * @param g
-	 * @return
+	 * The function that should initialise the branch and bound algorithm, and calls Branch() to do a call down the children
+	 * While branch is giving a false (ie no better solution), loop the following:
+	 * - Take away last node from schedule, 
+	 * --- if this is the first node of the schedule, then check if any other root nodes that have not been processed as the first node in the schedule.
+	 * - If all root nodes have being processed, then we have the optimal solution hopefully.
 	 */
-	public void branchAndBoundAlgorithm() {		
+	public void branchAndBoundAlgorithm() {	
+		// removes the bottom node from the schedule
 		original=nodeToBeRemoved ;
 		nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
 		currentSchedule.removeNode(currentSchedule.schedule.size() - 1);
 		updateRemoveLengthChanges(currentSchedule, nodeToBeRemoved);
 
-		//Start the branch and bound
-		while(Branch(new Schedule(currentSchedule.schedule, currentSchedule.procLengths, currentSchedule.scheduleLength)) == false){
-             original=nodeToBeRemoved ;
+		//Starts the branch and bound
+		while(Branch(new Schedule(currentSchedule.schedule, currentSchedule.procLengths, currentSchedule.scheduleLength)) == false){ // checks branch is always false
+			// gets current bottom node of the schedule
+			original=nodeToBeRemoved ;
 			nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
-			if (Main.vis){
-				
-					Main.update.updateColor(nodeToBeRemoved.getId(),"yellow");
-					Main.update.updateColor(original.getId(),"gray");
-				}
+			
+			if (Main.vis){ // changes the colour to yellow briefly to show it was looked at
+				Main.update.updateColor(nodeToBeRemoved.getId(),"yellow");
+				Main.update.updateColor(original.getId(),"gray");
+			}
 
-
-			currentSchedule.removeNode(currentSchedule.schedule.size() - 1);
+			currentSchedule.removeNode(currentSchedule.schedule.size() - 1); // removes the node
 			updateRemoveLengthChanges(currentSchedule, nodeToBeRemoved);
 
-			if(currentSchedule.schedule.size() == 1){
-				if (Main.vis) {Main.update.updateColor(nodeToBeRemoved.getId(),"gray");}
+			if(currentSchedule.schedule.size() == 1){// checks if it's empty - then returns (back to branch and bound algorithm)
+				if (Main.vis) {Main.update.updateColor(nodeToBeRemoved.getId(),"gray");} // changes the color to grey
 				return;
 			}
 		}
 	}
 
 	/**
-	 * Recursive function, finds all processable nodes, for each processable children nodes, check how much the schedule increases when trying to add them to each of the processors,
+	 * Recursive function Branch, calleed by BranchandboundAlgorithm
+	 * Loops through all the nodes of the graph and checks if the path is better (optomised) then the current best schedule
+	 * finds all processable nodes and for each processable children nodes, check how much the schedule increases when trying to add them to each of the processors,
 	 * if the schedule time after adding to that processor is less than the current best schedule time (currentBestSchedule.scheduleLength) then insert node into the current schedule
 	 * and recursively call Branch with the current schedule (this should be done for each of the nodes/processors that produce a lower schedule length)
 	 * if the path is larger then return false, if no more nodes then return true.
@@ -69,16 +71,16 @@ public class BranchAndBound {
 		boolean hasInserted = false;
 
 		for (Node n : g) {// loops through all the nodes
-			if (!branchingSchedule.schedule.contains(n)) {// new schedule doesn't contain it
-				// check all the node that is not in the schedule
+			if (!branchingSchedule.schedule.contains(n)) {// checks new schedule doesn't contain it
+				
 				boolean isProcessable = ScheduleHelper.isProcessable(n,branchingSchedule);
-				if (isProcessable) { // if it is processable
-					//	Main.update.updateColor(n.getId(), "cyan");
-					for (int i = 0; i < branchingSchedule.procLengths.length; i++) { // check all the available processor
+				if (isProcessable) { // checks if the nodes dependencies have been processed
 
-						int timeToWait = ScheduleHelper.checkChildNode(n, branchingSchedule, i);
+					for (int i = 0; i < branchingSchedule.procLengths.length; i++) { // check all the available processors
 
-						if (timeToWait > -1) {
+						int timeToWait = ScheduleHelper.checkChildNode(n, branchingSchedule, i); //calculates the time of the node added to the schedule
+
+						if (timeToWait > -1) { // if it's better, goes down child again
 							hasInserted = true;
 							ScheduleHelper.insertNodeToSchedule(n, branchingSchedule, i, timeToWait);
 
@@ -105,9 +107,9 @@ public class BranchAndBound {
 	}
 
 	/**
-	 * 
-	 * @param s
-	 * @param removeNode
+	 * This method update the length of the schedule after a node is removed
+	 * @param s : schedule
+	 * @param removeNode : node that's been removed
 	 */
 	public void updateRemoveLengthChanges(Schedule s, Node removeNode){
 		int updatedScheduleLength = 0;
@@ -127,7 +129,7 @@ public class BranchAndBound {
 			}
 		}
 
-		if (updatedScheduleLength == 0) { 
+		if (updatedScheduleLength == 0) {
 			s.procLengths[(int)removeNode.getAttribute("Processor")] = 0;
 			s.scheduleLength = s.findScheduleLength();
 		}

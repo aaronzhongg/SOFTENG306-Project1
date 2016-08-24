@@ -898,5 +898,5 @@ public class Main {//####[16]####
         }//####[227]####
         BranchAndBound bnb = new BranchAndBound(sgPair.schedule, sgPair.g);//####[229]####
         bnb.branchAndBoundAlgorithm();//####[230]####
-    }//####[232]####
-}//####[232]####
+    }//####[231]####
+}//####[231]####
