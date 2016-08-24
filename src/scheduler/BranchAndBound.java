@@ -76,8 +76,6 @@ public class BranchAndBound {
 						int timeToWait = ScheduleHelper.checkChildNode(n, branchingSchedule, i);
 
 						if (timeToWait > -1) {
-							//Main.update.updateColor(n.getId(), "green");
-							//Main.update.updateProcessor(n.getId(),i);
 							hasInserted = true;
 							ScheduleHelper.insertNodeToSchedule(n, branchingSchedule, i, timeToWait);
 

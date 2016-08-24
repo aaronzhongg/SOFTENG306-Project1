@@ -54,8 +54,6 @@ public class Greedy {
 					smallest = q;
 					smallestWeightChange = newProcLength - scheduleLength;
 					processorWeightInc = newProcLength - schedule.procLengths[q.Processor];	
-
-					//GUI //g.getNode(q.nodeIndex).addAttribute("ui.style", "fill-color: rgb(0,100,255);");
 				}
 			}
 
@@ -77,8 +75,6 @@ public class Greedy {
 					queue.add(new QueueItem(i, j));
 				}
 			}
-
-			//update.updateColor(smallest.nodeIndex,smallest.Processor,g); //GUI
 		}
 		
 		ScheduleGraphPair sng = new ScheduleGraphPair(schedule, g);
