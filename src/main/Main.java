@@ -42,7 +42,7 @@ public class Main {//####[16]####
 //####[21]####
     public static long initialTime, endTime;//####[21]####
 //####[22]####
-    public static boolean inParallel = true;//####[22]####
+    public static boolean inParallel = false;//####[22]####
 //####[23]####
     public static boolean vis = false;//####[23]####
 //####[28]####

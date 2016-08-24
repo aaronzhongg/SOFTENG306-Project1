@@ -19,7 +19,7 @@ public class Main {
 	public static Graph gVis;
 	public static Update update;
 	public static long initialTime,endTime;
-	public static boolean inParallel=true;
+	public static boolean inParallel=false;
 	public static boolean vis = false;
 
 	/**
