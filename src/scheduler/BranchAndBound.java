@@ -30,7 +30,7 @@ public class BranchAndBound {
 	 * @return
 	 */
 	public void branchAndBoundAlgorithm() {		
-
+		original=nodeToBeRemoved ;
 		nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
 		currentSchedule.removeNode(currentSchedule.schedule.size() - 1);
 		updateRemoveLengthChanges(currentSchedule, nodeToBeRemoved);
@@ -40,11 +40,11 @@ public class BranchAndBound {
              original=nodeToBeRemoved ;
 			nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
 			if (Main.vis){
-				//if(!Main.inParallel){
+				
 					Main.update.updateColor(nodeToBeRemoved.getId(),"yellow");
 					Main.update.updateColor(original.getId(),"gray");
-					
-				}//}
+				}
+
 
 			currentSchedule.removeNode(currentSchedule.schedule.size() - 1);
 			updateRemoveLengthChanges(currentSchedule, nodeToBeRemoved);
