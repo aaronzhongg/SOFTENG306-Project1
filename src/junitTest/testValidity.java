@@ -41,7 +41,7 @@ import util.io;
  */
 public class testValidity {
 
-	boolean isParallel = true; //change this to test different ones
+	boolean isParallel = false; //change this to test different ones
 	
 	/**
 	 * Main test class, where each file 7012 is tested on processors 1 -7
