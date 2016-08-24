@@ -21,8 +21,8 @@ Developed by:
       , UPI: )
   Alex Li
       (GitHub username: humbis
-      , Student ID: 
-      , UPI: )
+      , Student ID: 9074030
+      , UPI: kli438)
   Ida De Smet :
       (GitHub username: idaknow, ides542, 
       Student ID: 9199116, 
