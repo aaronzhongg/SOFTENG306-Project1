@@ -1,10 +1,12 @@
 package scheduler;
+
 import main.Main;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 
 public class BranchAndBound {
+
 
 	private Schedule currentSchedule;
 	private Graph g;
@@ -21,6 +23,7 @@ public class BranchAndBound {
 		this.g = g;
 	}
 
+
 	/**
 	 * The function that should initialise the branch and bound algorithm, and calls Branch() to do a call down the children
 	 * While branch is giving a false (ie no better solution), loop the following:
@@ -31,9 +34,11 @@ public class BranchAndBound {
 	public void branchAndBoundAlgorithm() {	
 		// removes the bottom node from the schedule
 		original=nodeToBeRemoved ;
+
 		nodeToBeRemoved = currentSchedule.schedule.get(currentSchedule.schedule.size() - 1);
 		currentSchedule.removeNode(currentSchedule.schedule.size() - 1);
 		updateRemoveLengthChanges(currentSchedule, nodeToBeRemoved);
+
 
 		//Starts the branch and bound
 		while(Branch(new Schedule(currentSchedule.schedule, currentSchedule.procLengths, currentSchedule.scheduleLength)) == false){ // checks branch is always false
@@ -51,10 +56,12 @@ public class BranchAndBound {
 
 			if(currentSchedule.schedule.size() == 1){// checks if it's empty - then returns (back to branch and bound algorithm)
 				if (Main.vis) {Main.update.updateColor(nodeToBeRemoved.getId(),"gray");} // changes the color to grey
+
 				return;
 			}
 		}
 	}
+
 
 	/**
 	 * Recursive function Branch, calleed by BranchandboundAlgorithm

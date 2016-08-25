@@ -26,6 +26,7 @@ public class ScheduleHelper {
 	 * @return a 2d int array of all edges between nodes
 	 */
 	public static void makeDependencyMatrix(Graph g){
+
 		dependencyMatrix = new int[g.getNodeCount()][g.getNodeCount()];
 		
 		for(Edge e:g.getEachEdge()){
@@ -248,7 +249,7 @@ public class ScheduleHelper {
 	 * @return true if schedule time after adding the node is less than current best total schedule time
 	 */
     public static int checkChildNode(Node node, Schedule schedule, int processorID){
-    	
+
         ArrayList<Node> parentNodes = new ArrayList<Node>();
         for (Edge e : node.getEachEnteringEdge()) {
             Node parentNode = e.getNode0();
@@ -264,6 +265,7 @@ public class ScheduleHelper {
         for (Node parent: parentNodes){ // loops through all  parent nodes
                     
             int parentProcessor = (int)parent.getAttribute("Processor");
+
             
             if (parentProcessor == processorID){ //node is being processed on same processor as parent currently being checked
                 tempValue = schedule.procLengths[processorID];
@@ -272,11 +274,13 @@ public class ScheduleHelper {
             else { //node being processed on different processor
                
                 Edge parentToChild = parent.getEdgeToward(node);
+
                 double d = parentToChild.getAttribute("Weight");
                 edgeWeight = (int)(d);
                 int lengthCurrentProcessor = schedule.procLengths[processorID];
                 d = parent.getAttribute("Weight");
                 int endTime = (int)Double.parseDouble(parent.getAttribute("Start").toString()) + (int)d;
+
                 int timeWaited = lengthCurrentProcessor - endTime;
                 tempTimeToWait = edgeWeight - timeWaited;
                
@@ -296,8 +300,10 @@ public class ScheduleHelper {
             }
         }
        
+
         double d = node.getAttribute("Weight");
         int procLength = canStartat + (int)d;
+
         for(int i : schedule.procLengths){
             if (i > procLength){
                 procLength = i;
@@ -320,8 +326,10 @@ public class ScheduleHelper {
 	 */ 
 	public static void insertNodeToSchedule(Node nodeToInsert, Schedule currentSchedule, int Processor, int procWaitTime) {
 		currentSchedule.addNode(nodeToInsert, Processor, procWaitTime);
+
 		double d = nodeToInsert.getAttribute("Weight");
 		currentSchedule.updateProcessorLength(Processor, (int)d + procWaitTime);
+
 	}
 	
 
