@@ -12,11 +12,13 @@ import org.graphstream.stream.file.FileSource;
 import org.graphstream.stream.file.FileSourceDOT;
 
 /**
- * This is just a skeleton class that I've created to test some input and output of the DOT format file. All utility classes
- * should be included in the "util" package.
+ * This class is used to handle the input and output of the Task graphs in .dot format. Initially, the processInput method
+ * was written as a way to understand the input formatting. However, after deciding to use Graphstream, the IO handling is
+ * heavily abstracted and simple to do - so the initial code was not used and is kept for reference.
  */
 public class io {
-	
+
+    // Creating a separate graph which will be used for visualisation
 	private Graph gVis;
 
 	/**
@@ -71,7 +73,7 @@ public class io {
 			fs.removeSink(g);
 		}
 
-		//Add Processor attribute to every node
+		//Add required attributes to every node - includes attributes used in visualisation and BnB.
 		for (int i = 0; i < g.getNodeCount(); i++) {
 			g.getNode(i).addAttribute("Processor", -1);
 			g.getNode(i).addAttribute("Start" , -1);   
@@ -92,6 +94,9 @@ public class io {
 	 */
 	public void outputFile(Schedule schedule, Graph inputGraph, String outputFileName){
 
+	    // The output graph is saved in the /tmp/ folder by default. This was a design decision made to ensure that the output files
+        // didn't occupy too much memory (tmp is cleared on restart).
+
 		String output = "/tmp/" + outputFileName;
 		FileSinkDOT fs = new FileSinkDOT(true);
 		File outputFile = new File(output);
@@ -109,7 +114,7 @@ public class io {
 	}
 	
 	/**
-	 * Getter for the graph
+	 * Get method for the visualisation graph
 	 * @return
 	 */
 	public Graph getVisGraph(){ return this.gVis; }

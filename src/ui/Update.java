@@ -74,6 +74,7 @@ public class Update {
 		change.add(id+","+color+";");
 
 		Main.gVis.getNode(id).addAttribute("ui.style",  "fill-color:"+color+";");
+		// If the node has been assigned a processor
 		if(!(Main.gVis.getNode(id).getAttribute("Processor").equals(-1))){
 			Main.gVis.getNode(id).addAttribute("ui.label",  id+" Processor: "+Main.gVis.getNode(id).getAttribute("Processor"));
 			change.add("label,"+id+","+Main.gVis.getNode(id).getAttribute("Processor"));
@@ -92,13 +93,11 @@ public class Update {
 		}
 
 		for(int i=0; i<change.size();i++){
-			//System.out.println(change.size());
 			long startTime=System.currentTimeMillis();
 			while(System.currentTimeMillis()-startTime<delay){
 
 			}
 			String[] temp=((String) change.get(i)).split(",");
-			//  System.out.println(temp[0]+temp[1]);
 			if(temp.length>2){
 				Main.gVis.getNode(temp[1]).addAttribute("ui.label", temp[1]+" Processor: "+temp[2]);
 
@@ -123,7 +122,7 @@ public class Update {
 	}
 	
 	/**
-	 * 
+	 * This method updates the processor of a particular node during the visualisation of the search.
 	 * @param id
 	 * @param i
 	 */
