@@ -16,9 +16,9 @@ Please see our github wiki for meeting minutes, the link to our google docs for 
 
 Developed by: 
   Aaron Zhong
-      (GitHub username:
-      , Student ID: 
-      , UPI: )
+      (GitHub username: azho472
+      , Student ID: 8379430
+      , UPI: azho472)
   Alex Li
       (GitHub username: humbis
       , Student ID: 9074030
