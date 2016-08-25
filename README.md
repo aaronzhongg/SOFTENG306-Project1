@@ -32,9 +32,9 @@ Developed by:
       Student ID: 6785814,
       UPI: jpan889)
   Sherry Wang :
-      (GitHub username: ,
-      Student ID: ,
-      UPI: )
+      (GitHub username: Jingw98,
+      Student ID: 6595375,
+      UPI: jwan501 )
 
 Notes:
 
