@@ -1,0 +1,233 @@
+package main;
+
+import java.io.File;
+import java.util.ArrayList;
+import org.graphstream.graph.*;
+import org.graphstream.graph.implementations.Graphs;
+import scheduler.*;
+import scheduler.Greedy.ScheduleGraphPair;
+import ui.*;
+import util.io;
+
+/**
+ * Main class contains the main()
+ * Initialises variables and graph used by other functions
+ */
+public class Main {
+
+	public static int processorInput;
+	public static Graph gVis;
+	public static Update update;
+	public static long initialTime,endTime;
+	//default values
+	public static boolean inParallel=false;
+	public static boolean vis = false;
+
+	/**
+	 * Takes in the user input as a parameter, and calls the functions required to calculate the valid, optomised solution
+	 */
+	public static void main(String[] args){
+
+		MainView mainView= null;
+		int nThreads = 1;
+
+		if (args.length < 2){ //just some additional robustness and error-checking, checks they entered filenmae and # processors
+			System.out.println("Please ensure that all input parameters have been entered - Input file name and number of processors. ");
+			System.exit(1);
+		}
+		//initialises input/ output file names
+		String inputFile = args[0];
+		String[] split = inputFile.split(".dot");
+		String inputWithoutExtension = split[0];
+		File input = new File(inputWithoutExtension);
+		String inputFileName = input.getName();
+		String outputFile = inputFileName + "-output.dot";
+		processorInput = Integer.parseInt(args[1]);
+
+		//checks for additional arguments
+		if (args.length > 2){
+			int i = 2;
+			while (i < args.length){ // loops through all inputs
+				if (args[i].equals("-p")){ //wanting N core processors
+					i++;
+					nThreads = Integer.parseInt(args[i]);
+					if (nThreads > 0){// error checking
+						inParallel = true; //makes sure runs in parallel
+					}
+				} else if (args[i].equals("-v")){ // check if visualisation is on
+					vis = true;
+				} else if (args[i].equals("-o")){ // checks if output file name provided
+					i++;
+					outputFile = args[i];
+				}
+				i++;
+			}
+		}
+		// creates input file, shcedule and graph
+		File input_file = new File(inputFile);
+		io IOProcessor = new io();
+		Schedule schedule;
+		Graph g = IOProcessor.DOTParser(input_file, inputFile);
+
+		if (vis){ // initialises the main frame to view the visualisation
+			gVis=IOProcessor.getVisGraph();
+			update=new Update(processorInput);
+			mainView=new MainView(gVis);
+			mainView.setVisible(true);
+		}
+
+		// initialises the timer for visualisation
+		initialTime = System.currentTimeMillis();
+		endTime=0;
+
+		//gets all the rootnodes
+		ArrayList<Integer> rootnodes = ScheduleHelper.findRootNodes(g);
+
+		//initialises greedy and inputs in ScheduleHelpet
+		ScheduleHelper.currentBestSchedule = new Schedule(processorInput);
+		ScheduleHelper.bestGraph = Graphs.clone(g);
+		ScheduleHelper.currentBestSchedule.scheduleLength = 2147483647;
+		Greedy greedy = new Greedy();
+		ScheduleHelper.makeDependencyMatrix(g);
+
+		// Creates a schedule that has every combination of root node + next processable node (in each processor)
+		for(int rootNode: rootnodes) {
+
+			Graph tempNewGraph = Graphs.clone(g); // Make a clone to get the processableNodes after adding the root node to the schedule
+			Schedule tempNewSchedule = new Schedule(processorInput);
+			tempNewSchedule.addNode(tempNewGraph.getNode(rootNode), 0, 0); //adds node to the temporary schedule
+			tempNewGraph.getNode(rootNode).setAttribute("Processor", 0);
+
+			if (vis) { update.updateColor(rootNode+"","black");} // changes root node colour
+
+			ArrayList<Integer> processableNodes = new ArrayList<Integer>(); // creates empty array list for processable nodes
+
+			//loops through all the nodes to add processable children nodes to empty arrayList
+			for (Node n : tempNewGraph) {// loops through all the nodes
+				if (!tempNewSchedule.schedule.contains(n)) {// checks that the new schedule doesn't contain it
+					boolean isProcessable = ScheduleHelper.isProcessable(n,tempNewSchedule);
+					if (isProcessable) { // if it is processable
+						processableNodes.add(n.getIndex()); // add to the arraylist
+					}
+				}
+			}
+
+			for(int processableNodeIndex: processableNodes) { //loops through all the rootNode's processable nodes
+
+				// checks to see if in PARALLEL or SEQUENTIAL
+				if (inParallel){
+
+					if (nThreads > processorInput){
+						nThreads = processorInput;
+					}
+
+					int tempProcessorCount = 0;
+
+					while (tempProcessorCount < processorInput){// loops through all processors
+
+						TaskIDGroup<TaskID<Void>> taskGroup = new TaskIDGroup<TaskID<Void>>(nThreads); // creates a task group
+
+						for (int i = 0; ((i < nThreads) && (tempProcessorCount< processorInput)); i++){ // loops through nThreads
+
+							Graph newGraph = Graphs.clone(tempNewGraph); 		//creates a new graph because GraphStream nodes
+							Schedule newSchedule = new Schedule(processorInput);		//New schedule with nodes from newly created Graph
+							newSchedule.addNode(newGraph.getNode(rootNode), 0, 0); //adds node
+							newSchedule.updateProcessorLength(0, (int)Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString())); //adds nodeweight to processor length
+
+							//checks to see if the child path is worth traversing
+							int procWaitTime = ScheduleHelper.checkChildNode(newGraph.getNode(processableNodeIndex), newSchedule, tempProcessorCount);
+							if (procWaitTime > -1 ) { // if it is worth travesing
+								if (vis){ //change colour of the processable node that's child path we looking down
+									update.updateColor(processableNodeIndex+"","green");
+									update.updateProcessor(processableNodeIndex+"",tempProcessorCount);
+								}
+
+								newSchedule.addNode(newGraph.getNode(processableNodeIndex), tempProcessorCount, procWaitTime);
+								newSchedule.updateProcessorLength(tempProcessorCount, procWaitTime + (int)Double.parseDouble(newGraph.getNode(processableNodeIndex).getAttribute("Weight").toString()));			
+
+								//adds task to the group of greedy & branch and bound
+								TaskID<Void> id = CreateScheduleTask(newSchedule, processorInput, newGraph);
+								taskGroup.add(id);
+							}
+							tempProcessorCount++; //increment till reaches number of processors
+						}
+						try { // wait till all tasks are finished
+							taskGroup.waitTillFinished(); }catch (Exception e){}}} 
+
+				else {// IN SEQUENTIAL
+
+					int tempProcessorCount = 0;
+					while(tempProcessorCount < processorInput) { // loops through all proessors
+
+						//New graph for each processableNode
+						Graph newGraph = Graphs.clone(tempNewGraph); 		//create a new graph
+						Schedule newSchedule = new Schedule(processorInput);		//New schedule with nodes from newly created Graph
+						newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);
+						newSchedule.updateProcessorLength(0, (int)Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));
+
+						//checks to see if the child path is worth traversing
+						int procWaitTime = ScheduleHelper.checkChildNode(newGraph.getNode(processableNodeIndex), newSchedule, tempProcessorCount);
+						if (procWaitTime > -1 ) { // if it is worth travesing
+							if (vis){ //change colour of the processable node that's child path we looking down
+								update.updateColor(processableNodeIndex+"","green"); 
+								update.updateProcessor(processableNodeIndex+"",tempProcessorCount);
+							}
+
+							newSchedule.addNode(newGraph.getNode(processableNodeIndex), tempProcessorCount, procWaitTime);
+							newSchedule.updateProcessorLength(tempProcessorCount, procWaitTime + (int)Double.parseDouble(newGraph.getNode(processableNodeIndex).getAttribute("Weight").toString()));			
+
+							CreateSchedule(newSchedule, processorInput, newGraph); // calls greedy and branch and bound on the schedule & graph
+						}
+						tempProcessorCount++; //increment till reaches number of processors
+					}
+				}
+			}
+
+
+			if (vis){ // update visual input with the resulting schedule
+				update.updateProcessorColor(ScheduleHelper.bestGraph);
+				mainView.updateSchedule(ScheduleHelper.currentBestSchedule.scheduleLength);
+				mainView.start.setEnabled(true);
+			}
+
+			endTime=System.currentTimeMillis(); // gets the end time
+
+			IOProcessor.outputFile(ScheduleHelper.currentBestSchedule, ScheduleHelper.bestGraph, outputFile); // creates the output file
+
+		}
+	}
+
+	/**
+	 * Called when making multiple tasks to run on seperate cores
+	 * Each task calls CreateSchedule with its own inputs
+	 */
+	TASK public static void CreateScheduleTask(Schedule schedule, int processorCount, Graph graph){
+		CreateSchedule(schedule, processorCount, graph);
+	}
+
+	/**
+	 * This initialises a greedy call and does the greedy searhc on the schedule
+	 * updates the current best if a schedule is better
+	 */
+	public static void CreateSchedule(Schedule schedule, int processorCount, Graph g) {
+		Greedy greedy = new Greedy();
+		ScheduleGraphPair sgPair = greedy.greedySearch(g, processorCount, schedule);
+
+		// After greedy algorithm returns a schedule, if it is better than current best, update the bound and bestGraph
+		if (sgPair.schedule.scheduleLength < ScheduleHelper.currentBestSchedule.scheduleLength) {
+			ScheduleHelper.currentBestSchedule.scheduleLength = sgPair.schedule.scheduleLength;
+
+			for(Node n : sgPair.g){
+				for(Node bestN : ScheduleHelper.bestGraph){
+					if(n.getIndex() == bestN.getIndex()){ // update he bound and best graph
+						Graphs.copyAttributes(n, bestN);
+					}
+				}
+			}
+		}
+		// performs branch and bound on valid schedule output from greedy
+		BranchAndBound bnb = new BranchAndBound(sgPair.schedule, sgPair.g);
+		bnb.branchAndBoundAlgorithm();
+	}
+}
+
