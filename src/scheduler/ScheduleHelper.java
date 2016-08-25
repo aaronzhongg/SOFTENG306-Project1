@@ -12,7 +12,6 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.implementations.Graphs;
 /**
  * This class provides methods that the Schedule data structure can use
- *
  */
 public class ScheduleHelper {
 	
@@ -21,12 +20,13 @@ public class ScheduleHelper {
 	public static Graph bestGraph; //This is a cloned graph just for the currentBestSchedule
 
 	/**
-	 * This method should find all node dependencies and map them to an adjacency matrix.
+	 * This method finds all node dependencies and map them to an adjacency matrix.
+	 * This function can then be used to check if a node is processable
 	 * @param g the graph of nodes and edges
 	 * @return a 2d int array of all edges between nodes
 	 */
 	public static void makeDependencyMatrix(Graph g){
-		
+
 		dependencyMatrix = new int[g.getNodeCount()][g.getNodeCount()];
 		
 		for(Edge e:g.getEachEdge()){
@@ -61,9 +61,9 @@ public class ScheduleHelper {
 	 * @return : weight of nodeIndex
 	 */
 	public static int getNodeWeight(Graph g, int nodeIndex){
-		return (int)Double.parseDouble(g.getNode(nodeIndex).getAttribute("Weight").toString());
+		double d = g.getNode(nodeIndex).getAttribute("Weight");
+		return (int)d;
 	}
-
 
 	/**
 	 * After a node has been processed, this method is used to return all new nodes that can be processed
@@ -89,7 +89,7 @@ public class ScheduleHelper {
 			for (Edge childEdge: childIte) {
 				Node parentNode = childEdge.getNode0();
 
-				if ((int)Double.parseDouble(parentNode.getAttribute("Processor").toString()) == -1) { //checks if parent processed
+				if ((int)(parentNode.getAttribute("Processor")) == -1) { //checks if the parent have been processed
 					nodeProcessable = false;
 					break;
 				}
@@ -120,20 +120,23 @@ public class ScheduleHelper {
 		
 		
 		if (g.getNode(q.nodeIndex).getInDegree() != 0) { //if it's not a root
+			
 			int parentNodeFinishedProcessing = 0;
 			//need to find when the longest parent node finished processing
 			for (Edge e : g.getNode(q.nodeIndex).getEachEnteringEdge()) {
 				Node parentNode = e.getNode0();
-				int tempValue = (int)Double.parseDouble(parentNode.getAttribute("Start").toString()) + getNodeWeight(g, parentNode.getIndex());
+				int tempValue = (int)(parentNode.getAttribute("Start")) + getNodeWeight(g, parentNode.getIndex());
 				if(tempValue > parentNodeFinishedProcessing){
 					parentNodeFinishedProcessing = tempValue;
 				}
 			}
+			
 			//Get the post-processed processorLength of the queueitem from each of the parent nodes
 			for (Edge e : g.getNode(q.nodeIndex).getEachEnteringEdge()) {
 				Node parentNode = e.getNode0();
-				int parentProcessor = (int)Double.parseDouble(parentNode.getAttribute("Processor").toString());
-				int edgeWeight = (int)Double.parseDouble(e.getAttribute("Weight").toString());	
+				int parentProcessor = (int)(parentNode.getAttribute("Processor"));
+				double d = e.getAttribute("Weight");
+				int edgeWeight = (int)(d);	
 				
 				//if parent node was processed on the same processor the edge weight is 0
 				if (q.Processor == parentProcessor) {	
@@ -141,7 +144,7 @@ public class ScheduleHelper {
 				}
 				
 				//if the parent node end time plus the edge is smaller than the longest parent node end time, dont add edge weight on
-				int currentParentNodeFinish = (int)Double.parseDouble(parentNode.getAttribute("Start").toString()) + getNodeWeight(g, parentNode.getIndex());
+				int currentParentNodeFinish = (int)(parentNode.getAttribute("Start")) + getNodeWeight(g, parentNode.getIndex());
 				if (parentNodeFinishedProcessing > currentParentNodeFinish + edgeWeight){
 					edgeWeight = 0;
 				}					
@@ -246,8 +249,7 @@ public class ScheduleHelper {
 	 * @return true if schedule time after adding the node is less than current best total schedule time
 	 */
     public static int checkChildNode(Node node, Schedule schedule, int processorID){
-        //scheduleCopy = new Schedule(schedule.schedule, schedule.procLengths, schedule.scheduleLength);
- 
+
         ArrayList<Node> parentNodes = new ArrayList<Node>();
         for (Edge e : node.getEachEnteringEdge()) {
             Node parentNode = e.getNode0();
@@ -260,9 +262,10 @@ public class ScheduleHelper {
         int timeLeftToWait = 0;
         int tempTimeToWait;
         
-        for (Node parent: parentNodes){
+        for (Node parent: parentNodes){ // loops through all  parent nodes
                     
-            int parentProcessor = (int)Double.parseDouble(parent.getAttribute("Processor").toString());
+            int parentProcessor = (int)parent.getAttribute("Processor");
+
             
             if (parentProcessor == processorID){ //node is being processed on same processor as parent currently being checked
                 tempValue = schedule.procLengths[processorID];
@@ -271,9 +274,13 @@ public class ScheduleHelper {
             else { //node being processed on different processor
                
                 Edge parentToChild = parent.getEdgeToward(node);
-                edgeWeight = (int)Double.parseDouble(parentToChild.getAttribute("Weight").toString());
+
+                double d = parentToChild.getAttribute("Weight");
+                edgeWeight = (int)(d);
                 int lengthCurrentProcessor = schedule.procLengths[processorID];
-                int endTime = (int)Double.parseDouble(parent.getAttribute("Start").toString()) + (int)Double.parseDouble(parent.getAttribute("Weight").toString());
+                d = parent.getAttribute("Weight");
+                int endTime = (int)Double.parseDouble(parent.getAttribute("Start").toString()) + (int)d;
+
                 int timeWaited = lengthCurrentProcessor - endTime;
                 tempTimeToWait = edgeWeight - timeWaited;
                
@@ -293,7 +300,10 @@ public class ScheduleHelper {
             }
         }
        
-        int procLength = canStartat + (int)Double.parseDouble(node.getAttribute("Weight").toString());
+
+        double d = node.getAttribute("Weight");
+        int procLength = canStartat + (int)d;
+
         for(int i : schedule.procLengths){
             if (i > procLength){
                 procLength = i;
@@ -316,7 +326,10 @@ public class ScheduleHelper {
 	 */ 
 	public static void insertNodeToSchedule(Node nodeToInsert, Schedule currentSchedule, int Processor, int procWaitTime) {
 		currentSchedule.addNode(nodeToInsert, Processor, procWaitTime);
-		currentSchedule.updateProcessorLength(Processor, (int)Double.parseDouble(nodeToInsert.getAttribute("Weight").toString()) + procWaitTime);
+
+		double d = nodeToInsert.getAttribute("Weight");
+		currentSchedule.updateProcessorLength(Processor, (int)d + procWaitTime);
+
 	}
 	
 

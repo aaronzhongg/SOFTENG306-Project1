@@ -7,7 +7,6 @@ import org.graphstream.graph.*;
  * This is the schedule data structure.
  * This stores the nodes of the graph with their assigned processor ids
  * The order of the schedule should be the order the tasks are scheduled
- * @author Alex
  */
 public class Schedule {
 
