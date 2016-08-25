@@ -55,14 +55,17 @@ public class Greedy {
 				scheduleLength = schedule.findScheduleLength();		// current length of schedule
 
 				if(newProcLength - scheduleLength < smallestWeightChange){ //checks if this item to the schedule is the smallest weight change
+
 					procWaitTime = procInfo[1];
 					smallest = q;
 					smallestWeightChange = newProcLength - scheduleLength;
 					processorWeightInc = newProcLength - schedule.procLengths[q.Processor];	
+
 				}
 			}
 
 			for (int popIndex = queue.size() -1 ; popIndex > -1; popIndex--) { //removes the node from the queue that makes the smallest difference
+
 				if (queue.get(popIndex).nodeIndex == smallest.nodeIndex) {
 					queue.remove(popIndex);
 				}
@@ -72,12 +75,14 @@ public class Greedy {
 			schedule.addNode(g.getNode(smallest.nodeIndex), smallest.Processor, procWaitTime);
 			schedule.updateProcessorLength(smallest.Processor, processorWeightInc);
 
+
 			ArrayList<Integer> childrenNodes = ScheduleHelper.processableNodes(g, smallest.nodeIndex); //adds processable children to queue
 			for(int i:childrenNodes){
 				for(int j = 0; j < procCount; j++ ){
 					queue.add(new QueueItem(i, j));
 				}
 			}
+
 		}
 		
 		ScheduleGraphPair sng = new ScheduleGraphPair(schedule, g);
@@ -102,6 +107,7 @@ public class Greedy {
 		}
 	}
 	
+
 	/**Simple schedule graph pair returned by greedy. Required for multi-threading since each thread needs its own graph
 	 */
 	public class ScheduleGraphPair{

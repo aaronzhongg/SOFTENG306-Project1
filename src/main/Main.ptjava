@@ -2,6 +2,7 @@ package main;
 
 import java.io.File;
 import java.util.ArrayList;
+
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.Graphs;
 import scheduler.*;
@@ -12,10 +13,12 @@ import util.io;
 /**
  * Main class contains the main()
  * Initialises variables and graph used by other functions
+
  */
 public class Main {
 
 	public static int processorInput;
+
 	public static Graph gVis;
 	public static Update update;
 	public static long initialTime,endTime;
@@ -44,6 +47,7 @@ public class Main {
 		String outputFile = inputFileName + "-output.dot";
 		processorInput = Integer.parseInt(args[1]);
 
+
 		//checks for additional arguments
 		if (args.length > 2){
 			int i = 2;
@@ -57,12 +61,14 @@ public class Main {
 				} else if (args[i].equals("-v")){ // check if visualisation is on
 					vis = true;
 				} else if (args[i].equals("-o")){ // checks if output file name provided
+
 					i++;
 					outputFile = args[i];
 				}
 				i++;
 			}
 		}
+
 		// creates input file, shcedule and graph
 		File input_file = new File(inputFile);
 		io IOProcessor = new io();
@@ -90,6 +96,7 @@ public class Main {
 		Greedy greedy = new Greedy();
 		ScheduleHelper.makeDependencyMatrix(g);
 
+
 		// Creates a schedule that has every combination of root node + next processable node (in each processor)
 		for(int rootNode: rootnodes) {
 
@@ -108,9 +115,11 @@ public class Main {
 					boolean isProcessable = ScheduleHelper.isProcessable(n,tempNewSchedule);
 					if (isProcessable) { // if it is processable
 						processableNodes.add(n.getIndex()); // add to the arraylist
+
 					}
 				}
 			}
+
 
 			for(int processableNodeIndex: processableNodes) { //loops through all the rootNode's processable nodes
 
@@ -161,6 +170,7 @@ public class Main {
 
 						//New graph for each processableNode
 						Graph newGraph = Graphs.clone(tempNewGraph); 		//create a new graph
+
 						Schedule newSchedule = new Schedule(processorInput);		//New schedule with nodes from newly created Graph
 						newSchedule.addNode(newGraph.getNode(rootNode), 0, 0);
 						newSchedule.updateProcessorLength(0, (int)Double.parseDouble(newGraph.getNode(rootNode).getAttribute("Weight").toString()));
@@ -213,18 +223,22 @@ public class Main {
 		Greedy greedy = new Greedy();
 		ScheduleGraphPair sgPair = greedy.greedySearch(g, processorCount, schedule);
 
+
 		// After greedy algorithm returns a schedule, if it is better than current best, update the bound and bestGraph
 		if (sgPair.schedule.scheduleLength < ScheduleHelper.currentBestSchedule.scheduleLength) {
 			ScheduleHelper.currentBestSchedule.scheduleLength = sgPair.schedule.scheduleLength;
 
 			for(Node n : sgPair.g){
 				for(Node bestN : ScheduleHelper.bestGraph){
+
 					if(n.getIndex() == bestN.getIndex()){ // update he bound and best graph
+
 						Graphs.copyAttributes(n, bestN);
 					}
 				}
 			}
 		}
+
 		// performs branch and bound on valid schedule output from greedy
 		BranchAndBound bnb = new BranchAndBound(sgPair.schedule, sgPair.g);
 		bnb.branchAndBoundAlgorithm();
